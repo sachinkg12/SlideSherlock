@@ -6,6 +6,7 @@ import VideoPlayer from '../components/VideoPlayer'
 import MetricBar from '../components/MetricBar'
 import GlowButton from '../components/GlowButton'
 import { getMetrics, getProgress, getVideoUrl, getEvidenceReportUrl } from '../api/client'
+import { isDemoMode, getMockMetrics, getMockProgress } from '../api/mock'
 import type { JobMetrics, JobProgress } from '../api/client'
 
 function ResultPage() {
@@ -15,8 +16,15 @@ function ResultPage() {
   const [progress, setProgress] = useState<JobProgress | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const demo = isDemoMode()
+
   useEffect(() => {
     if (!jobId) return
+    if (demo) {
+      setMetrics(getMockMetrics())
+      setProgress(getMockProgress() as JobProgress)
+      return
+    }
     Promise.all([getMetrics(jobId), getProgress(jobId)])
       .then(([m, p]) => {
         setMetrics(m)
@@ -25,7 +33,7 @@ function ResultPage() {
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load results')
       })
-  }, [jobId])
+  }, [jobId, demo])
 
   if (error) {
     return (

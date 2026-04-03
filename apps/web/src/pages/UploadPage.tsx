@@ -6,6 +6,7 @@ import DropZone from '../components/DropZone'
 import PresetCard from '../components/PresetCard'
 import GlowButton from '../components/GlowButton'
 import { createQuickJob } from '../api/client'
+import { isDemoMode, startMockJob } from '../api/mock'
 
 type Preset = 'draft' | 'standard' | 'pro'
 
@@ -21,8 +22,23 @@ function UploadPage() {
     setIsSubmitting(true)
     setError(null)
     try {
-      const result = await createQuickJob(file, preset)
-      navigate(`/jobs/${result.job_id}`)
+      // Try real API first; fall back to demo mode if unreachable
+      let jobId: string
+      if (isDemoMode()) {
+        jobId = startMockJob(file.name)
+      } else {
+        try {
+          const result = await createQuickJob(file, preset)
+          jobId = result.job_id
+        } catch {
+          // Backend unreachable — enter demo mode
+          const url = new URL(window.location.href)
+          url.searchParams.set('demo', 'true')
+          window.history.replaceState({}, '', url.toString())
+          jobId = startMockJob(file.name)
+        }
+      }
+      navigate(`/jobs/${jobId}${isDemoMode() ? '?demo=true' : ''}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setIsSubmitting(false)

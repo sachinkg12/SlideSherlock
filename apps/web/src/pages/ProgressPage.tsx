@@ -6,6 +6,7 @@ import StageCard from '../components/StageCard'
 import ProgressBar from '../components/ProgressBar'
 import EvidenceTrail from '../components/EvidenceTrail'
 import { getProgress, getEvidenceTrail } from '../api/client'
+import { isDemoMode, getMockProgress, getMockEvidenceTrail } from '../api/mock'
 import { spawnConfetti } from '../utils/confetti'
 import type { JobProgress, EvidenceEntry } from '../api/client'
 
@@ -17,10 +18,17 @@ function ProgressPage() {
   const [error, setError] = useState<string | null>(null)
   const doneHandled = useRef(false)
 
+  const demo = isDemoMode()
+
   const pollProgress = useCallback(async () => {
     if (!jobId) return
     try {
-      const data = await getProgress(jobId)
+      let data: JobProgress
+      if (demo) {
+        data = getMockProgress()
+      } else {
+        data = await getProgress(jobId)
+      }
       setProgress(data)
 
       // Fetch evidence trail if verify stage is running or done
@@ -29,7 +37,7 @@ function ProgressPage() {
       )
       if (verifyStage && verifyStage.status !== 'pending') {
         try {
-          const trail = await getEvidenceTrail(jobId)
+          const trail = demo ? getMockEvidenceTrail() : await getEvidenceTrail(jobId)
           setEvidence(trail.entries ?? [])
         } catch {
           // Evidence trail might not be available yet
@@ -39,12 +47,13 @@ function ProgressPage() {
       if (data.status === 'done' && !doneHandled.current) {
         doneHandled.current = true
         spawnConfetti()
-        setTimeout(() => navigate(`/jobs/${jobId}/result`), 2000)
+        const suffix = demo ? '?demo=true' : ''
+        setTimeout(() => navigate(`/jobs/${jobId}/result${suffix}`), 2000)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load progress')
     }
-  }, [jobId, navigate])
+  }, [jobId, navigate, demo])
 
   useEffect(() => {
     pollProgress()
