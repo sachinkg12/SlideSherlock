@@ -1,0 +1,30 @@
+{
+  "name": "@slidesherlock/worker",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "init-minio": "tsx src/init-minio.ts"
+  },
+  "dependencies": {
+    "@slidesherlock/core": "workspace:*",
+    "@slidesherlock/schemas": "workspace:*",
+    "@slidesherlock/providers": "workspace:*",
+    "pg": "^8.11.3",
+    "ioredis": "^5.3.2",
+    "pptxgenjs": "^3.12.0",
+    "sharp": "^0.33.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "@aws-sdk/client-s3": "^3.490.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/pg": "^8.10.9",
+    "@types/fluent-ffmpeg": "^2.1.24",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  }
+}

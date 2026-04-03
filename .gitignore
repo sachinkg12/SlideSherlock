@@ -1,0 +1,42 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.local
+.DS_Store
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+*.mp4
+*.png
+*.jpg
+*.jpeg
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+# Python
+*.egg-info/
+.venv/
+venv/
+ENV/
+# Alembic
+alembic.ini.bak
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+test-results/
+*.test.log
+# Test artifacts
+test_*.txt
+test_output/
+test.pptx
+sample_connectors.pptx
+
+# Docusaurus build cache
+docs/.docusaurus/

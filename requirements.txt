@@ -1,0 +1,49 @@
+# SlideSherlock - Consolidated Python Dependencies
+# Install all dependencies with: pip install -r requirements.txt
+
+# Web Framework & API
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+httpx==0.25.2
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary>=2.9.9
+
+# Configuration & Environment
+python-dotenv==1.0.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Job Queue & Redis
+redis==5.0.1
+rq==1.15.1
+
+# Storage (MinIO/S3)
+boto3==1.29.7
+
+# Image Processing (for render stage)
+pdf2image==1.16.3
+Pillow==10.1.0
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.8
+numpy>=1.24.0
+
+# PPTX parsing (slide text, shapes, connectors, notes)
+python-pptx==0.6.23
+
+# TTS (per-slide narration)
+pyttsx3>=2.90
+
+# Vision pipeline (optional)
+pytesseract>=0.3.10
+openai>=1.0.0
+# opencv-python-headless>=4.8.0  # optional: Hough line detection
+# easyocr>=1.7.0  # optional: alternative OCR backend
+
+# Development & Testing
+pytest==7.4.3
+black==23.11.0
+flake8==6.1.0

@@ -1,0 +1,206 @@
+/**
+ * SlideSherlock Documentation — Custom CSS
+ */
+
+/* ─── Brand colours ─────────────────────────────────────────────────────── */
+:root {
+  --ifm-color-primary: #6c63ff;
+  --ifm-color-primary-dark: #5a50ff;
+  --ifm-color-primary-darker: #4e44ff;
+  --ifm-color-primary-darkest: #3229f5;
+  --ifm-color-primary-light: #7e76ff;
+  --ifm-color-primary-lighter: #8a82ff;
+  --ifm-color-primary-lightest: #aaa5ff;
+  --ifm-code-font-size: 92%;
+  --docusaurus-highlighted-code-line-bg: rgba(108, 99, 255, 0.12);
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-heading-font-weight: 700;
+  --ifm-navbar-height: 60px;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #9d97ff;
+  --ifm-color-primary-dark: #8b84ff;
+  --ifm-color-primary-darker: #7f78ff;
+  --ifm-color-primary-darkest: #5c54ff;
+  --ifm-color-primary-light: #afaaff;
+  --ifm-color-primary-lighter: #bbb7ff;
+  --ifm-color-primary-lightest: #d4d2ff;
+  --docusaurus-highlighted-code-line-bg: rgba(157, 151, 255, 0.15);
+  --ifm-background-color: #0f0f1a;
+  --ifm-background-surface-color: #16162a;
+  --ifm-navbar-background-color: #0f0f1a;
+  --ifm-footer-background-color: #0a0a14;
+}
+
+/* ─── Hero section ──────────────────────────────────────────────────────── */
+.hero--primary {
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1035 50%, #0d1a2e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero--primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(108, 99, 255, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(99, 179, 255, 0.10) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero__title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 0%, #c4bfff 60%, #9d97ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero__subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 640px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+
+/* ─── Feature cards ─────────────────────────────────────────────────────── */
+.features-section {
+  padding: 4rem 0;
+  background: var(--ifm-background-color);
+}
+
+.feature-card {
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(108, 99, 255, 0.15);
+  border-color: var(--ifm-color-primary);
+}
+
+.feature-card__icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.feature-card__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--ifm-color-primary);
+}
+
+/* ─── Pipeline badge strip ──────────────────────────────────────────────── */
+.pipeline-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 1.5rem 0;
+}
+
+.pipeline-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: rgba(108, 99, 255, 0.12);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  color: var(--ifm-color-primary-lighter);
+  white-space: nowrap;
+}
+
+.pipeline-badge__arrow {
+  color: var(--ifm-color-emphasis-400);
+  font-size: 1rem;
+}
+
+/* ─── Admonition overrides ──────────────────────────────────────────────── */
+.alert--info {
+  border-left: 4px solid var(--ifm-color-primary);
+}
+
+/* ─── Code block enhancements ───────────────────────────────────────────── */
+.prism-code {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* ─── Table styles ──────────────────────────────────────────────────────── */
+table {
+  font-size: 0.9rem;
+}
+
+th {
+  background: rgba(108, 99, 255, 0.08);
+}
+
+/* ─── Navbar ────────────────────────────────────────────────────────────── */
+.navbar {
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: none;
+}
+
+.navbar__title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Sidebar ───────────────────────────────────────────────────────────── */
+.menu__link--active {
+  background: rgba(108, 99, 255, 0.1);
+  border-radius: 6px;
+}
+
+/* ─── Steps component ───────────────────────────────────────────────────── */
+.steps-container ol {
+  counter-reset: step-counter;
+  list-style: none;
+  padding: 0;
+}
+
+.steps-container ol > li {
+  counter-increment: step-counter;
+  position: relative;
+  padding-left: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.steps-container ol > li::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2rem;
+  height: 2rem;
+  background: var(--ifm-color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ─── Mermaid ───────────────────────────────────────────────────────────── */
+.docusaurus-mermaid-container {
+  margin: 2rem 0;
+  text-align: center;
+}
