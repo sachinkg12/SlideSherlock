@@ -53,12 +53,29 @@ function VideoPlayer({ src, title }: VideoPlayerProps) {
     setDuration(`${mins}:${secs.toString().padStart(2, '0')}`)
   }
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+  const seekTo = (e: React.MouseEvent<HTMLDivElement> | MouseEvent, el: HTMLDivElement) => {
     const v = videoRef.current
-    if (!v) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const pct = (e.clientX - rect.left) / rect.width
+    if (!v || !v.duration) return
+    const rect = el.getBoundingClientRect()
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
     v.currentTime = pct * v.duration
+  }
+
+  const progressBarRef = useRef<HTMLDivElement>(null)
+
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    seekTo(e, e.currentTarget)
+  }
+
+  const handleSeekDrag = (e: React.MouseEvent<HTMLDivElement>) => {
+    const bar = e.currentTarget
+    const onMove = (ev: MouseEvent) => seekTo(ev, bar)
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+    }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
   }
 
   const handleEnded = () => {
@@ -129,8 +146,10 @@ function VideoPlayer({ src, title }: VideoPlayerProps) {
 
         {/* Progress bar */}
         <div
-          className="flex-1 h-1.5 rounded-full bg-white/10 cursor-pointer group"
+          className="flex-1 h-2 rounded-full bg-white/10 cursor-pointer group relative"
           onClick={handleSeek}
+          onMouseDown={handleSeekDrag}
+          ref={progressBarRef}
           role="slider"
           aria-label="Video progress"
           aria-valuenow={progress}
@@ -139,10 +158,10 @@ function VideoPlayer({ src, title }: VideoPlayerProps) {
           tabIndex={0}
         >
           <div
-            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-150 group-hover:h-2.5 relative"
+            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-[width] duration-150 pointer-events-none relative"
             style={{ width: `${progress}%` }}
           >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-3 w-3 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 h-3.5 w-3.5 rounded-full bg-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </div>
 

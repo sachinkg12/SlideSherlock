@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File, Request
+from fastapi.responses import StreamingResponse, Response
 from sqlalchemy.orm import Session
 import json
 import redis
@@ -253,7 +254,7 @@ async def upload_pptx(
             from .worker import render_stage
         except ImportError:
             from apps.api.worker import render_stage
-        job_queue.enqueue(render_stage, job_id)
+        job_queue.enqueue(render_stage, job_id, job_timeout=900)
     else:
         print(
             f"Warning: Render stage not enqueued for job {job_id} (Redis unavailable)"
@@ -324,25 +325,67 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
     except Exception:
         pass
 
-    total_stages = len(stage_checks) + 4  # 4 per-variant stages (approximate)
-    pct = int(100 * len(completed_stages) / total_stages) if total_stages else 0
+    # Build ordered stage list matching the UI's STAGE_REGISTRY
+    all_stage_names = [
+        "ingest", "evidence", "render", "graph",
+        "script", "verify", "translate", "audio", "video",
+    ]
 
+    # Normalise completed_stages: strip variant suffix (e.g. "script_en" → "script")
+    completed_base = set()
+    for cs in completed_stages:
+        base = cs.split("_")[0] if "_" in cs else cs
+        completed_base.add(base)
+
+    # Determine current stage
     current_stage = None
     if job.status.value == "PROCESSING":
-        # The current stage is the first one not in completed_stages
-        all_ordered = list(stage_checks.keys())
-        for s in all_ordered:
-            if s not in completed_stages:
+        for s in all_stage_names:
+            if s not in completed_base:
                 current_stage = s
                 break
 
+    # Build per-stage status objects
+    stages = []
+    for name in all_stage_names:
+        if name in completed_base:
+            status = "done"
+        elif name == current_stage:
+            status = "running"
+        elif job.status.value == "FAILED" and name == current_stage:
+            status = "failed"
+        else:
+            status = "pending"
+        stages.append({
+            "name": name,
+            "status": status,
+            "started_at": None,
+            "finished_at": None,
+            "duration_s": None,
+            "detail": None,
+            "metrics": None,
+        })
+
+    total_stages = len(all_stage_names)
+    pct = int(100 * len(completed_base) / total_stages) if total_stages else 0
+
+    # Map job status to UI status
+    status_map = {"QUEUED": "queued", "PROCESSING": "running", "DONE": "done", "FAILED": "failed"}
+    ui_status = status_map.get(job.status.value, "running")
+
+    # If video stage is done, the job is done regardless of DB status
+    if "video" in completed_base:
+        ui_status = "done"
+        pct = 100
+
     return {
         "job_id": job_id,
-        "status": job.status.value,
-        "completed_stages": completed_stages,
-        "current_stage": current_stage,
-        "percentage": min(pct, 100),
-        "metrics": metrics,
+        "status": ui_status,
+        "filename": (job.input_file_path or "").split("/")[-1] if job.input_file_path else "Presentation",
+        "preset": "standard",
+        "percent": min(pct, 100),
+        "stages": stages,
+        "error": job.error_message,
     }
 
 
@@ -359,9 +402,56 @@ async def get_job_metrics(job_id: str, db: Session = Depends(get_db)):
 
     try:
         metrics_data = minio_client.get(f"jobs/{job_id}/metrics.json")
-        return json.loads(metrics_data.decode("utf-8"))
+        raw = json.loads(metrics_data.decode("utf-8"))
     except Exception:
         raise HTTPException(status_code=404, detail="Metrics not available yet")
+
+    # Transform raw pipeline metrics to UI-friendly shape
+    stages = raw.get("stages", {})
+    slide_count = stages.get("ingest", {}).get("metrics", {}).get("slide_count", 0)
+    graph_count = stages.get("graph", {}).get("metrics", {}).get("unified_graph_count", 0)
+    total_duration_s = raw.get("pipeline_duration_ms", 0) / 1000.0
+
+    # Read verify report for pass/rewrite/remove counts
+    verify_stats = {"pass": 0, "rewrite": 0, "remove": 0, "iterations": 0}
+    try:
+        manifest_data = minio_client.get(f"jobs/{job_id}/render/manifest.json")
+        manifest = json.loads(manifest_data.decode("utf-8"))
+        for v in manifest.get("output_variants", []):
+            vid = v.get("id", "en")
+            try:
+                report_data = minio_client.get(f"jobs/{job_id}/script/{vid}/verify_report.json")
+                report = json.loads(report_data.decode("utf-8"))
+                for d in report.get("decisions", []):
+                    verdict = d.get("verdict", "").upper()
+                    if verdict == "PASS":
+                        verify_stats["pass"] += 1
+                    elif verdict == "REWRITE":
+                        verify_stats["rewrite"] += 1
+                    elif verdict == "REMOVE":
+                        verify_stats["remove"] += 1
+                verify_stats["iterations"] = report.get("iterations", 1)
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    total_claims = verify_stats["pass"] + verify_stats["rewrite"] + verify_stats["remove"]
+    pass_rate = verify_stats["pass"] / total_claims if total_claims > 0 else 1.0
+    coverage = 1.0 if total_claims > 0 else 0.0
+
+    return {
+        "evidence_coverage": coverage,
+        "verification_pass_rate": pass_rate,
+        "verifier_iterations": verify_stats["iterations"],
+        "claims_pass": verify_stats["pass"],
+        "claims_rewrite": verify_stats["rewrite"],
+        "claims_remove": verify_stats["remove"],
+        "graph_nodes": graph_count,
+        "dual_provenance_pct": 0.0,
+        "total_duration_s": total_duration_s,
+        "slide_count": slide_count,
+    }
 
 
 @app.get("/jobs/{job_id}/evidence-trail")
@@ -399,6 +489,75 @@ async def get_evidence_trail(job_id: str, limit: int = 50, db: Session = Depends
         "decisions": decisions[-limit:],
         "total": len(decisions),
     }
+
+
+@app.get("/jobs/{job_id}/output/{variant_id}/final.mp4")
+async def get_video(job_id: str, variant_id: str, request: Request):
+    """Stream the final video from MinIO with Range request support for seeking."""
+    minio_client = MinIOClient() if MinIOClient else None
+    if not minio_client:
+        raise HTTPException(status_code=500, detail="MinIO client not available")
+
+    object_path = f"jobs/{job_id}/output/{variant_id}/final.mp4"
+    try:
+        data = minio_client.get(object_path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="Video not found")
+
+    total = len(data)
+    range_header = request.headers.get("range")
+
+    if range_header:
+        # Parse Range: bytes=start-end
+        range_spec = range_header.replace("bytes=", "")
+        parts = range_spec.split("-")
+        start = int(parts[0]) if parts[0] else 0
+        end = int(parts[1]) if parts[1] else total - 1
+        end = min(end, total - 1)
+        chunk = data[start : end + 1]
+        return Response(
+            content=chunk,
+            status_code=206,
+            media_type="video/mp4",
+            headers={
+                "Content-Range": f"bytes {start}-{end}/{total}",
+                "Accept-Ranges": "bytes",
+                "Content-Length": str(len(chunk)),
+            },
+        )
+
+    return Response(
+        content=data,
+        media_type="video/mp4",
+        headers={
+            "Accept-Ranges": "bytes",
+            "Content-Length": str(total),
+        },
+    )
+
+
+@app.get("/jobs/{job_id}/output/{file_path:path}")
+async def get_artifact(job_id: str, file_path: str):
+    """Stream any output artifact from MinIO."""
+    minio_client = MinIOClient() if MinIOClient else None
+    if not minio_client:
+        raise HTTPException(status_code=500, detail="MinIO client not available")
+
+    object_path = f"jobs/{job_id}/output/{file_path}"
+    try:
+        data = minio_client.get(object_path)
+        content_type = "application/octet-stream"
+        if file_path.endswith(".json"):
+            content_type = "application/json"
+        elif file_path.endswith(".mp4"):
+            content_type = "video/mp4"
+        return StreamingResponse(
+            iter([data]),
+            media_type=content_type,
+            headers={"Content-Length": str(len(data))},
+        )
+    except Exception:
+        raise HTTPException(status_code=404, detail="Artifact not found")
 
 
 @app.post("/jobs/quick")
@@ -488,7 +647,7 @@ async def quick_create_job(
             from .worker import render_stage
         except ImportError:
             from apps.api.worker import render_stage
-        job_queue.enqueue(render_stage, job_id)
+        job_queue.enqueue(render_stage, job_id, job_timeout=900)
 
     return {
         "project_id": db_project.project_id,
