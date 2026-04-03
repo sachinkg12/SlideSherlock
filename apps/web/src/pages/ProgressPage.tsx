@@ -6,25 +6,8 @@ import StageCard from '../components/StageCard'
 import ProgressBar from '../components/ProgressBar'
 import EvidenceTrail from '../components/EvidenceTrail'
 import { getProgress, getEvidenceTrail } from '../api/client'
+import { spawnConfetti } from '../utils/confetti'
 import type { JobProgress, EvidenceEntry } from '../api/client'
-
-function spawnConfetti() {
-  const colors = ['#6366f1', '#8b5cf6', '#a78bfa', '#34d399', '#fbbf24']
-  const container = document.body
-  for (let i = 0; i < 40; i++) {
-    const particle = document.createElement('div')
-    particle.className = 'confetti-particle'
-    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
-    particle.style.left = `${Math.random() * 100}vw`
-    particle.style.top = `${60 + Math.random() * 30}vh`
-    particle.style.transform = `rotate(${Math.random() * 360}deg)`
-    particle.style.animation = `confetti ${1 + Math.random() * 1.5}s ease-out forwards`
-    particle.style.width = `${6 + Math.random() * 6}px`
-    particle.style.height = `${6 + Math.random() * 6}px`
-    container.appendChild(particle)
-    setTimeout(() => particle.remove(), 2500)
-  }
-}
 
 function ProgressPage() {
   const { jobId } = useParams<{ jobId: string }>()

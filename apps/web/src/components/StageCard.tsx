@@ -1,19 +1,7 @@
 import { motion } from 'framer-motion'
-import {
-  CheckCircle2,
-  Loader2,
-  Circle,
-  XCircle,
-  FileInput,
-  FileSearch,
-  Image,
-  Network,
-  FileText,
-  ShieldCheck,
-  Volume2,
-  Film,
-} from 'lucide-react'
+import { CheckCircle2, Loader2, Circle, XCircle } from 'lucide-react'
 import type { StageProgress } from '../api/client'
+import { STAGE_REGISTRY } from '../config/stages'
 import ProgressBar from './ProgressBar'
 
 interface StageCardProps {
@@ -21,32 +9,11 @@ interface StageCardProps {
   index: number
 }
 
-const stageIcons: Record<string, typeof FileInput> = {
-  ingest: FileInput,
-  evidence: FileSearch,
-  render: Image,
-  graph: Network,
-  script: FileText,
-  verify: ShieldCheck,
-  audio: Volume2,
-  video: Film,
-}
-
-const stageLabels: Record<string, string> = {
-  ingest: 'Ingest',
-  evidence: 'Evidence',
-  render: 'Render',
-  graph: 'Graph',
-  script: 'Script',
-  verify: 'Verify',
-  audio: 'Audio',
-  video: 'Video',
-}
-
 function StageCard({ stage, index }: StageCardProps) {
   const status = stage.status
-  const StageIcon = stageIcons[stage.name.toLowerCase()] ?? Circle
-  const label = stageLabels[stage.name.toLowerCase()] ?? stage.name
+  const config = STAGE_REGISTRY[stage.name.toLowerCase()]
+  const StageIcon = config?.icon ?? Circle
+  const label = config?.label ?? stage.name
 
   const statusIcon = {
     done: <CheckCircle2 className="h-6 w-6 text-emerald-400" />,
