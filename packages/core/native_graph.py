@@ -13,6 +13,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+
 # EMU to float for geometry
 def _f(val: Any) -> float:
     if val is None:
@@ -66,7 +67,9 @@ def _label_from_text_runs(text_runs: List[Dict]) -> str:
     return " ".join(s.split())  # collapse whitespace
 
 
-def _flatten_shapes_connectors_groups(slide_payload: Dict[str, Any]) -> Tuple[List[Dict], List[Dict], List[Dict]]:
+def _flatten_shapes_connectors_groups(
+    slide_payload: Dict[str, Any]
+) -> Tuple[List[Dict], List[Dict], List[Dict]]:
     """Return (shapes, connectors, groups) including from group children."""
     shapes: List[Dict] = []
     connectors: List[Dict] = []
@@ -154,16 +157,18 @@ def build_native_graph_slide(slide_payload: Dict[str, Any]) -> Dict[str, Any]:
         bbox = s.get("bbox") or {}
         center = _bbox_center(bbox)
         label = _label_from_text_runs(s.get("text_runs") or [])
-        nodes.append({
-            "node_id": nid,
-            "ppt_shape_id": ppt_shape_id,
-            "bbox": bbox,
-            "center": {"x": center[0], "y": center[1]},
-            "label_text": label,
-            "z_index": s.get("z_order", 0),
-            "cluster_id": None,
-            "confidence": 1.0,
-        })
+        nodes.append(
+            {
+                "node_id": nid,
+                "ppt_shape_id": ppt_shape_id,
+                "bbox": bbox,
+                "center": {"x": center[0], "y": center[1]},
+                "label_text": label,
+                "z_index": s.get("z_order", 0),
+                "cluster_id": None,
+                "confidence": 1.0,
+            }
+        )
 
     # Clusters from groups
     clusters: List[Dict[str, Any]] = []
@@ -178,13 +183,15 @@ def build_native_graph_slide(slide_payload: Dict[str, Any]) -> Dict[str, Any]:
         group_members[cid] = member_node_ids
         bbox = g.get("bbox") or {}
         title = _label_from_text_runs(g.get("text_runs") or [])
-        clusters.append({
-            "cluster_id": cid,
-            "group_id": gid,
-            "member_node_ids": member_node_ids,
-            "bbox": bbox,
-            "title": title or None,
-        })
+        clusters.append(
+            {
+                "cluster_id": cid,
+                "group_id": gid,
+                "member_node_ids": member_node_ids,
+                "bbox": bbox,
+                "title": title or None,
+            }
+        )
         for nid in member_node_ids:
             for n in nodes:
                 if n["node_id"] == nid:
@@ -222,12 +229,16 @@ def build_native_graph_slide(slide_payload: Dict[str, Any]) -> Dict[str, Any]:
         }
         edges.append(edge)
         if needs_review:
-            needs_review_list.append({
-                "slide_index": slide_index,
-                "edge_id": eid,
-                "ppt_connector_id": pcid,
-                "reason": "ambiguous_endpoints" if (src_id is None or dst_id is None or rev_src or rev_dst) else "unresolved",
-            })
+            needs_review_list.append(
+                {
+                    "slide_index": slide_index,
+                    "edge_id": eid,
+                    "ppt_connector_id": pcid,
+                    "reason": "ambiguous_endpoints"
+                    if (src_id is None or dst_id is None or rev_src or rev_dst)
+                    else "unresolved",
+                }
+            )
 
     return {
         "slide_index": slide_index,
@@ -253,10 +264,14 @@ def build_native_graph_and_persist(
     from apps.api.models import EvidenceItem, EntityLink
 
     def _evidence_id_shape(job_id: str, slide_index: int, ppt_shape_id: str) -> str:
-        return hashlib.sha256(f"{job_id}|{slide_index}|SHAPE_LABEL|{ppt_shape_id}".encode("utf-8")).hexdigest()
+        return hashlib.sha256(
+            f"{job_id}|{slide_index}|SHAPE_LABEL|{ppt_shape_id}".encode("utf-8")
+        ).hexdigest()
 
     def _evidence_id_connector(job_id: str, slide_index: int, ppt_connector_id: str) -> str:
-        return hashlib.sha256(f"{job_id}|{slide_index}|CONNECTOR|{ppt_connector_id}".encode("utf-8")).hexdigest()
+        return hashlib.sha256(
+            f"{job_id}|{slide_index}|CONNECTOR|{ppt_connector_id}".encode("utf-8")
+        ).hexdigest()
 
     created_at = datetime.utcnow()
     all_needs_review: List[Dict] = []
@@ -275,7 +290,9 @@ def build_native_graph_and_persist(
             "clusters": g["clusters"],
             "needs_review": g["needs_review"],
         }
-        minio_client.put(storage_path, json.dumps(payload, indent=2).encode("utf-8"), "application/json")
+        minio_client.put(
+            storage_path, json.dumps(payload, indent=2).encode("utf-8"), "application/json"
+        )
         index_entries.append({"slide_index": slide_index, "path": storage_path})
         all_needs_review.extend(g["needs_review"])
 
@@ -288,12 +305,14 @@ def build_native_graph_and_persist(
             # Only add if evidence_item exists (evidence index ran first)
             if db_session.query(EvidenceItem).filter(EvidenceItem.evidence_id == ev_id).first():
                 for role in ("LABEL", "GEOMETRY"):
-                    db_session.add(EntityLink(
-                        entity_link_id=str(uuid.uuid4()),
-                        entity_id=n["node_id"],
-                        evidence_id=ev_id,
-                        role=role,
-                    ))
+                    db_session.add(
+                        EntityLink(
+                            entity_link_id=str(uuid.uuid4()),
+                            entity_id=n["node_id"],
+                            evidence_id=ev_id,
+                            role=role,
+                        )
+                    )
         # EntityLink: edge_id -> evidence_id (LABEL, GEOMETRY)
         for e in g["edges"]:
             ppt_connector_id = e.get("ppt_connector_id", "")
@@ -302,22 +321,36 @@ def build_native_graph_and_persist(
             ev_id = _evidence_id_connector(job_id, slide_index, ppt_connector_id)
             if db_session.query(EvidenceItem).filter(EvidenceItem.evidence_id == ev_id).first():
                 for role in ("LABEL", "GEOMETRY"):
-                    db_session.add(EntityLink(
-                        entity_link_id=str(uuid.uuid4()),
-                        entity_id=e["edge_id"],
-                        evidence_id=ev_id,
-                        role=role,
-                    ))
+                    db_session.add(
+                        EntityLink(
+                            entity_link_id=str(uuid.uuid4()),
+                            entity_id=e["edge_id"],
+                            evidence_id=ev_id,
+                            role=role,
+                        )
+                    )
 
     # Optional index.json
     index_path = f"jobs/{job_id}/graphs/native/index.json"
-    index_payload = {"job_id": job_id, "slides": index_entries, "created_at": created_at.isoformat() + "Z"}
-    minio_client.put(index_path, json.dumps(index_payload, indent=2).encode("utf-8"), "application/json")
+    index_payload = {
+        "job_id": job_id,
+        "slides": index_entries,
+        "created_at": created_at.isoformat() + "Z",
+    }
+    minio_client.put(
+        index_path, json.dumps(index_payload, indent=2).encode("utf-8"), "application/json"
+    )
 
     # flags.json (NEEDS_REVIEW)
     flags_path = f"jobs/{job_id}/graphs/native/flags.json"
-    flags_payload = {"job_id": job_id, "needs_review": all_needs_review, "created_at": created_at.isoformat() + "Z"}
-    minio_client.put(flags_path, json.dumps(flags_payload, indent=2).encode("utf-8"), "application/json")
+    flags_payload = {
+        "job_id": job_id,
+        "needs_review": all_needs_review,
+        "created_at": created_at.isoformat() + "Z",
+    }
+    minio_client.put(
+        flags_path, json.dumps(flags_payload, indent=2).encode("utf-8"), "application/json"
+    )
 
     db_session.commit()
     return {"slides": index_entries, "needs_review_count": len(all_needs_review)}

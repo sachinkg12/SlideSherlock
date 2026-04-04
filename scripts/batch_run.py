@@ -53,9 +53,12 @@ def run_one(pptx_path: str, output_dir: str, preset: str, idx: int, total: int) 
             [
                 os.path.join(repo_root, "venv", "bin", "python"),
                 os.path.join(repo_root, "scripts", "slidesherlock_cli.py"),
-                "run", pptx_path,
-                "--preset", preset,
-                "--output", file_output,
+                "run",
+                pptx_path,
+                "--preset",
+                preset,
+                "--output",
+                file_output,
             ],
             capture_output=True,
             text=True,
@@ -102,7 +105,9 @@ def run_one(pptx_path: str, output_dir: str, preset: str, idx: int, total: int) 
         result["pipeline_duration_s"] = round(time.time() - t0, 1)
 
     status_icon = "OK" if result["status"] == "ok" else result["status"].upper()
-    print(f"  [{idx:>3}/{total}] {status_icon:<10} {result['pipeline_duration_s']:>6.1f}s  {result.get('slide_count', '?'):>3} slides  {result['file'][:60]}")
+    print(
+        f"  [{idx:>3}/{total}] {status_icon:<10} {result['pipeline_duration_s']:>6.1f}s  {result.get('slide_count', '?'):>3} slides  {result['file'][:60]}"
+    )
     return result
 
 
@@ -137,7 +142,9 @@ def aggregate(results: list[dict], output_dir: str):
         "success_rate": round(len(ok) / len(results) * 100, 1) if results else 0,
         "total_slides": sum(r.get("slide_count", 0) for r in ok),
         "total_pipeline_s": round(sum(r["pipeline_duration_s"] for r in ok), 1),
-        "mean_pipeline_s": round(sum(r["pipeline_duration_s"] for r in ok) / len(ok), 1) if ok else 0,
+        "mean_pipeline_s": round(sum(r["pipeline_duration_s"] for r in ok) / len(ok), 1)
+        if ok
+        else 0,
         "mean_slides": round(sum(r.get("slide_count", 0) for r in ok) / len(ok), 1) if ok else 0,
         "total_input_mb": round(sum(r["input_bytes"] for r in results) / 1e6, 1),
         "total_output_mb": round(sum(r.get("output_bytes", 0) for r in ok) / 1e6, 1),
@@ -153,11 +160,26 @@ def aggregate(results: list[dict], output_dir: str):
     # Write CSV (one row per file)
     csv_path = os.path.join(output_dir, "batch_summary.csv")
     fieldnames = [
-        "file", "status", "slide_count", "pipeline_duration_s",
-        "input_bytes", "output_bytes", "error",
+        "file",
+        "status",
+        "slide_count",
+        "pipeline_duration_s",
+        "input_bytes",
+        "output_bytes",
+        "error",
     ]
     # Add per-stage duration columns
-    stage_names = ["ingest", "evidence", "render", "graph", "script", "verify", "translate", "audio", "video"]
+    stage_names = [
+        "ingest",
+        "evidence",
+        "render",
+        "graph",
+        "script",
+        "verify",
+        "translate",
+        "audio",
+        "video",
+    ]
     for sn in stage_names:
         fieldnames.append(f"{sn}_s")
 
@@ -199,7 +221,9 @@ def aggregate(results: list[dict], output_dir: str):
     if stage_stats:
         print("  Stage Timing (mean across successful runs):")
         for sname, stats in stage_stats.items():
-            print(f"    {sname:<12} {stats['mean_s']:>7.1f}s mean  ({stats['min_s']:.1f}–{stats['max_s']:.1f}s)")
+            print(
+                f"    {sname:<12} {stats['mean_s']:>7.1f}s mean  ({stats['min_s']:.1f}–{stats['max_s']:.1f}s)"
+            )
         print()
 
     if failed:
@@ -218,11 +242,17 @@ def aggregate(results: list[dict], output_dir: str):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Batch run SlideSherlock on a directory of PPTX files")
+    parser = argparse.ArgumentParser(
+        description="Batch run SlideSherlock on a directory of PPTX files"
+    )
     parser.add_argument("pptx_dir", help="Directory containing .pptx files")
     parser.add_argument("--preset", "-p", default="draft", help="Quality preset (default: draft)")
-    parser.add_argument("--output", "-o", default=None, help="Output directory (default: ./output/batch)")
-    parser.add_argument("--workers", "-w", type=int, default=3, help="Parallel workers (default: 3)")
+    parser.add_argument(
+        "--output", "-o", default=None, help="Output directory (default: ./output/batch)"
+    )
+    parser.add_argument(
+        "--workers", "-w", type=int, default=3, help="Parallel workers (default: 3)"
+    )
     parser.add_argument("--limit", "-n", type=int, default=None, help="Process only first N files")
     args = parser.parse_args()
 
@@ -231,13 +261,16 @@ def main():
         print(f"Error: {pptx_dir} is not a directory", file=sys.stderr)
         return 1
 
-    pptx_files = sorted([
-        os.path.join(pptx_dir, f) for f in os.listdir(pptx_dir)
-        if f.lower().endswith(".pptx") and not f.startswith("~$")
-    ])
+    pptx_files = sorted(
+        [
+            os.path.join(pptx_dir, f)
+            for f in os.listdir(pptx_dir)
+            if f.lower().endswith(".pptx") and not f.startswith("~$")
+        ]
+    )
 
     if args.limit:
-        pptx_files = pptx_files[:args.limit]
+        pptx_files = pptx_files[: args.limit]
 
     if not pptx_files:
         print(f"No .pptx files found in {pptx_dir}", file=sys.stderr)
@@ -271,13 +304,15 @@ def main():
                 results.append(result)
             except Exception as e:
                 pptx = futures[future]
-                results.append({
-                    "file": os.path.basename(pptx),
-                    "status": "error",
-                    "pipeline_duration_s": 0,
-                    "input_bytes": 0,
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "file": os.path.basename(pptx),
+                        "status": "error",
+                        "pipeline_duration_s": 0,
+                        "input_bytes": 0,
+                        "error": str(e),
+                    }
+                )
 
     # Sort results by filename for consistent output
     results.sort(key=lambda r: r["file"])

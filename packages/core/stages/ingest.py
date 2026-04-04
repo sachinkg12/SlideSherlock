@@ -103,20 +103,30 @@ class IngestStage:
                         images_index = extract_images_from_pptx(pptx_path, job_id, minio_client)
                         img_count = len(images_index.get("images", []))
                         if img_count:
-                            print(f"  Extracted {img_count} embedded image(s) -> jobs/{job_id}/images/")
+                            print(
+                                f"  Extracted {img_count} embedded image(s) -> jobs/{job_id}/images/"
+                            )
                             if ctx.vision_enabled and run_classify_images:
                                 try:
                                     force_kind = ctx.vision_config.get("force_kind_by_slide") or {}
                                     image_kinds = run_classify_images(
-                                        job_id, images_index, minio_client,
+                                        job_id,
+                                        images_index,
+                                        minio_client,
                                         force_kind_by_slide=force_kind,
                                     )
-                                    print(f"  Image classifier: jobs/{job_id}/vision/image_kinds.json")
+                                    print(
+                                        f"  Image classifier: jobs/{job_id}/vision/image_kinds.json"
+                                    )
                                 except Exception as ec:
                                     import traceback
-                                    print(f"  Warning: image classifier failed: {ec}\n{traceback.format_exc()}")
+
+                                    print(
+                                        f"  Warning: image classifier failed: {ec}\n{traceback.format_exc()}"
+                                    )
                     except Exception as e:
                         import traceback
+
                         print(f"  Warning: image extraction failed: {e}\n{traceback.format_exc()}")
 
                 ctx.slides_data = slides_data

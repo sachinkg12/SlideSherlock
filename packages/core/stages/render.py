@@ -79,9 +79,7 @@ class RenderStage:
             timeout=300,
         )
         if result.returncode != 0:
-            raise Exception(
-                f"LibreOffice conversion failed: {result.stderr or result.stdout}"
-            )
+            raise Exception(f"LibreOffice conversion failed: {result.stderr or result.stdout}")
 
         if not os.path.exists(pdf_path):
             raise Exception(f"PDF file not created at {pdf_path}")
@@ -91,9 +89,7 @@ class RenderStage:
 
         # 3. Convert PDF to PNG slides using pdf2image
         if not convert_from_path:
-            raise Exception(
-                "pdf2image not available. Install with: pip install pdf2image"
-            )
+            raise Exception("pdf2image not available. Install with: pip install pdf2image")
 
         print("  Converting PDF to PNG slides...")
         slides = convert_from_path(pdf_path, dpi=150)
@@ -118,9 +114,7 @@ class RenderStage:
             storage_path=pdf_storage_path,
             sha256=pdf_sha256,
             size_bytes=str(pdf_size),
-            metadata_json=json.dumps(
-                {"type": "render_pdf", "slide_count": slide_count}
-            ),
+            metadata_json=json.dumps({"type": "render_pdf", "slide_count": slide_count}),
             created_at=datetime.utcnow(),
         )
         db.add(pdf_artifact)
@@ -133,6 +127,7 @@ class RenderStage:
             print(f"  Uploading slide {i}/{slide_count} to {slide_storage_path}...")
 
             from io import BytesIO
+
             png_buffer = BytesIO()
             slide_img.save(png_buffer, format="PNG")
             png_data = png_buffer.getvalue()
@@ -190,9 +185,12 @@ class RenderStage:
                 )
                 n = cap_result.get("evidence_count", 0)
                 if n:
-                    print(f"  Slide caption fallback: {n} SLIDE_CAPTION evidence item(s) for slides {cap_result.get('slides_captioned', [])}")
+                    print(
+                        f"  Slide caption fallback: {n} SLIDE_CAPTION evidence item(s) for slides {cap_result.get('slides_captioned', [])}"
+                    )
             except Exception as e:
                 import traceback
+
                 print(f"  Warning: slide_caption_fallback failed: {e}\n{traceback.format_exc()}")
 
         # 5c. Debug: vision summary
@@ -201,6 +199,7 @@ class RenderStage:
                 write_vision_summary(job_id=job_id, minio_client=minio_client)
             except Exception as e:
                 import traceback
+
                 print(f"  Warning: write_vision_summary failed: {e}\n{traceback.format_exc()}")
 
         # 6. Generate manifest.json (with output_variants)
@@ -211,9 +210,13 @@ class RenderStage:
 
         job_obj = db.query(JobModel).filter(JobModel.job_id == job_id).first()
         requested_lang = getattr(job_obj, "requested_language", None) or None
-        output_variants = build_output_variants(requested_lang) if build_output_variants else [
-            {"id": "en", "lang": "en-US", "voice_id": "default_en", "notes_translate": False},
-        ]
+        output_variants = (
+            build_output_variants(requested_lang)
+            if build_output_variants
+            else [
+                {"id": "en", "lang": "en-US", "voice_id": "default_en", "notes_translate": False},
+            ]
+        )
 
         manifest = {
             "job_id": job_id,
@@ -234,9 +237,7 @@ class RenderStage:
         manifest_sha256 = hashlib.sha256(manifest_json.encode("utf-8")).hexdigest()
 
         print(f"  Uploading manifest to {manifest_storage_path}...")
-        minio_client.put(
-            manifest_storage_path, manifest_json.encode("utf-8"), "application/json"
-        )
+        minio_client.put(manifest_storage_path, manifest_json.encode("utf-8"), "application/json")
         artifacts_written.append(manifest_storage_path)
 
         manifest_artifact = Artifact(

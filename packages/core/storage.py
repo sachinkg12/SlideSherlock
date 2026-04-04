@@ -15,7 +15,7 @@ class MinIOClient:
         access_key: Optional[str] = None,
         secret_key: Optional[str] = None,
         bucket: Optional[str] = None,
-        use_ssl: bool = False
+        use_ssl: bool = False,
     ):
         self.endpoint = endpoint or os.getenv("MINIO_ENDPOINT", "http://localhost:9000")
         self.access_key = access_key or os.getenv("MINIO_ACCESS_KEY", "minioadmin")
@@ -24,13 +24,13 @@ class MinIOClient:
         self.use_ssl = use_ssl
 
         self.client = boto3.client(
-            's3',
+            "s3",
             endpoint_url=self.endpoint,
             aws_access_key_id=self.access_key,
             aws_secret_access_key=self.secret_key,
-            config=Config(signature_version='s3v4'),
+            config=Config(signature_version="s3v4"),
             use_ssl=use_ssl,
-            verify=False
+            verify=False,
         )
 
         # Ensure bucket exists
@@ -50,12 +50,7 @@ class MinIOClient:
     def put(self, key: str, data: bytes, content_type: str = "application/octet-stream") -> str:
         """Upload data to MinIO"""
         try:
-            self.client.put_object(
-                Bucket=self.bucket,
-                Key=key,
-                Body=data,
-                ContentType=content_type
-            )
+            self.client.put_object(Bucket=self.bucket, Key=key, Body=data, ContentType=content_type)
             return self.get_url(key)
         except ClientError as e:
             raise Exception(f"Failed to upload to MinIO: {e}")
@@ -64,7 +59,7 @@ class MinIOClient:
         """Download data from MinIO"""
         try:
             response = self.client.get_object(Bucket=self.bucket, Key=key)
-            return response['Body'].read()
+            return response["Body"].read()
         except ClientError as e:
             raise Exception(f"Failed to download from MinIO: {e}")
 

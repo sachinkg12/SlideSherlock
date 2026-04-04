@@ -35,17 +35,21 @@ def test_is_picture_shape():
 
 
 def test_flatten_shapes():
-    shapes = _flatten_shapes({
-        "shapes": [{"type": "PICTURE", "ppt_shape_id": "1"}],
-        "groups": [],
-    })
+    shapes = _flatten_shapes(
+        {
+            "shapes": [{"type": "PICTURE", "ppt_shape_id": "1"}],
+            "groups": [],
+        }
+    )
     assert len(shapes) == 1
     assert shapes[0]["type"] == "PICTURE"
 
-    shapes2 = _flatten_shapes({
-        "shapes": [],
-        "groups": [{"children": [{"type": "IMAGE", "ppt_shape_id": "2"}]}],
-    })
+    shapes2 = _flatten_shapes(
+        {
+            "shapes": [],
+            "groups": [{"children": [{"type": "IMAGE", "ppt_shape_id": "2"}]}],
+        }
+    )
     assert len(shapes2) == 1
     assert shapes2[0]["type"] == "IMAGE"
 
@@ -69,10 +73,14 @@ def test_stub_vision_extractor_photo():
 
 def test_stub_vision_extractor_diagram():
     ext = StubVisionExtractor()
-    results = ext.extract_diagram(b"fake", slide_index=1, vision_graph={
-        "nodes": [{"label_text": "A"}, {"label_text": "B"}],
-        "edges": [],
-    })
+    results = ext.extract_diagram(
+        b"fake",
+        slide_index=1,
+        vision_graph={
+            "nodes": [{"label_text": "A"}, {"label_text": "B"}],
+            "edges": [],
+        },
+    )
     assert len(results) >= 1
     assert results[0].kind == KIND_DIAGRAM_SUMMARY
     assert "A" in results[0].content or "diagram" in results[0].content.lower()
@@ -90,7 +98,13 @@ def test_write_vision_summary():
         "evidence_items": [
             {"evidence_id": "e1", "kind": "IMAGE_CAPTION", "confidence": 0.9, "slide_index": 1},
             {"evidence_id": "e2", "kind": "IMAGE_OBJECTS", "confidence": 0.8, "slide_index": 1},
-            {"evidence_id": "e3", "kind": "SLIDE_CAPTION", "confidence": 0.1, "reason_code": "VISION_UNAVAILABLE", "slide_index": 2},
+            {
+                "evidence_id": "e3",
+                "kind": "SLIDE_CAPTION",
+                "confidence": 0.1,
+                "reason_code": "VISION_UNAVAILABLE",
+                "slide_index": 2,
+            },
         ],
     }
     minio.get.return_value = json.dumps(index_payload).encode("utf-8")

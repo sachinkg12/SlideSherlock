@@ -33,17 +33,17 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       minio:
-        image: minio/minio:latest
+        image: bitnami/minio:latest
         ports:
           - 9000:9000
         env:
           MINIO_ROOT_USER: minioadmin
           MINIO_ROOT_PASSWORD: minioadmin
         options: >-
-          --health-cmd "mc ready local || exit 0"
+          --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 10
 
     env:
       DATABASE_URL: postgresql://slidesherlock:slidesherlock@localhost:5433/slidesherlock

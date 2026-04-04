@@ -72,17 +72,29 @@ def test_stub_deterministic():
 def test_script_with_context_bundle_image_evidence():
     """With context bundle (image_evidence high conf), intro segment cites caption and has evidence_ids."""
     from script_context import build_context_bundle
+
     g = {"slide_index": 1, "nodes": [], "edges": [], "clusters": []}
     plan = build_explain_plan("job1", [g])
     by_slide = {1: g}
     evidence_items = [
-        {"evidence_id": "ev_cap", "kind": "IMAGE_CAPTION", "content": "A football on the field.", "slide_index": 1, "confidence": 0.85},
+        {
+            "evidence_id": "ev_cap",
+            "kind": "IMAGE_CAPTION",
+            "content": "A football on the field.",
+            "slide_index": 1,
+            "confidence": 0.85,
+        },
     ]
     evidence_index = {"evidence_items": evidence_items}
     bundle = build_context_bundle(1, "Title", "", g, evidence_items)
     stub = StubLLMProvider()
     script = generate_script(
-        "job1", plan, by_slide, evidence_index, {}, stub,
+        "job1",
+        plan,
+        by_slide,
+        evidence_index,
+        {},
+        stub,
         context_bundles_by_slide={1: bundle},
     )
     intro_seg = next(s for s in script["segments"] if s["slide_index"] == 1)
@@ -94,22 +106,37 @@ def test_script_with_context_bundle_image_evidence():
 def test_script_with_context_bundle_generic():
     """With context bundle (generic), intro segment has generic text and used_hedging."""
     from script_context import build_context_bundle
+
     g = {"slide_index": 1, "nodes": [], "edges": [], "clusters": []}
     plan = build_explain_plan("job1", [g])
     by_slide = {1: g}
     evidence_items = [
-        {"evidence_id": "ev_lo", "kind": "IMAGE_CAPTION", "content": "Unclear.", "slide_index": 1, "confidence": 0.2},
+        {
+            "evidence_id": "ev_lo",
+            "kind": "IMAGE_CAPTION",
+            "content": "Unclear.",
+            "slide_index": 1,
+            "confidence": 0.2,
+        },
     ]
     evidence_index = {"evidence_items": evidence_items}
     bundle = build_context_bundle(1, "", "", g, evidence_items)
     bundle["_policy"] = "generic"
     stub = StubLLMProvider()
     script = generate_script(
-        "job1", plan, by_slide, evidence_index, {}, stub,
+        "job1",
+        plan,
+        by_slide,
+        evidence_index,
+        {},
+        stub,
         context_bundles_by_slide={1: bundle},
     )
     intro_seg = next(s for s in script["segments"] if s["slide_index"] == 1)
-    assert "could not be extracted" in intro_seg["text"].lower() or "image or diagram" in intro_seg["text"].lower()
+    assert (
+        "could not be extracted" in intro_seg["text"].lower()
+        or "image or diagram" in intro_seg["text"].lower()
+    )
     assert intro_seg.get("used_hedging") is True
 
 

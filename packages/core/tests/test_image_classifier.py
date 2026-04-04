@@ -39,4 +39,5 @@ def test_config_thresholds():
     """Config reads VISION_CLASSIFIER_MIN_CONFIDENCE_* env."""
     with patch.dict(os.environ, {"VISION_CLASSIFIER_MIN_CONFIDENCE_PHOTO": "0.7"}, clear=False):
         from image_classifier import _config_min_confidence_photo
+
         assert _config_min_confidence_photo() == 0.7

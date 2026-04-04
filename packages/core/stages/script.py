@@ -66,9 +66,11 @@ class ScriptStage:
 
         # EntityLink -> entity_to_evidence
         entity_to_evidence: Dict[str, List[str]] = {}
-        for link in db.query(EntityLink).join(
-            EvidenceItem, EntityLink.evidence_id == EvidenceItem.evidence_id
-        ).filter(EvidenceItem.job_id == job_id):
+        for link in (
+            db.query(EntityLink)
+            .join(EvidenceItem, EntityLink.evidence_id == EvidenceItem.evidence_id)
+            .filter(EvidenceItem.job_id == job_id)
+        ):
             entity_to_evidence.setdefault(link.entity_id, []).append(link.evidence_id)
 
         # RAG hook
@@ -82,12 +84,19 @@ class ScriptStage:
                 chunks = docs_payload.get("chunks", [])
                 if chunks:
                     ev_items = evidence_index.get("evidence_items", [])
-                    query = " ".join((ev.get("content", "") or "")[:200] for ev in ev_items[:10]) or "slide diagram"
-                    rag_chunk_ids = retrieve_chunk_ids(query, chunks, text_key="text", id_key="id", top_k=5)
+                    query = (
+                        " ".join((ev.get("content", "") or "")[:200] for ev in ev_items[:10])
+                        or "slide diagram"
+                    )
+                    rag_chunk_ids = retrieve_chunk_ids(
+                        query, chunks, text_key="text", id_key="id", top_k=5
+                    )
             except Exception:
                 pass
 
-        explain_plan = build_explain_plan(job_id, ctx.unified_graphs, rag_chunk_ids=rag_chunk_ids if rag_chunk_ids else None)
+        explain_plan = build_explain_plan(
+            job_id, ctx.unified_graphs, rag_chunk_ids=rag_chunk_ids if rag_chunk_ids else None
+        )
 
         # Per-slide context for script (notes, image evidence)
         slides_notes_and_text_for_script: List[Tuple[str, str]] = []
@@ -107,6 +116,7 @@ class ScriptStage:
         context_bundles_by_slide: Dict[int, Any] = {}
         try:
             from script_context import build_context_bundles_per_slide
+
             context_bundles_by_slide = build_context_bundles_per_slide(
                 slide_count, slides_notes_and_text_for_script, unified_by_slide, evidence_index
             )
@@ -127,8 +137,12 @@ class ScriptStage:
 
         plan_path = f"{script_prefix}explain_plan.json"
         script_path = f"{script_prefix}script.json"
-        minio_client.put(plan_path, json.dumps(explain_plan, indent=2).encode("utf-8"), "application/json")
-        minio_client.put(script_path, json.dumps(script_draft, indent=2).encode("utf-8"), "application/json")
+        minio_client.put(
+            plan_path, json.dumps(explain_plan, indent=2).encode("utf-8"), "application/json"
+        )
+        minio_client.put(
+            script_path, json.dumps(script_draft, indent=2).encode("utf-8"), "application/json"
+        )
         artifacts_written.extend([plan_path, script_path])
 
         for path, payload, art_type in [
@@ -137,17 +151,21 @@ class ScriptStage:
         ]:
             raw = json.dumps(payload, indent=2).encode("utf-8")
             sha = hashlib.sha256(raw).hexdigest()
-            db.add(Artifact(
-                artifact_id=str(uuid.uuid4()),
-                project_id=ctx.project_id,
-                job_id=job_id,
-                artifact_type=art_type,
-                storage_path=path,
-                sha256=sha,
-                size_bytes=str(len(raw)),
-                metadata_json=json.dumps({"type": art_type, "stage": "script", "variant_id": variant_id}),
-                created_at=datetime.utcnow(),
-            ))
+            db.add(
+                Artifact(
+                    artifact_id=str(uuid.uuid4()),
+                    project_id=ctx.project_id,
+                    job_id=job_id,
+                    artifact_type=art_type,
+                    storage_path=path,
+                    sha256=sha,
+                    size_bytes=str(len(raw)),
+                    metadata_json=json.dumps(
+                        {"type": art_type, "stage": "script", "variant_id": variant_id}
+                    ),
+                    created_at=datetime.utcnow(),
+                )
+            )
         print(f"  Explain plan + script written to {script_prefix}")
 
         # Store for downstream stages

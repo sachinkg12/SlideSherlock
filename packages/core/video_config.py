@@ -20,6 +20,7 @@ DEFAULT_OUTRO_DURATION = 2.0
 @dataclass
 class VideoConfig:
     """Configuration for video composition (transitions, intro/outro, subtitles, BGM)."""
+
     # Transitions
     transition: str  # cut | crossfade
     transition_ms: int
@@ -50,21 +51,37 @@ class VideoConfig:
         trans_ms = max(0, min(1000, trans_ms))
         audio_fade = int(os.environ.get("VIDEO_AUDIO_FADE_MS", str(DEFAULT_AUDIO_FADE_MS)))
         audio_fade = max(0, min(300, audio_fade))
-        intro_on = (os.environ.get("VIDEO_INTRO_ENABLED", "0")).strip().lower() in ("1", "true", "yes")
+        intro_on = (os.environ.get("VIDEO_INTRO_ENABLED", "0")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         intro_title = os.environ.get("VIDEO_INTRO_TITLE", deck_title or "Presentation").strip()
         intro_subtitle = os.environ.get("VIDEO_INTRO_SUBTITLE", deck_subtitle).strip()
         intro_dur = float(os.environ.get("VIDEO_INTRO_DURATION", str(DEFAULT_INTRO_DURATION)))
         intro_dur = max(0.5, min(10.0, intro_dur))
-        outro_on = (os.environ.get("VIDEO_OUTRO_ENABLED", "0")).strip().lower() in ("1", "true", "yes")
+        outro_on = (os.environ.get("VIDEO_OUTRO_ENABLED", "0")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         outro_text = os.environ.get("VIDEO_OUTRO_TEXT", "Thanks for watching").strip()
         outro_dur = float(os.environ.get("VIDEO_OUTRO_DURATION", str(DEFAULT_OUTRO_DURATION)))
         outro_dur = max(0.5, min(10.0, outro_dur))
         subs_on = (os.environ.get("SUBTITLES_ENABLED", "0")).strip().lower() in ("1", "true", "yes")
-        subs_burn = (os.environ.get("SUBTITLES_BURN_IN", "0")).strip().lower() in ("1", "true", "yes")
+        subs_burn = (os.environ.get("SUBTITLES_BURN_IN", "0")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         bgm_on = (os.environ.get("AUDIO_BGM_ENABLED", "0")).strip().lower() in ("1", "true", "yes")
         bgm_vol = float(os.environ.get("AUDIO_BGM_VOLUME_DB", str(DEFAULT_BGM_VOLUME_DB)))
         bgm_vol = max(-60.0, min(0.0, bgm_vol))
-        bgm_duck = (os.environ.get("AUDIO_BGM_DUCKING", "1")).strip().lower() in ("1", "true", "yes")
+        bgm_duck = (os.environ.get("AUDIO_BGM_DUCKING", "1")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         bgm_path = (os.environ.get("AUDIO_BGM_PATH") or "").strip() or None
         if bgm_path and not os.path.exists(bgm_path):
             bgm_path = None

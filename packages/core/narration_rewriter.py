@@ -84,7 +84,9 @@ def rewrite_narration_for_delivery(
             rewritten.append(entry)
             continue
 
-        user_prompt = f"Rewrite the narration for slide {slide_idx}:\n\n" + "\n\n".join(context_parts)
+        user_prompt = f"Rewrite the narration for slide {slide_idx}:\n\n" + "\n\n".join(
+            context_parts
+        )
 
         try:
             resp = requests.post(

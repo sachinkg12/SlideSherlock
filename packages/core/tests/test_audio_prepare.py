@@ -77,7 +77,9 @@ def test_check_supplied_audio_exists_partial_missing():
 def test_run_audio_prepare_use_supplied_no_tts():
     """When mode=use_supplied and all supplied audio exist, use user_audio and do not call TTS."""
     minio = MagicMock()
-    minio.exists.side_effect = lambda key: "input/audio" in key and ("slide_001" in key or "slide_002" in key)
+    minio.exists.side_effect = lambda key: "input/audio" in key and (
+        "slide_001" in key or "slide_002" in key
+    )
     minio.get.return_value = b"\x00\x00"
     config = AudioConfig(
         mode=AUDIO_MODE_USE_SUPPLIED,
@@ -115,7 +117,9 @@ def test_run_audio_prepare_use_supplied_no_tts():
     put_calls = [c[0][0] for c in minio.put.call_args_list]
     assert any(SCRIPT_NARRATION in k for k in put_calls)
     assert sum(1 for k in put_calls if f"{AUDIO_OUTPUT_PREFIX}/slide_" in k) == 2
-    assert sum(1 for k in put_calls if f"{TIMING_PREFIX}/slide_" in k and "_duration.json" in k) == 2
+    assert (
+        sum(1 for k in put_calls if f"{TIMING_PREFIX}/slide_" in k and "_duration.json" in k) == 2
+    )
 
 
 def test_run_audio_prepare_generate_uses_tts():
@@ -166,7 +170,10 @@ def test_run_audio_prepare_generate_uses_tts():
     assert len(per_slide_audio) == 2
     assert payload["schema_version"] == "1.0"
     assert payload["job_id"] == "job2"
-    assert all("slide_index" in s and "narration_text" in s and "source_used" in s and "word_count" in s for s in payload["slides"])
+    assert all(
+        "slide_index" in s and "narration_text" in s and "source_used" in s and "word_count" in s
+        for s in payload["slides"]
+    )
 
 
 def test_run_audio_prepare_artifact_narration_structure():
@@ -247,7 +254,11 @@ def test_run_audio_prepare_artifact_duration_structure():
                 unified_graphs_by_slide=unified_graphs,
                 tts_provider=mock_tts,
             )
-    duration_puts = [c for c in minio.put.call_args_list if f"{TIMING_PREFIX}/slide_" in c[0][0] and "_duration.json" in c[0][0]]
+    duration_puts = [
+        c
+        for c in minio.put.call_args_list
+        if f"{TIMING_PREFIX}/slide_" in c[0][0] and "_duration.json" in c[0][0]
+    ]
     assert len(duration_puts) == 1
     key, data = duration_puts[0][0][0], duration_puts[0][0][1]
     obj = json.loads(data.decode("utf-8"))

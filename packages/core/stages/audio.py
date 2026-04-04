@@ -67,7 +67,9 @@ class AudioStage:
         override = ctx.narration_entries_override
         if override:
             sources = [e.get("source_used", "?") for e in override[:3]]
-            print(f"  [AudioStage] narration_entries_override: {len(override)} entries, sources={sources}...")
+            print(
+                f"  [AudioStage] narration_entries_override: {len(override)} entries, sources={sources}..."
+            )
         else:
             print(f"  [AudioStage] narration_entries_override: None (using template)")
 
@@ -91,30 +93,47 @@ class AudioStage:
             )
             ctx.narration_entries = narration_entries
             ctx.per_slide_audio_paths = [p for p, _ in per_slide_audio]
-            ctx.per_slide_durations_dict = {i + 1: dur for i, (_, dur) in enumerate(per_slide_audio)}
+            ctx.per_slide_durations_dict = {
+                i + 1: dur for i, (_, dur) in enumerate(per_slide_audio)
+            }
 
-            db.add(Artifact(
-                artifact_id=str(uuid.uuid4()),
-                project_id=ctx.project_id,
-                job_id=job_id,
-                artifact_type="narration_per_slide",
-                storage_path=f"{script_prefix}narration_per_slide.json",
-                metadata_json=json.dumps({"type": "narration_per_slide", "stage": "audio_prepare", "variant_id": variant_id}),
-                created_at=datetime.utcnow(),
-            ))
-            if minio_client.exists(f"{script_prefix}narration_blueprint.json"):
-                db.add(Artifact(
+            db.add(
+                Artifact(
                     artifact_id=str(uuid.uuid4()),
                     project_id=ctx.project_id,
                     job_id=job_id,
-                    artifact_type="narration_blueprint",
-                    storage_path=f"{script_prefix}narration_blueprint.json",
-                    metadata_json=json.dumps({"type": "narration_blueprint", "stage": "audio_prepare"}),
+                    artifact_type="narration_per_slide",
+                    storage_path=f"{script_prefix}narration_per_slide.json",
+                    metadata_json=json.dumps(
+                        {
+                            "type": "narration_per_slide",
+                            "stage": "audio_prepare",
+                            "variant_id": variant_id,
+                        }
+                    ),
                     created_at=datetime.utcnow(),
-                ))
-            print(f"  Audio prepare: jobs/{job_id}/audio/slide_*.wav, narration_per_slide.json, timing/slide_*_duration.json written")
+                )
+            )
+            if minio_client.exists(f"{script_prefix}narration_blueprint.json"):
+                db.add(
+                    Artifact(
+                        artifact_id=str(uuid.uuid4()),
+                        project_id=ctx.project_id,
+                        job_id=job_id,
+                        artifact_type="narration_blueprint",
+                        storage_path=f"{script_prefix}narration_blueprint.json",
+                        metadata_json=json.dumps(
+                            {"type": "narration_blueprint", "stage": "audio_prepare"}
+                        ),
+                        created_at=datetime.utcnow(),
+                    )
+                )
+            print(
+                f"  Audio prepare: jobs/{job_id}/audio/slide_*.wav, narration_per_slide.json, timing/slide_*_duration.json written"
+            )
         except Exception as e:
             import traceback
+
             print(f"  Warning: audio_prepare failed: {e}\n{traceback.format_exc()}")
 
         return StageResult(status="ok")

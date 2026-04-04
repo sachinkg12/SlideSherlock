@@ -29,7 +29,9 @@ DIAGRAM_TYPE_SEQUENCE = "SEQUENCE"
 DIAGRAM_TYPE_FLOW = "FLOW"
 DIAGRAM_TYPE_ARCH = "ARCH"
 DIAGRAM_TYPE_UNKNOWN = "UNKNOWN_DIAGRAM"
-VALID_DIAGRAM_TYPES = frozenset({DIAGRAM_TYPE_SEQUENCE, DIAGRAM_TYPE_FLOW, DIAGRAM_TYPE_ARCH, DIAGRAM_TYPE_UNKNOWN})
+VALID_DIAGRAM_TYPES = frozenset(
+    {DIAGRAM_TYPE_SEQUENCE, DIAGRAM_TYPE_FLOW, DIAGRAM_TYPE_ARCH, DIAGRAM_TYPE_UNKNOWN}
+)
 
 # Strict fallback when OpenAI/validation fails (Day 3)
 DIAGRAM_FALLBACK_SUMMARY = "Diagram present; details unavailable"
@@ -47,6 +49,7 @@ except ImportError:
 
 try:
     from PIL import Image
+
     PIL_AVAILABLE = True
 except ImportError:
     Image = None  # type: ignore
@@ -55,6 +58,7 @@ except ImportError:
 try:
     import numpy as np
     import cv2
+
     CV2_AVAILABLE = True
 except ImportError:
     np = None  # type: ignore
@@ -118,7 +122,12 @@ def _run_diagram_primitives(image_bytes: bytes) -> Dict[str, Any]:
         h, w = img.shape[:2]
         edges = cv2.Canny(img, 50, 150)
         lines_p = cv2.HoughLinesP(
-            edges, rho=1, theta=math.pi / 180, threshold=40, minLineLength=min(w, h) // 20, maxLineGap=10
+            edges,
+            rho=1,
+            theta=math.pi / 180,
+            threshold=40,
+            minLineLength=min(w, h) // 20,
+            maxLineGap=10,
         )
         if lines_p is None:
             out["reason_code"] = REASON_ARROW_DETECT_LOW
@@ -133,7 +142,9 @@ def _run_diagram_primitives(image_bytes: bytes) -> Dict[str, Any]:
         # Arrow detection: heuristic - check for small contour (triangle) near line end
         arrows: List[Dict[str, Any]] = []
         for ln in lines:
-            has_head = _detect_arrowhead_simple(img, ln.get("x1"), ln.get("y1"), ln.get("x2"), ln.get("y2"))
+            has_head = _detect_arrowhead_simple(
+                img, ln.get("x1"), ln.get("y1"), ln.get("x2"), ln.get("y2")
+            )
             arrows.append({**ln, "has_head": has_head})
         out["arrows"] = arrows
         out["connectors"] = lines  # v1: no grouping
@@ -196,7 +207,9 @@ def _determine_diagram_type(
             vert += 1
     # Top-region labels (y in top 25%): typical for sequence lifelines
     top_frac = 0.25
-    top_labels = [s for s in ocr_spans if (s.get("bbox", {}).get("top", 0) or 0) < height * top_frac]
+    top_labels = [
+        s for s in ocr_spans if (s.get("bbox", {}).get("top", 0) or 0) < height * top_frac
+    ]
     if horiz >= 2 and len(top_labels) >= 1:
         return DIAGRAM_TYPE_SEQUENCE, 0.7
     if vert >= 2 or (horiz >= 1 and vert >= 1):
@@ -216,11 +229,13 @@ def _extract_entities_sequence(
         if top < height * top_frac:
             text = (s.get("text") or "").strip()
             if text:
-                entities.append({
-                    "name": text,
-                    "bbox": bbox,
-                    "role": "lifeline",
-                })
+                entities.append(
+                    {
+                        "name": text,
+                        "bbox": bbox,
+                        "role": "lifeline",
+                    }
+                )
     return entities
 
 
@@ -230,11 +245,13 @@ def _extract_entities_flow(ocr_spans: List[Dict], width: int, height: int) -> Li
     for s in ocr_spans:
         text = (s.get("text") or "").strip()
         if text and len(text) < 80:
-            entities.append({
-                "name": text,
-                "bbox": s.get("bbox") or {},
-                "role": "node",
-            })
+            entities.append(
+                {
+                    "name": text,
+                    "bbox": s.get("bbox") or {},
+                    "role": "node",
+                }
+            )
     return entities
 
 
@@ -266,21 +283,23 @@ def _extract_interactions_sequence(
         best_dist = 1e9
         for s in ocr_spans:
             b = s.get("bbox") or {}
-            bcx = (b.get("left", 0) + b.get("width", 0) / 2)
-            bcy = (b.get("top", 0) + b.get("height", 0) / 2)
+            bcx = b.get("left", 0) + b.get("width", 0) / 2
+            bcy = b.get("top", 0) + b.get("height", 0) / 2
             dist = abs(bcy - cy) + abs(bcx - cx) * 0.5
             if dist < best_dist and abs(bcy - cy) < height * 0.1:
                 best_dist = dist
                 label = (s.get("text") or "").strip()
         from_name = entity_names[0] if entity_names else "A"
         to_name = entity_names[1] if len(entity_names) > 1 else "B"
-        interactions.append({
-            "from_entity": from_name,
-            "to_entity": to_name,
-            "label": label or "(message)",
-            "order": order,
-            "confidence": 0.6,
-        })
+        interactions.append(
+            {
+                "from_entity": from_name,
+                "to_entity": to_name,
+                "label": label or "(message)",
+                "order": order,
+                "confidence": 0.6,
+            }
+        )
     return interactions
 
 
@@ -295,13 +314,15 @@ def _extract_interactions_flow(
         # Simplified: first two entities as from/to if we have them
         from_name = names[0] if names else "Node1"
         to_name = names[1] if len(names) > 1 else "Node2"
-        interactions.append({
-            "from_entity": from_name,
-            "to_entity": to_name,
-            "label": "",
-            "order": i,
-            "confidence": 0.5,
-        })
+        interactions.append(
+            {
+                "from_entity": from_name,
+                "to_entity": to_name,
+                "label": "",
+                "order": i,
+                "confidence": 0.5,
+            }
+        )
     return interactions[:20]  # cap
 
 
@@ -316,9 +337,7 @@ def _run_diagram_parse(
     Returns dict with confidence and reason_codes when low.
     """
     spans = ocr_result.get("spans") or []
-    diagram_type, type_conf = _determine_diagram_type(
-        spans, primitives, image_width, image_height
-    )
+    diagram_type, type_conf = _determine_diagram_type(spans, primitives, image_width, image_height)
     entities: List[Dict[str, Any]] = []
     interactions: List[Dict[str, Any]] = []
     if diagram_type == DIAGRAM_TYPE_SEQUENCE:
@@ -332,7 +351,11 @@ def _run_diagram_parse(
     else:
         entities = _extract_entities_flow(spans, image_width, image_height)
         if not entities and spans:
-            entities = [{"name": (s.get("text") or "").strip(), "bbox": s.get("bbox"), "role": "node"} for s in spans[:10] if (s.get("text") or "").strip()]
+            entities = [
+                {"name": (s.get("text") or "").strip(), "bbox": s.get("bbox"), "role": "node"}
+                for s in spans[:10]
+                if (s.get("text") or "").strip()
+            ]
 
     reason_codes: List[str] = []
     if ocr_result.get("reason_code"):
@@ -409,32 +432,36 @@ def _diagram_evidence_from_openai_result(
         diagram_type = DIAGRAM_TYPE_UNKNOWN
 
     ev_type = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_TYPE, image_id)
-    items.append({
-        "evidence_id": ev_type,
-        "kind": KIND_DIAGRAM_TYPE,
-        "content": diagram_type,
-        "confidence": conf,
-        "slide_index": slide_index,
-        "image_bbox": image_bbox,
-        "image_uri": uri,
-        "slide_png_uri": uri,
-        "ppt_picture_shape_id": ppt_shape_id,
-    })
-    entities = raw.get("entities") or []
-    if entities:
-        entities_content = ", ".join(e.get("name", "") for e in entities[:20])
-        ev_ent = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_ENTITIES, image_id)
-        items.append({
-            "evidence_id": ev_ent,
-            "kind": KIND_DIAGRAM_ENTITIES,
-            "content": entities_content,
+    items.append(
+        {
+            "evidence_id": ev_type,
+            "kind": KIND_DIAGRAM_TYPE,
+            "content": diagram_type,
             "confidence": conf,
             "slide_index": slide_index,
             "image_bbox": image_bbox,
             "image_uri": uri,
             "slide_png_uri": uri,
             "ppt_picture_shape_id": ppt_shape_id,
-        })
+        }
+    )
+    entities = raw.get("entities") or []
+    if entities:
+        entities_content = ", ".join(e.get("name", "") for e in entities[:20])
+        ev_ent = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_ENTITIES, image_id)
+        items.append(
+            {
+                "evidence_id": ev_ent,
+                "kind": KIND_DIAGRAM_ENTITIES,
+                "content": entities_content,
+                "confidence": conf,
+                "slide_index": slide_index,
+                "image_bbox": image_bbox,
+                "image_uri": uri,
+                "slide_png_uri": uri,
+                "ppt_picture_shape_id": ppt_shape_id,
+            }
+        )
     interactions = raw.get("interactions") or []
     if interactions:
         parts = []
@@ -445,30 +472,34 @@ def _diagram_evidence_from_openai_result(
             order = ia.get("order", 0)
             parts.append(f"{order}:{fr}->{to}:{label}")
         ev_int = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_INTERACTIONS, image_id)
-        items.append({
-            "evidence_id": ev_int,
-            "kind": KIND_DIAGRAM_INTERACTIONS,
-            "content": "; ".join(parts),
+        items.append(
+            {
+                "evidence_id": ev_int,
+                "kind": KIND_DIAGRAM_INTERACTIONS,
+                "content": "; ".join(parts),
+                "confidence": conf,
+                "slide_index": slide_index,
+                "image_bbox": image_bbox,
+                "image_uri": uri,
+                "slide_png_uri": uri,
+                "ppt_picture_shape_id": ppt_shape_id,
+            }
+        )
+    summary = (raw.get("summary") or "").strip() or DIAGRAM_FALLBACK_SUMMARY
+    ev_sum = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_SUMMARY, image_id)
+    items.append(
+        {
+            "evidence_id": ev_sum,
+            "kind": KIND_DIAGRAM_SUMMARY,
+            "content": summary,
             "confidence": conf,
             "slide_index": slide_index,
             "image_bbox": image_bbox,
             "image_uri": uri,
             "slide_png_uri": uri,
             "ppt_picture_shape_id": ppt_shape_id,
-        })
-    summary = (raw.get("summary") or "").strip() or DIAGRAM_FALLBACK_SUMMARY
-    ev_sum = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_SUMMARY, image_id)
-    items.append({
-        "evidence_id": ev_sum,
-        "kind": KIND_DIAGRAM_SUMMARY,
-        "content": summary,
-        "confidence": conf,
-        "slide_index": slide_index,
-        "image_bbox": image_bbox,
-        "image_uri": uri,
-        "slide_png_uri": uri,
-        "ppt_picture_shape_id": ppt_shape_id,
-    })
+        }
+    )
     return items
 
 
@@ -499,22 +530,51 @@ def run_diagram_understand(
     classifications = {c["image_id"]: c for c in image_kinds.get("classifications", [])}
     images = images_index.get("images", [])
     diagram_images = [
-        img for img in images
+        img
+        for img in images
         if classifications.get(img.get("image_id", ""), {}).get("image_kind") == "DIAGRAM"
     ]
     if not diagram_images or not minio_client:
         created_at = datetime.now(timezone.utc)
-        empty_ocr = {"schema_version": "1.0", "job_id": job_id, "images": [], "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"}
-        empty_prim = {"schema_version": "1.0", "job_id": job_id, "images": [], "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"}
-        empty_parse = {"schema_version": "1.0", "job_id": job_id, "images": [], "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"}
+        empty_ocr = {
+            "schema_version": "1.0",
+            "job_id": job_id,
+            "images": [],
+            "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+        }
+        empty_prim = {
+            "schema_version": "1.0",
+            "job_id": job_id,
+            "images": [],
+            "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+        }
+        empty_parse = {
+            "schema_version": "1.0",
+            "job_id": job_id,
+            "images": [],
+            "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+        }
         for path_suffix, payload in [
             ("diagram_ocr.json", empty_ocr),
             ("diagram_primitives.json", empty_prim),
             ("diagram_parse.json", empty_parse),
         ]:
-            minio_client.put(f"jobs/{job_id}/vision/{path_suffix}", json.dumps(payload, indent=2).encode("utf-8"), "application/json")
-        diagram_results_payload = {"schema_version": "1.0", "job_id": job_id, "results": [], "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"}
-        minio_client.put(f"jobs/{job_id}/vision/diagram_results.json", json.dumps(diagram_results_payload, indent=2).encode("utf-8"), "application/json")
+            minio_client.put(
+                f"jobs/{job_id}/vision/{path_suffix}",
+                json.dumps(payload, indent=2).encode("utf-8"),
+                "application/json",
+            )
+        diagram_results_payload = {
+            "schema_version": "1.0",
+            "job_id": job_id,
+            "results": [],
+            "created_at": created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
+        }
+        minio_client.put(
+            f"jobs/{job_id}/vision/diagram_results.json",
+            json.dumps(diagram_results_payload, indent=2).encode("utf-8"),
+            "application/json",
+        )
         return {"diagram_results": [], "evidence_count": 0}
 
     created_at = datetime.now(timezone.utc)
@@ -531,12 +591,16 @@ def run_diagram_understand(
         slide_index = img.get("slide_index", 0)
         ppt_shape_id = img.get("ppt_shape_id", "")
         bbox = img.get("bbox") or {}
-        image_bbox = {
-            "left": bbox.get("x"),
-            "top": bbox.get("y"),
-            "width": bbox.get("w"),
-            "height": bbox.get("h"),
-        } if bbox else None
+        image_bbox = (
+            {
+                "left": bbox.get("x"),
+                "top": bbox.get("y"),
+                "width": bbox.get("w"),
+                "height": bbox.get("h"),
+            }
+            if bbox
+            else None
+        )
 
         # Day 3: Try OpenAI diagram extraction first (primary)
         used_openai = False
@@ -552,48 +616,79 @@ def run_diagram_understand(
                         job_id, slide_index, image_id, image_bbox, uri, ppt_shape_id, raw
                     )
                     diagram_evidence_items.extend(items)
-                    diagram_results_for_json.append({
-                        "image_id": image_id,
-                        "slide_index": slide_index,
-                        "source": "openai",
-                        "diagram_type": raw.get("diagram_type"),
-                        "global_confidence": raw.get("global_confidence"),
-                        "entities_count": len(raw.get("entities") or []),
-                        "interactions_count": len(raw.get("interactions") or []),
-                    })
+                    diagram_results_for_json.append(
+                        {
+                            "image_id": image_id,
+                            "slide_index": slide_index,
+                            "source": "openai",
+                            "diagram_type": raw.get("diagram_type"),
+                            "global_confidence": raw.get("global_confidence"),
+                            "entities_count": len(raw.get("entities") or []),
+                            "interactions_count": len(raw.get("interactions") or []),
+                        }
+                    )
                     used_openai = True
             except Exception:
                 pass
         if not used_openai:
             # Fallback: low-confidence DIAGRAM_SUMMARY (Day 3)
             ev_fb = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_SUMMARY, image_id + "_fb")
-            diagram_evidence_items.append({
-                "evidence_id": ev_fb,
-                "kind": KIND_DIAGRAM_SUMMARY,
-                "content": DIAGRAM_FALLBACK_SUMMARY,
-                "confidence": 0.1,
-                "slide_index": slide_index,
-                "image_bbox": image_bbox,
-                "image_uri": uri,
-                "slide_png_uri": uri,
-                "ppt_picture_shape_id": ppt_shape_id,
-                "reason_code": DIAGRAM_FALLBACK_REASON,
-            })
-            diagram_results_for_json.append({
-                "image_id": image_id,
-                "slide_index": slide_index,
-                "source": "fallback",
-                "reason_code": DIAGRAM_FALLBACK_REASON,
-            })
+            diagram_evidence_items.append(
+                {
+                    "evidence_id": ev_fb,
+                    "kind": KIND_DIAGRAM_SUMMARY,
+                    "content": DIAGRAM_FALLBACK_SUMMARY,
+                    "confidence": 0.1,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                    "reason_code": DIAGRAM_FALLBACK_REASON,
+                }
+            )
+            diagram_results_for_json.append(
+                {
+                    "image_id": image_id,
+                    "slide_index": slide_index,
+                    "source": "fallback",
+                    "reason_code": DIAGRAM_FALLBACK_REASON,
+                }
+            )
 
         try:
             raw = minio_client.get(uri)
             image_bytes = raw if isinstance(raw, bytes) else raw.read()
         except Exception:
             if not used_openai:
-                ocr_images.append({"image_id": image_id, "slide_index": slide_index, "spans": [], "avg_conf": 0.0, "reason_code": REASON_OCR_LOW_CONF})
-                prim_images.append({"image_id": image_id, "lines": [], "arrows": [], "connectors": [], "reason_code": REASON_ARROW_DETECT_LOW})
-                parse_images.append({"image_id": image_id, "diagram_type": DIAGRAM_TYPE_UNKNOWN, "entities": [], "interactions": [], "confidence": 0.0, "reason_codes": [REASON_OCR_LOW_CONF]})
+                ocr_images.append(
+                    {
+                        "image_id": image_id,
+                        "slide_index": slide_index,
+                        "spans": [],
+                        "avg_conf": 0.0,
+                        "reason_code": REASON_OCR_LOW_CONF,
+                    }
+                )
+                prim_images.append(
+                    {
+                        "image_id": image_id,
+                        "lines": [],
+                        "arrows": [],
+                        "connectors": [],
+                        "reason_code": REASON_ARROW_DETECT_LOW,
+                    }
+                )
+                parse_images.append(
+                    {
+                        "image_id": image_id,
+                        "diagram_type": DIAGRAM_TYPE_UNKNOWN,
+                        "entities": [],
+                        "interactions": [],
+                        "confidence": 0.0,
+                        "reason_codes": [REASON_OCR_LOW_CONF],
+                    }
+                )
             continue
 
         if used_openai:
@@ -638,77 +733,128 @@ def run_diagram_understand(
 
         # EvidenceItems with refs to image bbox + uri
         ev_id_type = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_TYPE, image_id)
-        diagram_evidence_items.append({
-            "evidence_id": ev_id_type,
-            "kind": KIND_DIAGRAM_TYPE,
-            "content": parse_result.get("diagram_type", DIAGRAM_TYPE_UNKNOWN),
-            "confidence": conf,
-            "slide_index": slide_index,
-            "image_bbox": image_bbox,
-            "image_uri": uri,
-            "slide_png_uri": uri,
-            "ppt_picture_shape_id": ppt_shape_id,
-            "reason_code": reason_codes[0] if reason_codes else None,
-        })
-        entities_content = ", ".join(e.get("name", "") for e in parse_result.get("entities", [])[:20])
+        diagram_evidence_items.append(
+            {
+                "evidence_id": ev_id_type,
+                "kind": KIND_DIAGRAM_TYPE,
+                "content": parse_result.get("diagram_type", DIAGRAM_TYPE_UNKNOWN),
+                "confidence": conf,
+                "slide_index": slide_index,
+                "image_bbox": image_bbox,
+                "image_uri": uri,
+                "slide_png_uri": uri,
+                "ppt_picture_shape_id": ppt_shape_id,
+                "reason_code": reason_codes[0] if reason_codes else None,
+            }
+        )
+        entities_content = ", ".join(
+            e.get("name", "") for e in parse_result.get("entities", [])[:20]
+        )
         if entities_content:
             ev_id_ent = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_ENTITIES, image_id)
-            diagram_evidence_items.append({
-                "evidence_id": ev_id_ent,
-                "kind": KIND_DIAGRAM_ENTITIES,
-                "content": entities_content,
-                "confidence": conf,
-                "slide_index": slide_index,
-                "image_bbox": image_bbox,
-                "image_uri": uri,
-                "slide_png_uri": uri,
-                "ppt_picture_shape_id": ppt_shape_id,
-            })
+            diagram_evidence_items.append(
+                {
+                    "evidence_id": ev_id_ent,
+                    "kind": KIND_DIAGRAM_ENTITIES,
+                    "content": entities_content,
+                    "confidence": conf,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                }
+            )
         interactions_content = "; ".join(
-            f"{ia.get('from_entity','')}->{ia.get('to_entity','')}:{ia.get('label','')}" for ia in parse_result.get("interactions", [])[:15]
+            f"{ia.get('from_entity','')}->{ia.get('to_entity','')}:{ia.get('label','')}"
+            for ia in parse_result.get("interactions", [])[:15]
         )
         if interactions_content:
-            ev_id_int = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_INTERACTIONS, image_id)
-            diagram_evidence_items.append({
-                "evidence_id": ev_id_int,
-                "kind": KIND_DIAGRAM_INTERACTIONS,
-                "content": interactions_content,
+            ev_id_int = _stable_evidence_id(
+                job_id, slide_index, KIND_DIAGRAM_INTERACTIONS, image_id
+            )
+            diagram_evidence_items.append(
+                {
+                    "evidence_id": ev_id_int,
+                    "kind": KIND_DIAGRAM_INTERACTIONS,
+                    "content": interactions_content,
+                    "confidence": conf,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                }
+            )
+        ev_id_summary = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_SUMMARY, image_id)
+        diagram_evidence_items.append(
+            {
+                "evidence_id": ev_id_summary,
+                "kind": KIND_DIAGRAM_SUMMARY,
+                "content": summary,
                 "confidence": conf,
                 "slide_index": slide_index,
                 "image_bbox": image_bbox,
                 "image_uri": uri,
                 "slide_png_uri": uri,
                 "ppt_picture_shape_id": ppt_shape_id,
-            })
-        ev_id_summary = _stable_evidence_id(job_id, slide_index, KIND_DIAGRAM_SUMMARY, image_id)
-        diagram_evidence_items.append({
-            "evidence_id": ev_id_summary,
-            "kind": KIND_DIAGRAM_SUMMARY,
-            "content": summary,
-            "confidence": conf,
-            "slide_index": slide_index,
-            "image_bbox": image_bbox,
-            "image_uri": uri,
-            "slide_png_uri": uri,
-            "ppt_picture_shape_id": ppt_shape_id,
-        })
-        diagram_results_for_json.append({
-            "image_id": image_id,
-            "slide_index": slide_index,
-            "source": "ocr",
-            "diagram_type": parse_result.get("diagram_type"),
-            "confidence": conf,
-        })
+            }
+        )
+        diagram_results_for_json.append(
+            {
+                "image_id": image_id,
+                "slide_index": slide_index,
+                "source": "ocr",
+                "diagram_type": parse_result.get("diagram_type"),
+                "confidence": conf,
+            }
+        )
 
     # Write artifacts (including diagram_results.json for Day 3)
     created_at_str = created_at.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     for path_suffix, payload in [
-        ("diagram_ocr.json", {"schema_version": "1.0", "job_id": job_id, "images": ocr_images, "created_at": created_at_str}),
-        ("diagram_primitives.json", {"schema_version": "1.0", "job_id": job_id, "images": prim_images, "created_at": created_at_str}),
-        ("diagram_parse.json", {"schema_version": "1.0", "job_id": job_id, "images": parse_images, "created_at": created_at_str}),
-        ("diagram_results.json", {"schema_version": "1.0", "job_id": job_id, "results": diagram_results_for_json, "created_at": created_at_str}),
+        (
+            "diagram_ocr.json",
+            {
+                "schema_version": "1.0",
+                "job_id": job_id,
+                "images": ocr_images,
+                "created_at": created_at_str,
+            },
+        ),
+        (
+            "diagram_primitives.json",
+            {
+                "schema_version": "1.0",
+                "job_id": job_id,
+                "images": prim_images,
+                "created_at": created_at_str,
+            },
+        ),
+        (
+            "diagram_parse.json",
+            {
+                "schema_version": "1.0",
+                "job_id": job_id,
+                "images": parse_images,
+                "created_at": created_at_str,
+            },
+        ),
+        (
+            "diagram_results.json",
+            {
+                "schema_version": "1.0",
+                "job_id": job_id,
+                "results": diagram_results_for_json,
+                "created_at": created_at_str,
+            },
+        ),
     ]:
-        minio_client.put(f"jobs/{job_id}/vision/{path_suffix}", json.dumps(payload, indent=2).encode("utf-8"), "application/json")
+        minio_client.put(
+            f"jobs/{job_id}/vision/{path_suffix}",
+            json.dumps(payload, indent=2).encode("utf-8"),
+            "application/json",
+        )
 
     if diagram_evidence_items:
         _append_image_evidence_to_index(

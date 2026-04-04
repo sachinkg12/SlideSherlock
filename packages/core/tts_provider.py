@@ -43,6 +43,7 @@ class LocalTTSProvider(TTSProvider):
     Local TTS using pyttsx3 (offline) or fallback to system say/espeak.
     Supports voice_id and lang for multilingual output.
     """
+
     def __init__(
         self,
         sample_rate: int = TTS_SAMPLE_RATE,
@@ -59,6 +60,7 @@ class LocalTTSProvider(TTSProvider):
             return self._engine
         try:
             import pyttsx3
+
             self._engine = pyttsx3.init()
             return self._engine
         except Exception:
@@ -83,7 +85,16 @@ class LocalTTSProvider(TTSProvider):
     def _get_duration_seconds(self, path: str) -> Optional[float]:
         try:
             result = subprocess.run(
-                ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", path],
+                [
+                    "ffprobe",
+                    "-v",
+                    "error",
+                    "-show_entries",
+                    "format=duration",
+                    "-of",
+                    "default=noprint_wrappers=1:nokey=1",
+                    path,
+                ],
                 capture_output=True,
                 text=True,
                 timeout=5,
@@ -98,9 +109,14 @@ class LocalTTSProvider(TTSProvider):
         try:
             subprocess.run(
                 [
-                    "ffmpeg", "-y", "-f", "lavfi", "-i",
+                    "ffmpeg",
+                    "-y",
+                    "-f",
+                    "lavfi",
+                    "-i",
                     f"anullsrc=channel_layout=stereo:sample_rate={sample_rate}:duration={duration_sec}",
-                    "-ac", "1",
+                    "-ac",
+                    "1",
                     path,
                 ],
                 check=True,
@@ -118,7 +134,9 @@ class LocalTTSProvider(TTSProvider):
         try:
             if os.name == "posix" and os.uname().sysname == "Darwin":
                 cmd = ["say", "-o", aiff_path]
-                lang_code = VOICE_LANG_MAP.get(self.lang, VOICE_LANG_MAP.get(self.lang.split("-")[0], "en_US"))
+                lang_code = VOICE_LANG_MAP.get(
+                    self.lang, VOICE_LANG_MAP.get(self.lang.split("-")[0], "en_US")
+                )
                 if lang_code and lang_code != "en_US":
                     cmd.extend(["-l", lang_code.replace("_", "-")])
                 if self.voice_id and self.voice_id != "default":
@@ -136,8 +154,20 @@ class LocalTTSProvider(TTSProvider):
                     espeak_cmd.append(text)
                     subprocess.run(espeak_cmd, check=True, capture_output=True, timeout=30)
                     subprocess.run(
-                        ["ffmpeg", "-y", "-i", wav_tmp, "-ar", str(sample_rate), "-ac", "1", output_path],
-                        check=True, capture_output=True, timeout=10,
+                        [
+                            "ffmpeg",
+                            "-y",
+                            "-i",
+                            wav_tmp,
+                            "-ar",
+                            str(sample_rate),
+                            "-ac",
+                            "1",
+                            output_path,
+                        ],
+                        check=True,
+                        capture_output=True,
+                        timeout=10,
                     )
                     return self._get_duration_seconds(output_path) or 2.0
                 finally:
@@ -145,11 +175,17 @@ class LocalTTSProvider(TTSProvider):
                         os.unlink(wav_tmp)
             subprocess.run(
                 ["ffmpeg", "-y", "-i", aiff_path, "-ar", str(sample_rate), "-ac", "1", output_path],
-                check=True, capture_output=True, timeout=10,
+                check=True,
+                capture_output=True,
+                timeout=10,
             )
             return self._get_duration_seconds(output_path) or 2.0
         except Exception:
-            fallback = (os.environ.get("TTS_FALLBACK_TO_EN", "0")).strip().lower() in ("1", "true", "yes")
+            fallback = (os.environ.get("TTS_FALLBACK_TO_EN", "0")).strip().lower() in (
+                "1",
+                "true",
+                "yes",
+            )
             if fallback and self.lang and self.lang.lower() not in ("en", "en-us", "en_us"):
                 orig_lang, orig_voice = self.lang, self.voice_id
                 self.lang, self.voice_id = "en-US", "default"
@@ -179,12 +215,14 @@ def get_tts_provider(
     if voice_provider == "openai":
         try:
             from tts_provider_openai import OpenAITTSProvider
+
             return OpenAITTSProvider(voice_id=voice_id, lang=lang)
         except (ImportError, TypeError):
             return LocalTTSProvider(voice_id=voice_id, lang=lang)
     if voice_provider == "elevenlabs":
         try:
             from tts_provider_elevenlabs import ElevenLabsTTSProvider
+
             return ElevenLabsTTSProvider(voice_id=voice_id, lang=lang)
         except (ImportError, TypeError):
             return LocalTTSProvider(voice_id=voice_id, lang=lang)

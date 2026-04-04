@@ -100,7 +100,9 @@ def test_llm_callback_used_when_provided():
     def fake_llm(slide_index: int, slide_text: str, diagram_summary: str, notes: str) -> str:
         return "Generated narration for this slide."
 
-    text, source = get_narration_text_for_slide(1, notes, slide_text, graph, llm_narration_fn=fake_llm)
+    text, source = get_narration_text_for_slide(
+        1, notes, slide_text, graph, llm_narration_fn=fake_llm
+    )
     assert source == SOURCE_LLM
     assert "Generated narration" in text
 
@@ -114,7 +116,9 @@ def test_llm_callback_fallback_on_exception():
     def failing_llm(*args, **kwargs):
         raise RuntimeError("LLM error")
 
-    text, source = get_narration_text_for_slide(1, notes, slide_text, graph, llm_narration_fn=failing_llm)
+    text, source = get_narration_text_for_slide(
+        1, notes, slide_text, graph, llm_narration_fn=failing_llm
+    )
     assert source == SOURCE_LLM
     assert "slide 1" in text.lower()
 
@@ -129,12 +133,19 @@ def test_build_narration_per_slide_structure():
         1: {"nodes": [{"label_text": "A"}], "edges": [], "clusters": []},
         2: {"nodes": [], "edges": [], "clusters": []},
     }
-    entries = build_narration_per_slide(2, slides_notes_and_text, unified_graphs, llm_narration_fn=None)
+    entries = build_narration_per_slide(
+        2, slides_notes_and_text, unified_graphs, llm_narration_fn=None
+    )
     assert len(entries) == 2
     for i, entry in enumerate(entries):
         assert entry["slide_index"] == i + 1
         assert "narration_text" in entry
-        assert entry["source_used"] in (SOURCE_NOTES, SOURCE_SLIDE_AND_GRAPH, SOURCE_MIXED, SOURCE_LLM)
+        assert entry["source_used"] in (
+            SOURCE_NOTES,
+            SOURCE_SLIDE_AND_GRAPH,
+            SOURCE_MIXED,
+            SOURCE_LLM,
+        )
         assert isinstance(entry["word_count"], int)
         assert entry["word_count"] >= 0
 
@@ -146,7 +157,9 @@ def test_build_narration_per_slide_sources():
         ("", "Second slide has enough text for narration."),
     ]
     unified_graphs = {1: {}, 2: {}}
-    entries = build_narration_per_slide(2, slides_notes_and_text, unified_graphs, llm_narration_fn=None)
+    entries = build_narration_per_slide(
+        2, slides_notes_and_text, unified_graphs, llm_narration_fn=None
+    )
     assert entries[0]["source_used"] == SOURCE_NOTES
     assert entries[1]["source_used"] in (SOURCE_SLIDE_AND_GRAPH, SOURCE_MIXED, SOURCE_LLM)
 
@@ -159,7 +172,11 @@ def test_empty_slides_use_template():
     assert entries[0]["source_used"] == SOURCE_NOTES
     assert entries[1]["source_used"] in (SOURCE_LLM, SOURCE_SLIDE_AND_GRAPH)
     assert entries[2]["source_used"] in (SOURCE_LLM, SOURCE_SLIDE_AND_GRAPH)
-    assert "slide 2" in entries[1]["narration_text"].lower() or "slide 3" in entries[2]["narration_text"].lower() or "Diagram" in entries[1]["narration_text"]
+    assert (
+        "slide 2" in entries[1]["narration_text"].lower()
+        or "slide 3" in entries[2]["narration_text"].lower()
+        or "Diagram" in entries[1]["narration_text"]
+    )
 
 
 def test_smart_fallback_uses_template_when_no_llm():
@@ -237,7 +254,9 @@ def test_build_narration_per_slide_with_blueprints_uses_template():
     }
     evidence_index = {"evidence_items": [{"evidence_id": "ev1", "slide_index": 1, "content": "A"}]}
     entries = build_narration_per_slide(
-        2, slides_notes_and_text, unified_graphs,
+        2,
+        slides_notes_and_text,
+        unified_graphs,
         evidence_index=evidence_index,
         llm_smart_narration_fn=None,
     )

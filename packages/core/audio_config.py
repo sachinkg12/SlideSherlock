@@ -37,7 +37,11 @@ class AudioConfig:
         voice = (os.environ.get("AUDIO_VOICE_PROVIDER") or "local").strip().lower()
         if voice not in (AUDIO_VOICE_LOCAL, AUDIO_VOICE_OPENAI, AUDIO_VOICE_ELEVENLABS):
             voice = AUDIO_VOICE_LOCAL
-        norm = (os.environ.get("AUDIO_LOUDNESS_NORMALIZE", "1")).strip().lower() in ("1", "true", "yes")
+        norm = (os.environ.get("AUDIO_LOUDNESS_NORMALIZE", "1")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         lufs = float(os.environ.get("AUDIO_LUFS_TARGET", str(DEFAULT_LUFS_TARGET)))
         sr = int(os.environ.get("AUDIO_SAMPLE_RATE", str(DEFAULT_SAMPLE_RATE)))
         return cls(

@@ -38,6 +38,7 @@ class OpenAILLMProvider(LLMProvider):
     def _chat(self, messages: list, max_tokens: int = 200, temperature: float = 0.7) -> str:
         """Call OpenAI chat completions using requests (fork-safe, no httpx/asyncio)."""
         import requests
+
         if not self._api_key:
             raise RuntimeError("OPENAI_API_KEY not set")
         resp = requests.post(
@@ -95,7 +96,9 @@ class OpenAILLMProvider(LLMProvider):
                 content = (item.get("content") or "").strip()
                 conf = item.get("confidence", 0)
                 if content:
-                    parts.append(f"IMAGE EVIDENCE ({kind}, confidence={conf:.2f}):\n{content[:300]}")
+                    parts.append(
+                        f"IMAGE EVIDENCE ({kind}, confidence={conf:.2f}):\n{content[:300]}"
+                    )
 
         # Graph nodes and edges
         nodes = graph.get("nodes", [])
@@ -116,7 +119,9 @@ class OpenAILLMProvider(LLMProvider):
             if edge_descs:
                 parts.append(f"RELATIONSHIPS: {'; '.join(edge_descs)}")
 
-        context = "\n\n".join(parts) if parts else f"Slide {slide_index} with {len(nodes)} elements."
+        context = (
+            "\n\n".join(parts) if parts else f"Slide {slide_index} with {len(nodes)} elements."
+        )
 
         system_prompt = (
             "You are a professional presenter narrating a slideshow. "
@@ -138,15 +143,15 @@ class OpenAILLMProvider(LLMProvider):
                 f"This is slide {slide_index}. Introduce what this slide covers.\n\n{context}"
             )
         else:
-            user_prompt = (
-                f"Explain slide {slide_index}. Section type: {section_type}.\n\n{context}"
-            )
+            user_prompt = f"Explain slide {slide_index}. Section type: {section_type}.\n\n{context}"
 
         try:
-            text = self._chat([
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ])
+            text = self._chat(
+                [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ]
+            )
             if text:
                 return text
         except Exception as e:
@@ -155,9 +160,15 @@ class OpenAILLMProvider(LLMProvider):
         # Fallback to notes or basic template
         if notes:
             return notes
-        return f"This slide presents information about {slide_text[:100]}." if slide_text else f"Slide {slide_index}."
+        return (
+            f"This slide presents information about {slide_text[:100]}."
+            if slide_text
+            else f"Slide {slide_index}."
+        )
 
-    def generate_narration(self, blueprint: Dict[str, Any]) -> Optional[Tuple[str, List[str], List[str]]]:
+    def generate_narration(
+        self, blueprint: Dict[str, Any]
+    ) -> Optional[Tuple[str, List[str], List[str]]]:
         """
         Smart narration from blueprint — used by audio_prepare for per-slide narration.
         Returns (narration_text, entity_ids, evidence_ids) or None.
@@ -192,10 +203,15 @@ class OpenAILLMProvider(LLMProvider):
         )
 
         try:
-            text = self._chat([
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Narrate slide {slide_index} ({slide_type}):\n\n{context}"},
-            ])
+            text = self._chat(
+                [
+                    {"role": "system", "content": system_prompt},
+                    {
+                        "role": "user",
+                        "content": f"Narrate slide {slide_index} ({slide_type}):\n\n{context}",
+                    },
+                ]
+            )
             if text:
                 entity_ids = [n["node_id"] for n in nodes[:5]] if nodes else []
                 return text, entity_ids, evidence_ids

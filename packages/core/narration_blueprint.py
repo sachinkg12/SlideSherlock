@@ -28,7 +28,8 @@ def _has_bullet_pattern(text: str) -> bool:
     bullet_count = sum(
         1
         for line in lines
-        if line.startswith(bullet_chars) or (len(line) > 1 and line[0].isdigit() and line[1] in ".):")
+        if line.startswith(bullet_chars)
+        or (len(line) > 1 and line[0].isdigit() and line[1] in ".):")
     )
     return bullet_count >= 2 or (bullet_count >= 1 and len(lines) >= 3)
 
@@ -165,10 +166,15 @@ def _evidence_for_slide(
 
 
 # Evidence kinds that describe diagram/image content (used when graph has no labels)
-_IMAGE_EVIDENCE_KINDS = frozenset({
-    "IMAGE_CAPTION", "DIAGRAM_SUMMARY", "SLIDE_CAPTION",
-    "DIAGRAM_ENTITIES", "DIAGRAM_INTERACTIONS",
-})
+_IMAGE_EVIDENCE_KINDS = frozenset(
+    {
+        "IMAGE_CAPTION",
+        "DIAGRAM_SUMMARY",
+        "SLIDE_CAPTION",
+        "DIAGRAM_ENTITIES",
+        "DIAGRAM_INTERACTIONS",
+    }
+)
 
 # Low-confidence fallback phrases - do NOT use as narration (user would hear "low confidence, details not present")
 _LOW_CONFIDENCE_PHRASES = (
@@ -225,7 +231,9 @@ def build_narration_blueprint(
     edges = graph.get("edges", [])
     clusters = graph.get("clusters", [])
 
-    node_labels = [{"node_id": n.get("node_id"), "label": n.get("label_text") or ""} for n in nodes[:15]]
+    node_labels = [
+        {"node_id": n.get("node_id"), "label": n.get("label_text") or ""} for n in nodes[:15]
+    ]
     edge_flow = [
         {
             "edge_id": e.get("edge_id"),
@@ -236,11 +244,17 @@ def build_narration_blueprint(
         for e in edges[:20]
     ]
     cluster_info = [
-        {"cluster_id": c.get("cluster_id"), "member_node_ids": c.get("member_node_ids", []), "title": c.get("title")}
+        {
+            "cluster_id": c.get("cluster_id"),
+            "member_node_ids": c.get("member_node_ids", []),
+            "title": c.get("title"),
+        }
         for c in clusters[:10]
     ]
 
-    valid_evidence_ids = [ev.get("evidence_id") for ev in evidence_for_slide if ev.get("evidence_id")]
+    valid_evidence_ids = [
+        ev.get("evidence_id") for ev in evidence_for_slide if ev.get("evidence_id")
+    ]
 
     llm_context = {
         "nodes": node_labels,
@@ -274,12 +288,8 @@ def build_blueprint_per_slide(
     blueprints = []
     for i in range(slide_count):
         slide_index = i + 1
-        notes, slide_text = (
-            slides_notes_and_text[i] if i < len(slides_notes_and_text) else ("", "")
-        )
+        notes, slide_text = slides_notes_and_text[i] if i < len(slides_notes_and_text) else ("", "")
         graph = unified_graphs_by_slide.get(slide_index, {})
-        bp = build_narration_blueprint(
-            slide_index, notes, slide_text, graph, evidence_items
-        )
+        bp = build_narration_blueprint(slide_index, notes, slide_text, graph, evidence_items)
         blueprints.append(bp)
     return blueprints

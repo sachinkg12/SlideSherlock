@@ -37,6 +37,7 @@ def test_download_and_base64_creates_data_url():
     assert bytes_out == raw
     assert data_url.startswith("data:image/png;base64,")
     import base64
+
     decoded = base64.b64decode(data_url.split(",", 1)[1])
     assert decoded == raw
 
@@ -94,14 +95,17 @@ def test_cache_hit_skips_api_call():
     cache_path = f"jobs/job-123/cache/vision/{cache_key}.json"
 
     minio = MagicMock()
+
     def get(key):
         if key == image_uri:
             return image_bytes
         if key == cache_path:
             return json.dumps(cache_payload).encode("utf-8")
         raise FileNotFoundError(key)
+
     def exists(key):
         return key == cache_path
+
     minio.get.side_effect = get
     minio.exists.side_effect = exists
 
@@ -111,9 +115,11 @@ def test_cache_hit_skips_api_call():
             cache_prefix="jobs/{job_id}/cache/vision/",
         )
         api_called = []
+
         def track_call(*args, **kwargs):
             api_called.append(1)
             return json.dumps(cache_payload)
+
         with patch.object(provider, "_call_openai", side_effect=track_call):
             result = provider.caption(image_uri, lang="en-US", minio_client=minio)
         assert len(api_called) == 0
@@ -125,12 +131,16 @@ def test_get_cached_and_set_cached_roundtrip():
     """_set_cached and _get_cached work with a mock MinIO."""
     minio = MagicMock()
     stored = {}
+
     def put(key, data, content_type=None):
         stored[key] = data
+
     def get(key):
         return stored[key]
+
     def exists(key):
         return key in stored
+
     minio.put = put
     minio.get = get
     minio.exists = exists

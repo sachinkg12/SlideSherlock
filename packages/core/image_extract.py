@@ -12,6 +12,7 @@ try:
     from pptx import Presentation
     from pptx.enum.shapes import MSO_SHAPE_TYPE
     from pptx.util import Emu
+
     PRESENTATION_AVAILABLE = True
 except ImportError:
     Presentation = None  # type: ignore
@@ -69,7 +70,10 @@ def _collect_picture_shapes(slide: Any) -> List[tuple]:
                 elif hasattr(shape, "shapes"):
                     gid = f"{prefix}group_{shape.shape_id}_"
                     for j, child in enumerate(shape.shapes):
-                        if hasattr(child, "shape_type") and child.shape_type == MSO_SHAPE_TYPE.PICTURE:
+                        if (
+                            hasattr(child, "shape_type")
+                            and child.shape_type == MSO_SHAPE_TYPE.PICTURE
+                        ):
                             ppt_shape_id = f"{gid}{child.shape_id}"
                             out.append((child, z + i, ppt_shape_id))
             except Exception:

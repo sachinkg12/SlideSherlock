@@ -139,12 +139,14 @@ def run_audio_prepare(
                 sample_rate=config.sample_rate,
             )
             per_slide_audio.append((local_out, dur))
-            narration_entries.append({
-                "slide_index": i + 1,
-                "narration_text": "",
-                "source_used": "user_audio",
-                "word_count": 0,
-            })
+            narration_entries.append(
+                {
+                    "slide_index": i + 1,
+                    "narration_text": "",
+                    "source_used": "user_audio",
+                    "word_count": 0,
+                }
+            )
     else:
         blueprints = None
         if narration_entries_override and len(narration_entries_override) >= slide_count:
@@ -237,9 +239,17 @@ def run_audio_prepare(
             "created_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         }
         storage_duration = f"jobs/{job_id}/{TIMING_PREFIX}/{v_prefix}slide_{sn}_duration.json"
-        minio_client.put(storage_duration, json.dumps(duration_payload, indent=2).encode("utf-8"), "application/json")
+        minio_client.put(
+            storage_duration,
+            json.dumps(duration_payload, indent=2).encode("utf-8"),
+            "application/json",
+        )
 
     storage_narration = f"jobs/{job_id}/script/{v_prefix}narration_per_slide.json"
-    minio_client.put(storage_narration, json.dumps(narration_payload, indent=2).encode("utf-8"), "application/json")
+    minio_client.put(
+        storage_narration,
+        json.dumps(narration_payload, indent=2).encode("utf-8"),
+        "application/json",
+    )
 
     return narration_entries, per_slide_audio, narration_payload

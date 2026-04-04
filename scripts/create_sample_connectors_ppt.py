@@ -69,8 +69,10 @@ def create_sample_pptx(output_path: str) -> None:
     end_x = emu(left_b)
     conn_ab = shapes.add_connector(
         MSO_CONNECTOR_TYPE.STRAIGHT,
-        begin_x, center_y,
-        end_x, center_y,
+        begin_x,
+        center_y,
+        end_x,
+        center_y,
     )
 
     # Connector B -> C
@@ -78,8 +80,10 @@ def create_sample_pptx(output_path: str) -> None:
     end_x_bc = emu(left_c)
     conn_bc = shapes.add_connector(
         MSO_CONNECTOR_TYPE.STRAIGHT,
-        begin_x_bc, center_y,
-        end_x_bc, center_y,
+        begin_x_bc,
+        center_y,
+        end_x_bc,
+        center_y,
     )
 
     # Optional: elbow connector from A to C (bottom path) to get a second connector type
@@ -89,8 +93,10 @@ def create_sample_pptx(output_path: str) -> None:
     elbow_end_y = emu(top_c + h)
     shapes.add_connector(
         MSO_CONNECTOR_TYPE.ELBOW,
-        elbow_begin_x, elbow_begin_y,
-        elbow_end_x, elbow_end_y,
+        elbow_begin_x,
+        elbow_begin_y,
+        elbow_end_x,
+        elbow_end_y,
     )
 
     os.makedirs(os.path.dirname(os.path.abspath(output_path)) or ".", exist_ok=True)
@@ -101,9 +107,12 @@ def create_sample_pptx(output_path: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Create sample PPTX with connectors for SlideSherlock.")
+    parser = argparse.ArgumentParser(
+        description="Create sample PPTX with connectors for SlideSherlock."
+    )
     parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         default="sample_connectors.pptx",
         help="Output .pptx path (default: sample_connectors.pptx)",
     )

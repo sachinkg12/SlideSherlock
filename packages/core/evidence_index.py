@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
+
 # EMU to float for bbox in refs (store as float; 914400 EMU = 1 inch)
 def _emu_to_float(val: Any) -> float:
     if val is None:
@@ -157,23 +158,34 @@ def build_evidence_index(
             )
             db_session.add(ref_row)
 
-            sources_out.append({
-                "source_id": source_notes_id,
-                "type": "PPT_NOTES",
-                "slide_index": slide_index,
-                "artifact_url": None,
-                "metadata": {},
-            })
-            evidence_items_out.append({
-                "evidence_id": ev_id_notes,
-                "source_id": source_notes_id,
-                "kind": "TEXT_SPAN",
-                "content": notes,
-                "content_hash": _content_hash(notes),
-                "confidence": 1.0,
-                "slide_index": slide_index,
-                "refs": [{"ref_type": "PPT", "slide_index": slide_index, "char_start": 0, "char_end": len(notes)}],
-            })
+            sources_out.append(
+                {
+                    "source_id": source_notes_id,
+                    "type": "PPT_NOTES",
+                    "slide_index": slide_index,
+                    "artifact_url": None,
+                    "metadata": {},
+                }
+            )
+            evidence_items_out.append(
+                {
+                    "evidence_id": ev_id_notes,
+                    "source_id": source_notes_id,
+                    "kind": "TEXT_SPAN",
+                    "content": notes,
+                    "content_hash": _content_hash(notes),
+                    "confidence": 1.0,
+                    "slide_index": slide_index,
+                    "refs": [
+                        {
+                            "ref_type": "PPT",
+                            "slide_index": slide_index,
+                            "char_start": 0,
+                            "char_end": len(notes),
+                        }
+                    ],
+                }
+            )
 
         # --- Slide text: one Source + one EvidenceItem (TEXT_SPAN) ---
         if slide_text:
@@ -223,23 +235,34 @@ def build_evidence_index(
             )
             db_session.add(ref_row)
 
-            sources_out.append({
-                "source_id": source_text_id,
-                "type": "PPT_TEXT",
-                "slide_index": slide_index,
-                "artifact_url": None,
-                "metadata": {},
-            })
-            evidence_items_out.append({
-                "evidence_id": ev_id_text,
-                "source_id": source_text_id,
-                "kind": "TEXT_SPAN",
-                "content": slide_text,
-                "content_hash": _content_hash(slide_text),
-                "confidence": 1.0,
-                "slide_index": slide_index,
-                "refs": [{"ref_type": "PPT", "slide_index": slide_index, "char_start": 0, "char_end": len(slide_text)}],
-            })
+            sources_out.append(
+                {
+                    "source_id": source_text_id,
+                    "type": "PPT_TEXT",
+                    "slide_index": slide_index,
+                    "artifact_url": None,
+                    "metadata": {},
+                }
+            )
+            evidence_items_out.append(
+                {
+                    "evidence_id": ev_id_text,
+                    "source_id": source_text_id,
+                    "kind": "TEXT_SPAN",
+                    "content": slide_text,
+                    "content_hash": _content_hash(slide_text),
+                    "confidence": 1.0,
+                    "slide_index": slide_index,
+                    "refs": [
+                        {
+                            "ref_type": "PPT",
+                            "slide_index": slide_index,
+                            "char_start": 0,
+                            "char_end": len(slide_text),
+                        }
+                    ],
+                }
+            )
 
         # --- Shape labels: one Source + one EvidenceItem (SHAPE_LABEL) per shape with text ---
         for shape in shapes:
@@ -305,23 +328,27 @@ def build_evidence_index(
                 ref_item["bbox_w"] = _emu_to_float(bbox.get("width"))
                 ref_item["bbox_h"] = _emu_to_float(bbox.get("height"))
 
-            sources_out.append({
-                "source_id": source_shape_id,
-                "type": "PPT_SHAPE",
-                "slide_index": slide_index,
-                "artifact_url": None,
-                "metadata": {"ppt_shape_id": ppt_shape_id},
-            })
-            evidence_items_out.append({
-                "evidence_id": ev_id_shape,
-                "source_id": source_shape_id,
-                "kind": "SHAPE_LABEL",
-                "content": content,
-                "content_hash": _content_hash(content),
-                "confidence": 1.0,
-                "slide_index": slide_index,
-                "refs": [ref_item],
-            })
+            sources_out.append(
+                {
+                    "source_id": source_shape_id,
+                    "type": "PPT_SHAPE",
+                    "slide_index": slide_index,
+                    "artifact_url": None,
+                    "metadata": {"ppt_shape_id": ppt_shape_id},
+                }
+            )
+            evidence_items_out.append(
+                {
+                    "evidence_id": ev_id_shape,
+                    "source_id": source_shape_id,
+                    "kind": "SHAPE_LABEL",
+                    "content": content,
+                    "content_hash": _content_hash(content),
+                    "confidence": 1.0,
+                    "slide_index": slide_index,
+                    "refs": [ref_item],
+                }
+            )
 
         # --- Connector labels: one Source + one EvidenceItem (CONNECTOR) per connector with label ---
         for conn in connectors:
@@ -376,30 +403,38 @@ def build_evidence_index(
             )
             db_session.add(ref_row)
 
-            ref_item = {"ref_type": "PPT", "slide_index": slide_index, "ppt_shape_id": ppt_connector_id}
+            ref_item = {
+                "ref_type": "PPT",
+                "slide_index": slide_index,
+                "ppt_shape_id": ppt_connector_id,
+            }
             if bbox:
                 ref_item["bbox_x"] = _emu_to_float(bbox.get("left"))
                 ref_item["bbox_y"] = _emu_to_float(bbox.get("top"))
                 ref_item["bbox_w"] = _emu_to_float(bbox.get("width"))
                 ref_item["bbox_h"] = _emu_to_float(bbox.get("height"))
 
-            sources_out.append({
-                "source_id": source_conn_id,
-                "type": "PPT_SHAPE",
-                "slide_index": slide_index,
-                "artifact_url": None,
-                "metadata": {"ppt_connector_id": ppt_connector_id},
-            })
-            evidence_items_out.append({
-                "evidence_id": ev_id_conn,
-                "source_id": source_conn_id,
-                "kind": "CONNECTOR",
-                "content": content,
-                "content_hash": _content_hash(content),
-                "confidence": 1.0,
-                "slide_index": slide_index,
-                "refs": [ref_item],
-            })
+            sources_out.append(
+                {
+                    "source_id": source_conn_id,
+                    "type": "PPT_SHAPE",
+                    "slide_index": slide_index,
+                    "artifact_url": None,
+                    "metadata": {"ppt_connector_id": ppt_connector_id},
+                }
+            )
+            evidence_items_out.append(
+                {
+                    "evidence_id": ev_id_conn,
+                    "source_id": source_conn_id,
+                    "kind": "CONNECTOR",
+                    "content": content,
+                    "content_hash": _content_hash(content),
+                    "confidence": 1.0,
+                    "slide_index": slide_index,
+                    "refs": [ref_item],
+                }
+            )
 
     # --- IMAGE_ASSET: one EvidenceItem per extracted embedded image ---
     if images_index:
@@ -413,7 +448,9 @@ def build_evidence_index(
             bbox = img.get("bbox") or {}
             norm = img.get("normalized_bbox") or {}
 
-            ev_id = _stable_evidence_id(job_id, slide_index, "IMAGE_ASSET", ppt_shape_id or image_id)
+            ev_id = _stable_evidence_id(
+                job_id, slide_index, "IMAGE_ASSET", ppt_shape_id or image_id
+            )
             content = f"image_uri={uri}, mime={mime}, sha256={sha256_val}"
             source_img_id = str(uuid.uuid4())
             slide_id = slide_id_by_index.get(slide_index)
@@ -471,23 +508,27 @@ def build_evidence_index(
                 "bbox_w": _emu_to_float(bbox.get("w")),
                 "bbox_h": _emu_to_float(bbox.get("h")),
             }
-            sources_out.append({
-                "source_id": source_img_id,
-                "type": "IMAGE_ASSET",
-                "slide_index": slide_index,
-                "artifact_url": uri,
-                "metadata": {"ppt_shape_id": ppt_shape_id, "normalized_bbox": norm},
-            })
-            evidence_items_out.append({
-                "evidence_id": ev_id,
-                "source_id": source_img_id,
-                "kind": "IMAGE_ASSET",
-                "content": content,
-                "content_hash": _content_hash(content),
-                "confidence": 1.0,
-                "slide_index": slide_index,
-                "refs": [ref_item],
-            })
+            sources_out.append(
+                {
+                    "source_id": source_img_id,
+                    "type": "IMAGE_ASSET",
+                    "slide_index": slide_index,
+                    "artifact_url": uri,
+                    "metadata": {"ppt_shape_id": ppt_shape_id, "normalized_bbox": norm},
+                }
+            )
+            evidence_items_out.append(
+                {
+                    "evidence_id": ev_id,
+                    "source_id": source_img_id,
+                    "kind": "IMAGE_ASSET",
+                    "content": content,
+                    "content_hash": _content_hash(content),
+                    "confidence": 1.0,
+                    "slide_index": slide_index,
+                    "refs": [ref_item],
+                }
+            )
 
     # Build index JSON (schema_versioned)
     index_payload = {
@@ -517,12 +558,14 @@ def build_evidence_index(
         storage_path=storage_path,
         sha256=index_sha256,
         size_bytes=str(len(index_bytes)),
-        metadata_json=json.dumps({
-            "type": "evidence_index",
-            "schema_version": schema_version,
-            "source_count": len(sources_out),
-            "evidence_count": len(evidence_items_out),
-        }),
+        metadata_json=json.dumps(
+            {
+                "type": "evidence_index",
+                "schema_version": schema_version,
+                "source_count": len(sources_out),
+                "evidence_count": len(evidence_items_out),
+            }
+        ),
         created_at=created_at,
     )
     db_session.add(artifact_row)

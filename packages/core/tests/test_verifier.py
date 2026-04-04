@@ -35,7 +35,13 @@ from verifier import (
 
 def test_has_evidence_ids_rewrite():
     """No evidence_ids -> REWRITE, NO_EVIDENCE_IDS."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "Some claim.", "evidence_ids": [], "entity_ids": []}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "Some claim.",
+        "evidence_ids": [],
+        "entity_ids": [],
+    }
     evidence_by_id = {}
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -45,7 +51,13 @@ def test_has_evidence_ids_rewrite():
 
 def test_evidence_ids_exist_rewrite():
     """Invalid evidence_id -> REWRITE, EVIDENCE_NOT_FOUND."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "Claim.", "evidence_ids": ["ev_missing"], "entity_ids": []}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "Claim.",
+        "evidence_ids": ["ev_missing"],
+        "entity_ids": [],
+    }
     evidence_by_id = {"ev_other": {"evidence_id": "ev_other", "content": "other"}}
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -56,7 +68,13 @@ def test_evidence_ids_exist_rewrite():
 
 def test_entity_ids_in_graph_rewrite():
     """entity_id not in G_unified -> REWRITE, ENTITY_NOT_IN_GRAPH."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "Claim.", "evidence_ids": ["ev1"], "entity_ids": ["node_missing"]}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "Claim.",
+        "evidence_ids": ["ev1"],
+        "entity_ids": ["node_missing"],
+    }
     evidence_by_id = {"ev1": {"evidence_id": "ev1", "content": "evidence content"}}
     graph = {"nodes": [{"node_id": "n1", "label_text": "A"}], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -67,7 +85,13 @@ def test_entity_ids_in_graph_rewrite():
 
 def test_claim_supported_by_evidence_rewrite():
     """Claim numbers not in evidence -> REWRITE, UNSUPPORTED_BY_EVIDENCE."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "There are 99 items.", "evidence_ids": ["ev1"], "entity_ids": []}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "There are 99 items.",
+        "evidence_ids": ["ev1"],
+        "entity_ids": [],
+    }
     evidence_by_id = {"ev1": {"evidence_id": "ev1", "content": "We have two items."}}
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -78,9 +102,11 @@ def test_claim_supported_by_evidence_rewrite():
 def test_image_claim_needs_image_evidence_rewrite():
     """Image/diagram claim citing only TEXT_SPAN -> REWRITE, IMAGE_UNGROUNDED."""
     segment = {
-        "claim_id": "c1", "slide_index": 1,
+        "claim_id": "c1",
+        "slide_index": 1,
         "text": "The diagram shows a flow from A to B.",
-        "evidence_ids": ["ev_text"], "entity_ids": [],
+        "evidence_ids": ["ev_text"],
+        "entity_ids": [],
     }
     evidence_by_id = {
         "ev_text": {"evidence_id": "ev_text", "content": "slide title", "kind": "TEXT_SPAN"},
@@ -97,12 +123,18 @@ def test_image_claim_needs_image_evidence_rewrite():
 def test_image_claim_with_image_evidence_pass():
     """Image claim citing IMAGE_CAPTION -> PASS."""
     segment = {
-        "claim_id": "c1", "slide_index": 1,
+        "claim_id": "c1",
+        "slide_index": 1,
         "text": "The diagram shows visual elements.",
-        "evidence_ids": ["ev_img"], "entity_ids": [],
+        "evidence_ids": ["ev_img"],
+        "entity_ids": [],
     }
     evidence_by_id = {
-        "ev_img": {"evidence_id": "ev_img", "content": "This slide contains an image.", "kind": "IMAGE_CAPTION"},
+        "ev_img": {
+            "evidence_id": "ev_img",
+            "content": "This slide contains an image.",
+            "kind": "IMAGE_CAPTION",
+        },
     }
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -113,7 +145,13 @@ def test_image_claim_with_image_evidence_pass():
 
 def test_claim_supported_by_evidence_no_overlap_rewrite():
     """Claim tokens have no overlap with evidence -> REWRITE."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "xyz alien moon", "evidence_ids": ["ev1"], "entity_ids": []}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "xyz alien moon",
+        "evidence_ids": ["ev1"],
+        "entity_ids": [],
+    }
     evidence_by_id = {"ev1": {"evidence_id": "ev1", "content": "slide diagram elements"}}
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -123,7 +161,13 @@ def test_claim_supported_by_evidence_no_overlap_rewrite():
 
 def test_relations_consistent_edge_src_dst_rewrite():
     """Edge references node not in graph -> REWRITE, GRAPH_CONTRADICTION."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "Flow.", "evidence_ids": ["ev1"], "entity_ids": ["e1"]}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "Flow.",
+        "evidence_ids": ["ev1"],
+        "entity_ids": ["e1"],
+    }
     evidence_by_id = {"ev1": {"evidence_id": "ev1", "content": "flow"}}
     graph = {
         "nodes": [{"node_id": "n1"}],
@@ -156,8 +200,20 @@ def test_verify_script_coverage():
     """verify_script returns report + coverage with pct_claims_with_evidence, pct_entities_grounded."""
     script = {
         "segments": [
-            {"claim_id": "c1", "slide_index": 1, "text": "Slide one.", "evidence_ids": ["ev1"], "entity_ids": ["n1"]},
-            {"claim_id": "c2", "slide_index": 1, "text": "No evidence.", "evidence_ids": [], "entity_ids": []},
+            {
+                "claim_id": "c1",
+                "slide_index": 1,
+                "text": "Slide one.",
+                "evidence_ids": ["ev1"],
+                "entity_ids": ["n1"],
+            },
+            {
+                "claim_id": "c2",
+                "slide_index": 1,
+                "text": "No evidence.",
+                "evidence_ids": [],
+                "entity_ids": [],
+            },
         ],
     }
     evidence_index = {"evidence_items": [{"evidence_id": "ev1", "content": "slide one"}]}
@@ -176,12 +232,26 @@ def test_rewrite_loop_verified_script():
     script_draft = {
         "job_id": "job1",
         "segments": [
-            {"claim_id": "c1", "slide_index": 1, "text": "Good.", "evidence_ids": ["ev1"], "entity_ids": ["n1"]},
-            {"claim_id": "c2", "slide_index": 1, "text": "Bad 999.", "evidence_ids": ["ev1"], "entity_ids": []},
+            {
+                "claim_id": "c1",
+                "slide_index": 1,
+                "text": "Good.",
+                "evidence_ids": ["ev1"],
+                "entity_ids": ["n1"],
+            },
+            {
+                "claim_id": "c2",
+                "slide_index": 1,
+                "text": "Bad 999.",
+                "evidence_ids": ["ev1"],
+                "entity_ids": [],
+            },
         ],
     }
     evidence_index = {"evidence_items": [{"evidence_id": "ev1", "content": "slide content"}]}
-    unified_by_slide = {1: {"nodes": [{"node_id": "n1", "label_text": "A"}], "edges": [], "clusters": []}}
+    unified_by_slide = {
+        1: {"nodes": [{"node_id": "n1", "label_text": "A"}], "edges": [], "clusters": []}
+    }
     verified_script, report, coverage = run_rewrite_loop(
         job_id="job1",
         script_draft=script_draft,
@@ -204,7 +274,13 @@ def test_rewrite_loop_verified_script():
 
 def test_verify_report_has_verdict_reasons_pointers():
     """Each report entry has verdict, reasons, pointers, is_image_claim, required_evidence_kinds, confidence_used."""
-    segment = {"claim_id": "c1", "slide_index": 1, "text": "X", "evidence_ids": [], "entity_ids": []}
+    segment = {
+        "claim_id": "c1",
+        "slide_index": 1,
+        "text": "X",
+        "evidence_ids": [],
+        "entity_ids": [],
+    }
     entry = verify_segment(segment, {}, {"nodes": [], "edges": [], "clusters": []})
     assert "verdict" in entry
     assert "reasons" in entry
@@ -218,12 +294,20 @@ def test_verify_report_has_verdict_reasons_pointers():
 def test_needs_hedging_rewrite():
     """Low-confidence image evidence + definitive claim (no hedging) -> REWRITE, NEEDS_HEDGING."""
     segment = {
-        "claim_id": "c1", "slide_index": 1,
+        "claim_id": "c1",
+        "slide_index": 1,
         "text": "The photo shows a football match.",
-        "evidence_ids": ["ev_lo"], "entity_ids": [], "used_hedging": False,
+        "evidence_ids": ["ev_lo"],
+        "entity_ids": [],
+        "used_hedging": False,
     }
     evidence_by_id = {
-        "ev_lo": {"evidence_id": "ev_lo", "content": "sports scene", "kind": "IMAGE_CAPTION", "confidence": 0.3},
+        "ev_lo": {
+            "evidence_id": "ev_lo",
+            "content": "sports scene",
+            "kind": "IMAGE_CAPTION",
+            "confidence": 0.3,
+        },
     }
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -234,12 +318,18 @@ def test_needs_hedging_rewrite():
 def test_diagram_unsupported_rewrite():
     """Claim describes message/order not in DIAGRAM_INTERACTIONS -> REWRITE, DIAGRAM_UNSUPPORTED."""
     segment = {
-        "claim_id": "c1", "slide_index": 1,
+        "claim_id": "c1",
+        "slide_index": 1,
         "text": "Alice sends secret message to Bob then Charlie replies.",
-        "evidence_ids": ["ev_dia"], "entity_ids": [],
+        "evidence_ids": ["ev_dia"],
+        "entity_ids": [],
     }
     evidence_by_id = {
-        "ev_dia": {"evidence_id": "ev_dia", "content": "Actor A to Service B request", "kind": "DIAGRAM_INTERACTIONS"},
+        "ev_dia": {
+            "evidence_id": "ev_dia",
+            "content": "Actor A to Service B request",
+            "kind": "DIAGRAM_INTERACTIONS",
+        },
     }
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)
@@ -250,12 +340,18 @@ def test_diagram_unsupported_rewrite():
 def test_object_action_unsupported_rewrite():
     """Claim mentions objects/actions not in IMAGE_OBJECTS/ACTIONS -> REWRITE."""
     segment = {
-        "claim_id": "c1", "slide_index": 1,
+        "claim_id": "c1",
+        "slide_index": 1,
         "text": "The image shows elephants and giraffes in the savanna.",
-        "evidence_ids": ["ev_obj"], "entity_ids": [],
+        "evidence_ids": ["ev_obj"],
+        "entity_ids": [],
     }
     evidence_by_id = {
-        "ev_obj": {"evidence_id": "ev_obj", "content": "person(0.9); car(0.8)", "kind": "IMAGE_OBJECTS"},
+        "ev_obj": {
+            "evidence_id": "ev_obj",
+            "content": "person(0.9); car(0.8)",
+            "kind": "IMAGE_OBJECTS",
+        },
     }
     graph = {"nodes": [], "edges": [], "clusters": []}
     entry = verify_segment(segment, evidence_by_id, graph)

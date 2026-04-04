@@ -81,10 +81,10 @@ def test_script_segment_cites_image_caption_and_contains_phrase():
     text = (seg.get("text") or "").strip()
     evidence_ids = list(seg.get("evidence_ids") or [])
 
-    assert MOCK_EVIDENCE_ID in evidence_ids, (
-        f"Segment must cite IMAGE_CAPTION evidence_id; got evidence_ids={evidence_ids}"
-    )
+    assert (
+        MOCK_EVIDENCE_ID in evidence_ids
+    ), f"Segment must cite IMAGE_CAPTION evidence_id; got evidence_ids={evidence_ids}"
     # Narration should contain the caption or a clear derived phrase (stub uses content verbatim or with prefix)
-    assert "football" in text.lower() or "grass" in text.lower(), (
-        f"Narration must contain caption-derived phrase; got text={text!r}"
-    )
+    assert (
+        "football" in text.lower() or "grass" in text.lower()
+    ), f"Narration must contain caption-derived phrase; got text={text!r}"

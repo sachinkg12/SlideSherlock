@@ -12,6 +12,7 @@ from typing import Any, Dict, List, Optional
 try:
     import pytesseract
     from pytesseract import Output
+
     PYTESSERACT_AVAILABLE = True
 except ImportError:
     pytesseract = None  # type: ignore
@@ -21,6 +22,7 @@ except ImportError:
 # Optional: EasyOCR
 try:
     import easyocr
+
     EASYOCR_AVAILABLE = True
 except ImportError:
     easyocr = None  # type: ignore
@@ -61,12 +63,14 @@ def run_ocr_tesseract(
             height = int(data["height"][i])
             bbox = {"left": left, "top": top, "width": width, "height": height}
             ocr_id = _ocr_id(slide_index, i, bbox, text)
-            spans.append({
-                "ocr_id": ocr_id,
-                "bbox": bbox,
-                "text": text,
-                "conf": conf / 100.0,  # 0-100 -> 0-1
-            })
+            spans.append(
+                {
+                    "ocr_id": ocr_id,
+                    "bbox": bbox,
+                    "text": text,
+                    "conf": conf / 100.0,  # 0-100 -> 0-1
+                }
+            )
         return spans
     except Exception:
         return []
@@ -85,6 +89,7 @@ def run_ocr_easyocr(
         return []
     try:
         import numpy as np
+
         if hasattr(image, "mode") and image.mode != "RGB":
             image = image.convert("RGB")
         if hasattr(image, "size"):
@@ -108,12 +113,14 @@ def run_ocr_easyocr(
             height = max(ys) - top
             bbox = {"left": left, "top": top, "width": width, "height": height}
             ocr_id = _ocr_id(slide_index, idx, bbox, text)
-            spans.append({
-                "ocr_id": ocr_id,
-                "bbox": bbox,
-                "text": text,
-                "conf": float(conf),
-            })
+            spans.append(
+                {
+                    "ocr_id": ocr_id,
+                    "bbox": bbox,
+                    "text": text,
+                    "conf": float(conf),
+                }
+            )
         return spans
     except Exception:
         return []

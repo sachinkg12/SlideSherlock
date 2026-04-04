@@ -43,6 +43,7 @@ def build_alignment(
 
     if per_slide_durations:
         from collections import defaultdict
+
         by_slide: Dict[int, List[tuple]] = defaultdict(list)
         for i, seg in enumerate(segments):
             si = seg.get("slide_index", 0)
@@ -63,14 +64,19 @@ def build_alignment(
                 duration = slide_dur * (wc / total_words) if total_words else slide_dur / len(items)
                 duration = max(MIN_SEGMENT_DURATION, min(duration, slide_dur))
                 t_end = t_start + duration
-                segment_entries.append((i, {
-                    "claim_id": seg.get("claim_id", ""),
-                    "slide_index": si,
-                    "segment_index": i,
-                    "t_start": round(t_start, 3),
-                    "t_end": round(t_end, 3),
-                    "duration": round(duration, 3),
-                }))
+                segment_entries.append(
+                    (
+                        i,
+                        {
+                            "claim_id": seg.get("claim_id", ""),
+                            "slide_index": si,
+                            "segment_index": i,
+                            "t_start": round(t_start, 3),
+                            "t_end": round(t_end, 3),
+                            "duration": round(duration, 3),
+                        },
+                    )
+                )
                 t_start = t_end
         entries = [e for _, e in sorted(segment_entries, key=lambda x: x[0])]
         t_current = sum(per_slide_durations.values()) if per_slide_durations else t_current
@@ -89,14 +95,16 @@ def build_alignment(
                 duration = estimate_duration_seconds(text, wpm)
                 t_end = t_start + duration
 
-            entries.append({
-                "claim_id": claim_id,
-                "slide_index": slide_index,
-                "segment_index": i,
-                "t_start": round(t_start, 3),
-                "t_end": round(t_end, 3),
-                "duration": round(t_end - t_start, 3),
-            })
+            entries.append(
+                {
+                    "claim_id": claim_id,
+                    "slide_index": slide_index,
+                    "segment_index": i,
+                    "t_start": round(t_start, 3),
+                    "t_end": round(t_end, 3),
+                    "duration": round(t_end - t_start, 3),
+                }
+            )
             t_current = t_end
 
     if per_slide_durations and not entries:
@@ -107,7 +115,9 @@ def build_alignment(
         "job_id": job_id,
         "segments": entries,
         "total_duration_seconds": round(t_current, 3),
-        "source": "tts" if segment_timestamps else ("per_slide_audio" if per_slide_durations else "estimated"),
+        "source": "tts"
+        if segment_timestamps
+        else ("per_slide_audio" if per_slide_durations else "estimated"),
         "wpm": wpm if not (segment_timestamps or per_slide_durations) else None,
         "created_at": datetime.utcnow().isoformat() + "Z",
     }

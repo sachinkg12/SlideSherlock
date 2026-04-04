@@ -28,10 +28,13 @@ if repo_root not in sys.path:
 # After worker/API path setup we need apps.api and packages.core
 sys.path.insert(0, os.path.join(repo_root, "packages", "core"))
 
+
 def main():
     if len(sys.argv) != 2:
         print("Usage: PYTHONPATH=. venv/bin/python scripts/verify_evidence_id_stable.py <JOB_ID>")
-        print("  Get JOB_ID from ./test_api.sh or ./test_render.sh output after uploading test.pptx")
+        print(
+            "  Get JOB_ID from ./test_api.sh or ./test_render.sh output after uploading test.pptx"
+        )
         sys.exit(1)
     job_id = sys.argv[1].strip()
 
@@ -69,7 +72,9 @@ def main():
         sys.exit(1)
     keys.sort()
     if not keys:
-        print(f"No ppt/slide_*.json found under {prefix}. Run the pipeline first (upload test.pptx, let worker run).")
+        print(
+            f"No ppt/slide_*.json found under {prefix}. Run the pipeline first (upload test.pptx, let worker run)."
+        )
         sys.exit(1)
 
     slides_data = []
@@ -80,11 +85,17 @@ def main():
     def clear_evidence_for_job():
         # Delete in FK order (child tables first)
         subq = db.query(EvidenceItem.evidence_id).filter(EvidenceItem.job_id == job_id)
-        db.query(EntityLink).filter(EntityLink.evidence_id.in_(subq)).delete(synchronize_session=False)
+        db.query(EntityLink).filter(EntityLink.evidence_id.in_(subq)).delete(
+            synchronize_session=False
+        )
         subq = db.query(EvidenceItem.evidence_id).filter(EvidenceItem.job_id == job_id)
-        db.query(ClaimLink).filter(ClaimLink.evidence_id.in_(subq)).delete(synchronize_session=False)
+        db.query(ClaimLink).filter(ClaimLink.evidence_id.in_(subq)).delete(
+            synchronize_session=False
+        )
         subq = db.query(EvidenceItem.evidence_id).filter(EvidenceItem.job_id == job_id)
-        db.query(SourceRef).filter(SourceRef.evidence_id.in_(subq)).delete(synchronize_session=False)
+        db.query(SourceRef).filter(SourceRef.evidence_id.in_(subq)).delete(
+            synchronize_session=False
+        )
         db.query(EvidenceItem).filter(EvidenceItem.job_id == job_id).delete()
         db.query(Source).filter(Source.job_id == job_id).delete()
         db.query(Slide).filter(Slide.job_id == job_id).delete()

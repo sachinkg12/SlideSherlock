@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.join(repo_root, "apps", "api"))
 # that can be aggregated across multiple runs for paper tables/figures.
 # ---------------------------------------------------------------------------
 
+
 class PipelineLogger:
     """
     Structured logger for CLI pipeline runs.
@@ -224,9 +225,11 @@ def _metric_highlights(stage_name: str, m: dict) -> str:
 # CLI commands
 # ---------------------------------------------------------------------------
 
+
 def cmd_run(args: argparse.Namespace) -> int:
     """Run full pipeline on a PPTX file (synchronous, no Redis/RQ needed)."""
     from dotenv import load_dotenv
+
     load_dotenv()
 
     pptx_path = os.path.abspath(args.pptx_path)
@@ -246,6 +249,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     # Doctor check
     from doctor import run_doctor
+
     doctor_report = run_doctor()
     logger.set_doctor(doctor_report)
     if not doctor_report.get("all_required_ok"):
@@ -254,8 +258,11 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     # Apply preset
     from presets import apply_preset, VALID_PRESETS
+
     if preset not in VALID_PRESETS:
-        print(f"Error: unknown preset '{preset}'. Valid: {', '.join(VALID_PRESETS)}", file=sys.stderr)
+        print(
+            f"Error: unknown preset '{preset}'. Valid: {', '.join(VALID_PRESETS)}", file=sys.stderr
+        )
         return 1
     os.environ["SLIDESHERLOCK_PRESET"] = preset
     apply_preset(preset)
@@ -288,7 +295,11 @@ def cmd_run(args: argparse.Namespace) -> int:
 
         with open(pptx_path, "rb") as f:
             pptx_data = f.read()
-        minio_client.put(input_path, pptx_data, "application/vnd.openxmlformats-officedocument.presentationml.presentation")
+        minio_client.put(
+            input_path,
+            pptx_data,
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        )
         print(f"  Uploaded {os.path.basename(pptx_path)} ({len(pptx_data) / 1024:.0f} KB)")
         print(f"  Job ID:  {job_id}")
         print()
@@ -296,8 +307,10 @@ def cmd_run(args: argparse.Namespace) -> int:
         # Run pipeline synchronously with per-stage logging
         import tempfile
         from pipeline import (
-            PipelineContext, _run_stage,
-            SHARED_STAGES, PER_VARIANT_STAGES,
+            PipelineContext,
+            _run_stage,
+            SHARED_STAGES,
+            PER_VARIANT_STAGES,
         )
 
         # Update status
@@ -312,6 +325,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         vision_enabled = True
         try:
             from vision_config import get_vision_config
+
             vision_config = get_vision_config(None)
             vision_enabled = vision_config.get("enabled", True)
         except ImportError:
@@ -336,15 +350,18 @@ def cmd_run(args: argparse.Namespace) -> int:
         if llm_mode != "stub" and api_key:
             try:
                 from llm_provider_openai import OpenAILLMProvider
+
                 ctx.llm_provider = OpenAILLMProvider(api_key=api_key)
                 logger.stage_detail("LLM: OpenAI (AI narration)")
             except ImportError:
                 from llm_provider import StubLLMProvider
+
                 ctx.llm_provider = StubLLMProvider()
                 logger.stage_detail("LLM: Stub (template narration)")
         else:
             try:
                 from llm_provider import StubLLMProvider
+
                 ctx.llm_provider = StubLLMProvider()
                 logger.stage_detail("LLM: Stub (template narration)")
             except ImportError:
@@ -419,18 +436,23 @@ def cmd_run(args: argparse.Namespace) -> int:
         }
 
         metrics_path = f"jobs/{job_id}/metrics.json"
-        minio_client.put(metrics_path, json.dumps(metrics_payload, indent=2).encode(), "application/json")
+        minio_client.put(
+            metrics_path, json.dumps(metrics_payload, indent=2).encode(), "application/json"
+        )
 
         import hashlib
-        db.add(Artifact(
-            artifact_id=str(uuid.uuid4()),
-            project_id=project.project_id,
-            job_id=job_id,
-            artifact_type="metrics",
-            storage_path=metrics_path,
-            metadata_json=json.dumps({"type": "metrics", "stage": "pipeline"}),
-            created_at=datetime.now(timezone.utc),
-        ))
+
+        db.add(
+            Artifact(
+                artifact_id=str(uuid.uuid4()),
+                project_id=project.project_id,
+                job_id=job_id,
+                artifact_type="metrics",
+                storage_path=metrics_path,
+                metadata_json=json.dumps({"type": "metrics", "stage": "pipeline"}),
+                created_at=datetime.now(timezone.utc),
+            )
+        )
 
         job.status = JobStatus.RUNNING
         job.updated_at = datetime.now(timezone.utc)
@@ -440,12 +462,14 @@ def cmd_run(args: argparse.Namespace) -> int:
         os.makedirs(output_dir, exist_ok=True)
         output_video = None
 
-        for variant in (ctx.output_variants or [{"id": "en"}]):
+        for variant in ctx.output_variants or [{"id": "en"}]:
             vid = variant.get("id", "en")
             final_key = f"jobs/{job_id}/output/{vid}/final.mp4"
             try:
                 data = minio_client.get(final_key)
-                local_path = os.path.join(output_dir, f"final_{vid}.mp4" if len(ctx.output_variants) > 1 else "final.mp4")
+                local_path = os.path.join(
+                    output_dir, f"final_{vid}.mp4" if len(ctx.output_variants) > 1 else "final.mp4"
+                )
                 with open(local_path, "wb") as f:
                     f.write(data)
                 if output_video is None:
@@ -462,6 +486,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
         # Cleanup temp
         import shutil
+
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -469,6 +494,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     except Exception as e:
         import traceback
+
         print(f"\nError: {e}", file=sys.stderr)
         traceback.print_exc()
         return 1
@@ -522,6 +548,7 @@ def cmd_preset(args: argparse.Namespace) -> int:
 # Argument parser
 # ---------------------------------------------------------------------------
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="slidesherlock",
@@ -532,9 +559,18 @@ def main() -> int:
     # run
     run_parser = subparsers.add_parser("run", help="Run full pipeline on a PPTX file")
     run_parser.add_argument("pptx_path", help="Path to the .pptx file")
-    run_parser.add_argument("--preset", "-p", default="draft", help="Quality preset: draft|standard|pro (default: draft)")
-    run_parser.add_argument("--output", "-o", default="./output", help="Output directory (default: ./output)")
-    run_parser.add_argument("--lang", "-l", default=None, help="Add a second language variant (e.g. hi-IN)")
+    run_parser.add_argument(
+        "--preset",
+        "-p",
+        default="draft",
+        help="Quality preset: draft|standard|pro (default: draft)",
+    )
+    run_parser.add_argument(
+        "--output", "-o", default="./output", help="Output directory (default: ./output)"
+    )
+    run_parser.add_argument(
+        "--lang", "-l", default=None, help="Add a second language variant (e.g. hi-IN)"
+    )
     run_parser.set_defaults(func=cmd_run)
 
     # doctor

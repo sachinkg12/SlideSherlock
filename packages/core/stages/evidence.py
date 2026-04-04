@@ -71,9 +71,12 @@ class EvidenceStage:
                         )
                         ev_count = photo_result.get("evidence_count", 0)
                         if ev_count:
-                            print(f"  PHOTO understand: {ev_count} evidence items -> jobs/{job_id}/vision/photo_results.json")
+                            print(
+                                f"  PHOTO understand: {ev_count} evidence items -> jobs/{job_id}/vision/photo_results.json"
+                            )
                     except Exception as ep:
                         import traceback
+
                         print(f"  Warning: photo_understand failed: {ep}\n{traceback.format_exc()}")
                 if run_diagram_understand and image_kinds:
                     try:
@@ -88,9 +91,14 @@ class EvidenceStage:
                         )
                         ev_count = diagram_result.get("evidence_count", 0)
                         if ev_count:
-                            print(f"  DIAGRAM understand: {ev_count} evidence items -> jobs/{job_id}/vision/diagram_*.json")
+                            print(
+                                f"  DIAGRAM understand: {ev_count} evidence items -> jobs/{job_id}/vision/diagram_*.json"
+                            )
                     except Exception as ed:
                         import traceback
-                        print(f"  Warning: diagram_understand failed: {ed}\n{traceback.format_exc()}")
+
+                        print(
+                            f"  Warning: diagram_understand failed: {ed}\n{traceback.format_exc()}"
+                        )
 
         return StageResult(status="ok")

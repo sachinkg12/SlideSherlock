@@ -31,17 +31,36 @@ REASON_NEEDS_HEDGING = "NEEDS_HEDGING"
 REASON_OBJECT_ACTION_UNSUPPORTED = "OBJECT_ACTION_UNSUPPORTED"
 
 # Image evidence kinds (NO-HALLUCINATION: image claims must cite these)
-IMAGE_EVIDENCE_KINDS = frozenset({
-    "IMAGE_ASSET",  # Extracted embedded image (bbox, uri)
-    "IMAGE_CAPTION", "IMAGE_OBJECTS", "IMAGE_ACTIONS", "IMAGE_TAGS",
-    "DIAGRAM_TYPE", "DIAGRAM_ENTITIES", "DIAGRAM_INTERACTIONS", "DIAGRAM_SUMMARY",
-    "SLIDE_CAPTION",  # Last-resort full-slide caption (Prompt 7)
-})
+IMAGE_EVIDENCE_KINDS = frozenset(
+    {
+        "IMAGE_ASSET",  # Extracted embedded image (bbox, uri)
+        "IMAGE_CAPTION",
+        "IMAGE_OBJECTS",
+        "IMAGE_ACTIONS",
+        "IMAGE_TAGS",
+        "DIAGRAM_TYPE",
+        "DIAGRAM_ENTITIES",
+        "DIAGRAM_INTERACTIONS",
+        "DIAGRAM_SUMMARY",
+        "SLIDE_CAPTION",  # Last-resort full-slide caption (Prompt 7)
+    }
+)
 
 # Conservative: treat as image-related if text contains any of these
 IMAGE_CLAIM_KEYWORDS = (
-    "image", "photo", "shows", "students", "football", "diagram", "sequence",
-    "actor", "message", "depicts", "picture", "illustration", "appears to show",
+    "image",
+    "photo",
+    "shows",
+    "students",
+    "football",
+    "diagram",
+    "sequence",
+    "actor",
+    "message",
+    "depicts",
+    "picture",
+    "illustration",
+    "appears to show",
 )
 
 # Hedging words: if claim uses these, no NEEDS_HEDGING
@@ -293,8 +312,7 @@ def _check_hedging(
     # Only require hedging when segment actually cites image evidence
     evidence_ids = segment.get("evidence_ids") or []
     has_image = any(
-        evidence_by_id.get(eid, {}).get("kind") in IMAGE_EVIDENCE_KINDS
-        for eid in evidence_ids
+        evidence_by_id.get(eid, {}).get("kind") in IMAGE_EVIDENCE_KINDS for eid in evidence_ids
     )
     if not has_image:
         return None
@@ -377,22 +395,30 @@ def verify_segment(
     r = _check_claim_object_action_consistency(segment, evidence_by_id)
     if r:
         reasons.append(r)
-        pointers["claim_snippet"] = pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        pointers["claim_snippet"] = (
+            pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        )
 
     r = _check_diagram_interactions_consistency(segment, evidence_by_id)
     if r:
         reasons.append(r)
-        pointers["claim_snippet"] = pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        pointers["claim_snippet"] = (
+            pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        )
 
     r = _check_claim_supported_by_evidence(segment, evidence_by_id)
     if r:
         reasons.append(r)
-        pointers["claim_snippet"] = pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        pointers["claim_snippet"] = (
+            pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        )
 
     r = _check_hedging(segment, evidence_by_id)
     if r:
         reasons.append(r)
-        pointers["claim_snippet"] = pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        pointers["claim_snippet"] = (
+            pointers.get("claim_snippet") or (segment.get("text") or "")[:200]
+        )
 
     r = _check_relations_consistent_with_graph(segment, graph)
     if r:
@@ -530,7 +556,11 @@ def _deterministic_rewrite_segment(
     if labels:
         base = "This slide shows: " + ", ".join(labels) + "."
         return ("This slide appears to show: " + ", ".join(labels) + ".") if use_hedging else base
-    return "This slide appears to include visual content." if use_hedging else "This segment describes content on this slide."
+    return (
+        "This slide appears to include visual content."
+        if use_hedging
+        else "This segment describes content on this slide."
+    )
 
 
 def run_rewrite_loop(
@@ -569,7 +599,9 @@ def run_rewrite_loop(
             if cid not in rewrite_claim_ids:
                 continue
             slide_index = seg.get("slide_index", 0)
-            graph = unified_graphs_by_slide.get(slide_index, {"nodes": [], "edges": [], "clusters": []})
+            graph = unified_graphs_by_slide.get(
+                slide_index, {"nodes": [], "edges": [], "clusters": []}
+            )
             if llm_provider and explain_plan:
                 # Build minimal section for provider
                 section = {
@@ -602,7 +634,8 @@ def run_rewrite_loop(
     )
     report_by_claim = {r["claim_id"]: r for r in report}
     verified_segments = [
-        seg for seg in segments
+        seg
+        for seg in segments
         if report_by_claim.get(seg.get("claim_id"), {}).get("verdict") == VERDICT_PASS
     ]
 

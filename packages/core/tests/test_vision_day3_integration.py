@@ -93,7 +93,9 @@ def test_narration_includes_meaningful_specifics_and_cites_evidence():
     job_id = "test-job-day3"
     evidence_index = _mock_evidence_index_with_photo_and_diagram()
     # Use only PHOTO for this test so policy picks image_evidence and stub uses caption
-    evidence_index["evidence_items"] = [e for e in evidence_index["evidence_items"] if e["kind"] == "IMAGE_CAPTION"]
+    evidence_index["evidence_items"] = [
+        e for e in evidence_index["evidence_items"] if e["kind"] == "IMAGE_CAPTION"
+    ]
 
     explain_plan = {
         "sections": [
@@ -125,8 +127,12 @@ def test_narration_includes_meaningful_specifics_and_cites_evidence():
     assert len(segments) >= 1
     text = (segments[0].get("text") or "").strip().lower()
     evidence_ids = list(segments[0].get("evidence_ids") or [])
-    assert "football" in text, f"Narration must include meaningful specific 'football'; got {text!r}"
-    assert MOCK_PHOTO_EVIDENCE_ID in evidence_ids, f"Segment must cite IMAGE_CAPTION; got {evidence_ids}"
+    assert (
+        "football" in text
+    ), f"Narration must include meaningful specific 'football'; got {text!r}"
+    assert (
+        MOCK_PHOTO_EVIDENCE_ID in evidence_ids
+    ), f"Segment must cite IMAGE_CAPTION; got {evidence_ids}"
 
 
 def test_diagram_interactions_step_by_step_and_verifier_zero_rewrite():
@@ -161,9 +167,13 @@ def test_diagram_interactions_step_by_step_and_verifier_zero_rewrite():
     text = (segments[0].get("text") or "").strip()
     evidence_ids = list(segments[0].get("evidence_ids") or [])
     # Stub uses DIAGRAM_INTERACTIONS when present with conf >= 0.45 -> step-by-step
-    assert "Step" in text or "sends" in text or "User" in text or "API" in text or "request" in text.lower(), (
-        f"Narration should reflect diagram interactions; got {text!r}"
-    )
+    assert (
+        "Step" in text
+        or "sends" in text
+        or "User" in text
+        or "API" in text
+        or "request" in text.lower()
+    ), f"Narration should reflect diagram interactions; got {text!r}"
     assert any(
         eid in evidence_ids for eid in [MOCK_PHOTO_EVIDENCE_ID, MOCK_DIAGRAM_INTERACTIONS_ID]
     ), f"Segment must cite image/diagram evidence; got {evidence_ids}"
@@ -171,9 +181,9 @@ def test_diagram_interactions_step_by_step_and_verifier_zero_rewrite():
     # Verifier: should PASS when claim cites image evidence and is hedged or high conf
     report, _ = verify_script(script, evidence_index, unified_graphs_by_slide)
     rewrite_count = sum(1 for r in report if r.get("verdict") == VERDICT_REWRITE)
-    assert rewrite_count == 0, (
-        f"Verifier must end with 0 REWRITE when narration is grounded and appropriately hedged; got {rewrite_count} rewrites: {report}"
-    )
+    assert (
+        rewrite_count == 0
+    ), f"Verifier must end with 0 REWRITE when narration is grounded and appropriately hedged; got {rewrite_count} rewrites: {report}"
 
 
 def test_timeline_includes_highlight_or_zoom_for_image_entity():
@@ -183,7 +193,12 @@ def test_timeline_includes_highlight_or_zoom_for_image_entity():
     images_index = _mock_images_index()
     explain_plan = {
         "sections": [
-            {"slide_index": 1, "section_type": "intro", "entity_ids": [], "evidence_ids": [MOCK_PHOTO_EVIDENCE_ID]},
+            {
+                "slide_index": 1,
+                "section_type": "intro",
+                "entity_ids": [],
+                "evidence_ids": [MOCK_PHOTO_EVIDENCE_ID],
+            },
         ],
         "ordering": ["intro"],
     }
@@ -202,7 +217,9 @@ def test_timeline_includes_highlight_or_zoom_for_image_entity():
         context_bundles_by_slide=context_bundles,
         slides_notes_and_text=slides_notes_and_text,
     )
-    alignment = {"segments": [{"claim_id": script["segments"][0]["claim_id"], "t_start": 0, "t_end": 3}]}
+    alignment = {
+        "segments": [{"claim_id": script["segments"][0]["claim_id"], "t_start": 0, "t_end": 3}]
+    }
     slide_dimensions = {1: (1280, 720)}
     timeline = build_timeline(
         job_id,
@@ -216,16 +233,14 @@ def test_timeline_includes_highlight_or_zoom_for_image_entity():
     actions = timeline.get("actions", [])
     assert len(actions) >= 1
     image_actions = [
-        a for a in actions
+        a
+        for a in actions
         if a.get("type") in (ACTION_HIGHLIGHT, ACTION_ZOOM)
-        and any(
-            (eid or "").startswith("image:IMG_")
-            for eid in (a.get("entity_ids") or [])
-        )
+        and any((eid or "").startswith("image:IMG_") for eid in (a.get("entity_ids") or []))
     ]
-    assert len(image_actions) >= 1, (
-        f"Timeline must include at least one HIGHLIGHT or ZOOM for image entity; got actions={actions}"
-    )
+    assert (
+        len(image_actions) >= 1
+    ), f"Timeline must include at least one HIGHLIGHT or ZOOM for image entity; got actions={actions}"
     a = image_actions[0]
     assert a.get("claim_id")
     assert a.get("evidence_ids")

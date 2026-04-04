@@ -26,7 +26,9 @@ KIND_PHOTO = "PHOTO"
 # Threshold for NO-HALLUCINATION fallback (caption/objects below this => generic fallback text)
 VISION_CONFIDENCE_THRESHOLD = float(os.environ.get("VISION_PHOTO_CONFIDENCE_THRESHOLD", "0.5"))
 # Only run vision for PHOTO images with classifier confidence >= this (avoid low-confidence runs)
-PHOTO_CLASSIFIER_MIN_CONFIDENCE = float(os.environ.get("VISION_PHOTO_CLASSIFIER_MIN_CONFIDENCE", "0.5"))
+PHOTO_CLASSIFIER_MIN_CONFIDENCE = float(
+    os.environ.get("VISION_PHOTO_CLASSIFIER_MIN_CONFIDENCE", "0.5")
+)
 
 # Strict fallback: no invented content (Day 2)
 STRICT_FALLBACK_CAPTION = "Image present; details unavailable"
@@ -67,7 +69,8 @@ def run_photo_understand(
         img
         for img in images
         if classifications.get(img.get("image_id", ""), {}).get("image_kind") == KIND_PHOTO
-        and float(classifications.get(img.get("image_id", ""), {}).get("confidence", 0)) >= PHOTO_CLASSIFIER_MIN_CONFIDENCE
+        and float(classifications.get(img.get("image_id", ""), {}).get("confidence", 0))
+        >= PHOTO_CLASSIFIER_MIN_CONFIDENCE
     ]
     if not photo_images or not minio_client:
         payload = {
@@ -90,16 +93,22 @@ def run_photo_understand(
         slide_index = img.get("slide_index", 0)
         ppt_shape_id = img.get("ppt_shape_id", "")
         bbox = img.get("bbox") or {}
-        image_bbox = {
-            "left": bbox.get("x"),
-            "top": bbox.get("y"),
-            "width": bbox.get("w"),
-            "height": bbox.get("h"),
-        } if bbox else None
+        image_bbox = (
+            {
+                "left": bbox.get("x"),
+                "top": bbox.get("y"),
+                "width": bbox.get("w"),
+                "height": bbox.get("h"),
+            }
+            if bbox
+            else None
+        )
 
         try:
             caption_res = vision_provider.caption(uri, lang=lang, minio_client=minio_client)
-            extract_res = vision_provider.extract(uri, lang=lang, minio_client=minio_client, mode="photo")
+            extract_res = vision_provider.extract(
+                uri, lang=lang, minio_client=minio_client, mode="photo"
+            )
         except Exception as e:
             reason = getattr(e, "reason_code", None) or STRICT_FALLBACK_REASON
             caption_res = {
@@ -127,90 +136,106 @@ def run_photo_understand(
         tags = extract_res.get("scene_tags") or []
         global_conf = float(extract_res.get("global_confidence", 0.1))
 
-        results.append({
-            "image_id": image_id,
-            "uri": uri,
-            "slide_index": slide_index,
-            "caption": caption,
-            "caption_confidence": caption_conf,
-            "objects": objects,
-            "actions": actions,
-            "scene_tags": tags,
-            "global_confidence": global_conf,
-        })
+        results.append(
+            {
+                "image_id": image_id,
+                "uri": uri,
+                "slide_index": slide_index,
+                "caption": caption,
+                "caption_confidence": caption_conf,
+                "objects": objects,
+                "actions": actions,
+                "scene_tags": tags,
+                "global_confidence": global_conf,
+            }
+        )
 
         # Convert to EvidenceItems
         ev_id_caption = _stable_evidence_id(job_id, slide_index, KIND_IMAGE_CAPTION, image_id)
-        image_evidence_items.append({
-            "evidence_id": ev_id_caption,
-            "kind": KIND_IMAGE_CAPTION,
-            "content": caption,
-            "confidence": caption_conf,
-            "slide_index": slide_index,
-            "image_bbox": image_bbox,
-            "image_uri": uri,
-            "slide_png_uri": uri,
-            "ppt_picture_shape_id": ppt_shape_id,
-        })
+        image_evidence_items.append(
+            {
+                "evidence_id": ev_id_caption,
+                "kind": KIND_IMAGE_CAPTION,
+                "content": caption,
+                "confidence": caption_conf,
+                "slide_index": slide_index,
+                "image_bbox": image_bbox,
+                "image_uri": uri,
+                "slide_png_uri": uri,
+                "ppt_picture_shape_id": ppt_shape_id,
+            }
+        )
 
-        objects_content = "; ".join(f"{o.get('label', '')}({o.get('conf', 0):.2f})" for o in objects[:10])
+        objects_content = "; ".join(
+            f"{o.get('label', '')}({o.get('conf', 0):.2f})" for o in objects[:10]
+        )
         if objects_content:
             ev_id_objects = _stable_evidence_id(job_id, slide_index, KIND_IMAGE_OBJECTS, image_id)
-            image_evidence_items.append({
-                "evidence_id": ev_id_objects,
-                "kind": KIND_IMAGE_OBJECTS,
-                "content": objects_content,
-                "confidence": global_conf,
-                "slide_index": slide_index,
-                "image_bbox": image_bbox,
-                "image_uri": uri,
-                "slide_png_uri": uri,
-                "ppt_picture_shape_id": ppt_shape_id,
-            })
+            image_evidence_items.append(
+                {
+                    "evidence_id": ev_id_objects,
+                    "kind": KIND_IMAGE_OBJECTS,
+                    "content": objects_content,
+                    "confidence": global_conf,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                }
+            )
 
-        actions_content = "; ".join(f"{a.get('verb_phrase', '')}({a.get('conf', 0):.2f})" for a in actions[:10])
+        actions_content = "; ".join(
+            f"{a.get('verb_phrase', '')}({a.get('conf', 0):.2f})" for a in actions[:10]
+        )
         if actions_content:
             ev_id_actions = _stable_evidence_id(job_id, slide_index, KIND_IMAGE_ACTIONS, image_id)
-            image_evidence_items.append({
-                "evidence_id": ev_id_actions,
-                "kind": KIND_IMAGE_ACTIONS,
-                "content": actions_content,
-                "confidence": global_conf,
-                "slide_index": slide_index,
-                "image_bbox": image_bbox,
-                "image_uri": uri,
-                "slide_png_uri": uri,
-                "ppt_picture_shape_id": ppt_shape_id,
-            })
+            image_evidence_items.append(
+                {
+                    "evidence_id": ev_id_actions,
+                    "kind": KIND_IMAGE_ACTIONS,
+                    "content": actions_content,
+                    "confidence": global_conf,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                }
+            )
 
         tags_content = "; ".join(f"{t.get('tag', '')}({t.get('conf', 0):.2f})" for t in tags[:10])
         if tags_content:
             ev_id_tags = _stable_evidence_id(job_id, slide_index, KIND_IMAGE_TAGS, image_id)
-            image_evidence_items.append({
-                "evidence_id": ev_id_tags,
-                "kind": KIND_IMAGE_TAGS,
-                "content": tags_content,
-                "confidence": global_conf,
-                "slide_index": slide_index,
-                "image_bbox": image_bbox,
-                "image_uri": uri,
-                "slide_png_uri": uri,
-                "ppt_picture_shape_id": ppt_shape_id,
-            })
+            image_evidence_items.append(
+                {
+                    "evidence_id": ev_id_tags,
+                    "kind": KIND_IMAGE_TAGS,
+                    "content": tags_content,
+                    "confidence": global_conf,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                }
+            )
 
         if not objects_content and not actions_content and not tags_content:
             ev_id_objects = _stable_evidence_id(job_id, slide_index, KIND_IMAGE_OBJECTS, image_id)
-            image_evidence_items.append({
-                "evidence_id": ev_id_objects,
-                "kind": KIND_IMAGE_OBJECTS,
-                "content": "(no objects detected)",
-                "confidence": 0.1,
-                "slide_index": slide_index,
-                "image_bbox": image_bbox,
-                "image_uri": uri,
-                "slide_png_uri": uri,
-                "ppt_picture_shape_id": ppt_shape_id,
-            })
+            image_evidence_items.append(
+                {
+                    "evidence_id": ev_id_objects,
+                    "kind": KIND_IMAGE_OBJECTS,
+                    "content": "(no objects detected)",
+                    "confidence": 0.1,
+                    "slide_index": slide_index,
+                    "image_bbox": image_bbox,
+                    "image_uri": uri,
+                    "slide_png_uri": uri,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                }
+            )
 
     payload = {
         "schema_version": "1.0",

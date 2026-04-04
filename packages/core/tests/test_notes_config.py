@@ -41,7 +41,11 @@ def test_enabled_via_env():
 
 def test_layout_lower_third():
     """ON_SCREEN_NOTES_LAYOUT=lower_third is accepted."""
-    with patch.dict(os.environ, {"ON_SCREEN_NOTES_ENABLED": "1", "ON_SCREEN_NOTES_LAYOUT": "lower_third"}, clear=False):
+    with patch.dict(
+        os.environ,
+        {"ON_SCREEN_NOTES_ENABLED": "1", "ON_SCREEN_NOTES_LAYOUT": "lower_third"},
+        clear=False,
+    ):
         c = OnScreenNotesConfig.from_env()
     assert c.enabled is True
     assert c.layout == LAYOUT_LOWER_THIRD
@@ -49,7 +53,9 @@ def test_layout_lower_third():
 
 def test_layout_off_disables():
     """ON_SCREEN_NOTES_LAYOUT=off forces enabled False."""
-    with patch.dict(os.environ, {"ON_SCREEN_NOTES_ENABLED": "1", "ON_SCREEN_NOTES_LAYOUT": "off"}, clear=False):
+    with patch.dict(
+        os.environ, {"ON_SCREEN_NOTES_ENABLED": "1", "ON_SCREEN_NOTES_LAYOUT": "off"}, clear=False
+    ):
         c = OnScreenNotesConfig.from_env()
     assert c.enabled is False
     assert c.layout == LAYOUT_OFF
@@ -57,7 +63,11 @@ def test_layout_off_disables():
 
 def test_font_size_bounds():
     """Font size clamped to 12–72."""
-    with patch.dict(os.environ, {"ON_SCREEN_NOTES_ENABLED": "0", "ON_SCREEN_NOTES_FONT_SIZE": "100"}, clear=False):
+    with patch.dict(
+        os.environ,
+        {"ON_SCREEN_NOTES_ENABLED": "0", "ON_SCREEN_NOTES_FONT_SIZE": "100"},
+        clear=False,
+    ):
         c = OnScreenNotesConfig.from_env()
     assert c.font_size == 72
     with patch.dict(os.environ, {"ON_SCREEN_NOTES_FONT_SIZE": "8"}, clear=False):
@@ -83,7 +93,11 @@ def test_color_and_background():
 
 def test_side_layouts():
     """side_right and side_left are valid."""
-    with patch.dict(os.environ, {"ON_SCREEN_NOTES_ENABLED": "1", "ON_SCREEN_NOTES_LAYOUT": "side_right"}, clear=False):
+    with patch.dict(
+        os.environ,
+        {"ON_SCREEN_NOTES_ENABLED": "1", "ON_SCREEN_NOTES_LAYOUT": "side_right"},
+        clear=False,
+    ):
         c = OnScreenNotesConfig.from_env()
     assert c.layout == LAYOUT_SIDE_RIGHT
     with patch.dict(os.environ, {"ON_SCREEN_NOTES_LAYOUT": "side_left"}, clear=False):

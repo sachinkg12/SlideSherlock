@@ -17,6 +17,7 @@ except ImportError:
 try:
     import cv2
     import numpy as np
+
     CV2_AVAILABLE = True
 except ImportError:
     cv2 = None  # type: ignore
@@ -60,8 +61,12 @@ def _detect_lines_opencv(image: Any, slide_index: int) -> List[Dict[str, Any]]:
             gray = image
         edges = cv2.Canny(gray, 50, 150)
         lines = cv2.HoughLinesP(
-            edges, rho=1, theta=np.pi / 180, threshold=50,
-            minLineLength=30, maxLineGap=10,
+            edges,
+            rho=1,
+            theta=np.pi / 180,
+            threshold=50,
+            minLineLength=30,
+            maxLineGap=10,
         )
         if lines is None:
             return []
@@ -69,13 +74,23 @@ def _detect_lines_opencv(image: Any, slide_index: int) -> List[Dict[str, Any]]:
         for idx, line in enumerate(lines):
             x1, y1, x2, y2 = line[0]
             eid = _edge_id_v(slide_index, idx)
-            out.append({
-                "edge_id": eid,
-                "det_type": "line",
-                "bbox": {"left": min(x1, x2), "top": min(y1, y2), "width": abs(x2 - x1), "height": abs(y2 - y1)},
-                "endpoints": {"begin": {"x": float(x1), "y": float(y1)}, "end": {"x": float(x2), "y": float(y2)}},
-                "confidence": 0.6,
-            })
+            out.append(
+                {
+                    "edge_id": eid,
+                    "det_type": "line",
+                    "bbox": {
+                        "left": min(x1, x2),
+                        "top": min(y1, y2),
+                        "width": abs(x2 - x1),
+                        "height": abs(y2 - y1),
+                    },
+                    "endpoints": {
+                        "begin": {"x": float(x1), "y": float(y1)},
+                        "end": {"x": float(x2), "y": float(y2)},
+                    },
+                    "confidence": 0.6,
+                }
+            )
         return out
     except Exception:
         return []
@@ -108,39 +123,45 @@ def build_vision_graph_slide(
     # OCR -> text spans and node candidates
     spans = run_ocr(image, slide_index=slide_index, backend=ocr_backend)
     for s in spans:
-        text_spans.append({
-            "ocr_id": s["ocr_id"],
-            "bbox": s["bbox"],
-            "text": s["text"],
-            "conf": s["conf"],
-        })
+        text_spans.append(
+            {
+                "ocr_id": s["ocr_id"],
+                "bbox": s["bbox"],
+                "text": s["text"],
+                "conf": s["conf"],
+            }
+        )
         nid = _node_id_v(slide_index, s["ocr_id"])
         bbox = s["bbox"]
         center = _bbox_center(bbox)
-        nodes.append({
-            "node_id": nid,
-            "det_id": s["ocr_id"],
-            "det_type": "text_region",
-            "bbox": bbox,
-            "center": {"x": center[0], "y": center[1]},
-            "label_text": s["text"],
-            "confidence": s["conf"],
-        })
+        nodes.append(
+            {
+                "node_id": nid,
+                "det_id": s["ocr_id"],
+                "det_type": "text_region",
+                "bbox": bbox,
+                "center": {"x": center[0], "y": center[1]},
+                "label_text": s["text"],
+                "confidence": s["conf"],
+            }
+        )
 
     # Optional: Hough lines as edge candidates (no src/dst node resolution in vision layer)
     if detect_lines:
         line_edges = _detect_lines_opencv(image, slide_index)
         for e in line_edges:
-            edges.append({
-                "edge_id": e["edge_id"],
-                "det_type": e.get("det_type", "line"),
-                "bbox": e["bbox"],
-                "endpoints": e["endpoints"],
-                "label_text": None,
-                "confidence": e.get("confidence", 0.6),
-                "src_node_id": None,
-                "dst_node_id": None,
-            })
+            edges.append(
+                {
+                    "edge_id": e["edge_id"],
+                    "det_type": e.get("det_type", "line"),
+                    "bbox": e["bbox"],
+                    "endpoints": e["endpoints"],
+                    "label_text": None,
+                    "confidence": e.get("confidence", 0.6),
+                    "src_node_id": None,
+                    "dst_node_id": None,
+                }
+            )
 
     return {
         "slide_index": slide_index,

@@ -26,7 +26,9 @@ def main():
     try:
         from storage import MinIOClient
     except ImportError as e:
-        print(f"ERROR: Could not import MinIOClient from storage. Ensure PYTHONPATH includes {core_path}")
+        print(
+            f"ERROR: Could not import MinIOClient from storage. Ensure PYTHONPATH includes {core_path}"
+        )
         print(f"  Run: PYTHONPATH={repo_root}:{core_path} python scripts/run_demo.py")
         raise SystemExit(1) from e
 
@@ -35,9 +37,17 @@ def main():
         create_script = os.path.join(repo_root, "scripts", "create_sample_connectors_ppt.py")
         if os.path.exists(create_script):
             import subprocess
-            subprocess.run([sys.executable, create_script, "--output", sample_pptx], check=True, cwd=repo_root, env={**os.environ, "PYTHONPATH": repo_root})
+
+            subprocess.run(
+                [sys.executable, create_script, "--output", sample_pptx],
+                check=True,
+                cwd=repo_root,
+                env={**os.environ, "PYTHONPATH": repo_root},
+            )
         if not os.path.exists(sample_pptx):
-            print("ERROR: sample_connectors.pptx not found. Create with: PYTHONPATH=. python scripts/create_sample_connectors_ppt.py --output sample_connectors.pptx")
+            print(
+                "ERROR: sample_connectors.pptx not found. Create with: PYTHONPATH=. python scripts/create_sample_connectors_ppt.py --output sample_connectors.pptx"
+            )
             sys.exit(1)
 
     db = SessionLocal()
@@ -57,10 +67,16 @@ def main():
 
     minio_client = MinIOClient()
     with open(sample_pptx, "rb") as f:
-        minio_client.put(input_path, f.read(), "application/vnd.openxmlformats-officedocument.presentationml.presentation")
+        minio_client.put(
+            input_path,
+            f.read(),
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        )
     print(f"Created job {job_id}, uploaded PPTX to {input_path}")
 
-    print("Running render stage (PPT parse, evidence, graph, script, verifier, timeline, overlay, compose)...")
+    print(
+        "Running render stage (PPT parse, evidence, graph, script, verifier, timeline, overlay, compose)..."
+    )
     render_stage(job_id)
 
     out_dir = os.path.join(repo_root, "output", "demo")
@@ -78,6 +94,7 @@ def main():
     else:
         print(f"Warning: could not download final.mp4")
         print(f"  Check MinIO at jobs/{job_id}/output/")
+
 
 if __name__ == "__main__":
     main()

@@ -26,16 +26,18 @@ KIND_DIAGRAM_INTERACTIONS = "DIAGRAM_INTERACTIONS"
 KIND_DIAGRAM_SUMMARY = "DIAGRAM_SUMMARY"
 KIND_SLIDE_CAPTION = "SLIDE_CAPTION"
 
-IMAGE_EVIDENCE_KINDS = frozenset({
-    KIND_IMAGE_CAPTION,
-    KIND_IMAGE_OBJECTS,
-    KIND_IMAGE_ACTIONS,
-    KIND_IMAGE_TAGS,
-    KIND_DIAGRAM_ENTITIES,
-    KIND_DIAGRAM_INTERACTIONS,
-    KIND_DIAGRAM_SUMMARY,
-    KIND_SLIDE_CAPTION,
-})
+IMAGE_EVIDENCE_KINDS = frozenset(
+    {
+        KIND_IMAGE_CAPTION,
+        KIND_IMAGE_OBJECTS,
+        KIND_IMAGE_ACTIONS,
+        KIND_IMAGE_TAGS,
+        KIND_DIAGRAM_ENTITIES,
+        KIND_DIAGRAM_INTERACTIONS,
+        KIND_DIAGRAM_SUMMARY,
+        KIND_SLIDE_CAPTION,
+    }
+)
 
 
 def _stable_evidence_id(job_id: str, slide_index: int, kind: str, offset_key: str) -> str:
@@ -137,7 +139,9 @@ def run_image_understand(
                         "top": _emu_to_float(bbox.get("top")),
                         "width": _emu_to_float(bbox.get("width")),
                         "height": _emu_to_float(bbox.get("height")),
-                    } if bbox else None,
+                    }
+                    if bbox
+                    else None,
                     slide_png_uri=slide_png_uri,
                     ppt_picture_shape_id=ppt_shape_id,
                 )
@@ -190,18 +194,20 @@ def run_image_understand(
 
         for ix, e in enumerate(extractions):
             ev_id = _stable_evidence_id(job_id, slide_index, e.kind, str(ix))
-            image_evidence_items.append({
-                "evidence_id": ev_id,
-                "kind": e.kind,
-                "content": e.content,
-                "confidence": e.confidence,
-                "reason_code": e.reason_code,
-                "slide_index": slide_index,
-                "image_bbox": e.image_bbox,
-                "image_uri": e.image_uri,
-                "ppt_picture_shape_id": e.ppt_picture_shape_id,
-                "slide_png_uri": e.slide_png_uri,
-            })
+            image_evidence_items.append(
+                {
+                    "evidence_id": ev_id,
+                    "kind": e.kind,
+                    "content": e.content,
+                    "confidence": e.confidence,
+                    "reason_code": e.reason_code,
+                    "slide_index": slide_index,
+                    "image_bbox": e.image_bbox,
+                    "image_uri": e.image_uri,
+                    "ppt_picture_shape_id": e.ppt_picture_shape_id,
+                    "slide_png_uri": e.slide_png_uri,
+                }
+            )
 
     if image_evidence_items:
         _append_image_evidence_to_index(
@@ -269,16 +275,18 @@ def _append_image_evidence_to_index(
         slide_png_uri = ev.get("slide_png_uri")
 
         source_id = str(uuid.uuid4())
-        sources_out.append({
-            "source_id": source_id,
-            "type": "IMAGE",
-            "slide_index": slide_index,
-            "artifact_url": slide_png_uri,
-            "metadata": {
-                "image_bbox": image_bbox,
-                "ppt_picture_shape_id": ppt_shape_id,
-            },
-        })
+        sources_out.append(
+            {
+                "source_id": source_id,
+                "type": "IMAGE",
+                "slide_index": slide_index,
+                "artifact_url": slide_png_uri,
+                "metadata": {
+                    "image_bbox": image_bbox,
+                    "ppt_picture_shape_id": ppt_shape_id,
+                },
+            }
+        )
 
         image_uri = ev.get("image_uri") or slide_png_uri
         ref_item = {
@@ -295,17 +303,19 @@ def _append_image_evidence_to_index(
         if ppt_shape_id:
             ref_item["ppt_shape_id"] = ppt_shape_id
 
-        evidence_items_out.append({
-            "evidence_id": ev_id,
-            "source_id": source_id,
-            "kind": kind,
-            "content": content,
-            "content_hash": _content_hash(content),
-            "confidence": confidence,
-            "slide_index": slide_index,
-            "reason_code": ev.get("reason_code"),
-            "refs": [ref_item],
-        })
+        evidence_items_out.append(
+            {
+                "evidence_id": ev_id,
+                "source_id": source_id,
+                "kind": kind,
+                "content": content,
+                "content_hash": _content_hash(content),
+                "confidence": confidence,
+                "slide_index": slide_index,
+                "reason_code": ev.get("reason_code"),
+                "refs": [ref_item],
+            }
+        )
 
         slide_id = slide_by_index.get(slide_index)
         source_row = Source(
@@ -365,10 +375,12 @@ def _append_image_evidence_to_index(
         storage_path=storage_path,
         sha256=index_sha256,
         size_bytes=str(len(index_bytes)),
-        metadata_json=json.dumps({
-            "type": "evidence_index",
-            "image_evidence_appended": len(image_evidence_items),
-        }),
+        metadata_json=json.dumps(
+            {
+                "type": "evidence_index",
+                "image_evidence_appended": len(image_evidence_items),
+            }
+        ),
         created_at=created_at,
     )
     db_session.add(artifact_row)
@@ -464,12 +476,14 @@ def write_slide_vision_debug_bundle(
         if si not in images_by_slide:
             images_by_slide[si] = []
         kind_info = classifications_by_image.get(img.get("image_id", ""), {})
-        images_by_slide[si].append({
-            "image_id": img.get("image_id"),
-            "uri": img.get("uri"),
-            "kind": kind_info.get("image_kind"),
-            "confidence": kind_info.get("confidence"),
-        })
+        images_by_slide[si].append(
+            {
+                "image_id": img.get("image_id"),
+                "uri": img.get("uri"),
+                "kind": kind_info.get("image_kind"),
+                "confidence": kind_info.get("confidence"),
+            }
+        )
 
     for i in range(slide_count):
         slide_index = i + 1
@@ -495,11 +509,13 @@ def write_slide_vision_debug_bundle(
         for s in segs_for_slide:
             r = report_by_claim.get(s.get("claim_id"))
             if r:
-                verifier_entries.append({
-                    "claim_id": r.get("claim_id"),
-                    "verdict": r.get("verdict"),
-                    "reason_codes": r.get("reason_codes") or r.get("reasons") or [],
-                })
+                verifier_entries.append(
+                    {
+                        "claim_id": r.get("claim_id"),
+                        "verdict": r.get("verdict"),
+                        "reason_codes": r.get("reason_codes") or r.get("reasons") or [],
+                    }
+                )
 
         payload = {
             "schema_version": "1.0",

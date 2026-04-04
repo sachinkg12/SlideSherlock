@@ -87,6 +87,8 @@ def test_wrap_text_to_lines():
     img = Image.new("RGBA", (400, 100), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     font = ImageFont.load_default()
-    lines = _wrap_text_to_lines("One two three four five six seven eight nine ten", draw, font, 200, 3)
+    lines = _wrap_text_to_lines(
+        "One two three four five six seven eight nine ten", draw, font, 200, 3
+    )
     assert len(lines) <= 3
     assert len(lines) >= 1

@@ -45,6 +45,7 @@ def _slide_needs_fallback(
     if _word_count(notes or "") >= MIN_NOTES_WORDS:
         return False
     from script_context import IMAGE_EVIDENCE_KINDS
+
     for ev in evidence_items:
         if ev.get("slide_index") != slide_index:
             continue
@@ -116,9 +117,7 @@ def run_slide_caption_fallback(
             continue
         slide_uri = f"jobs/{job_id}/render/slides/slide_{slide_index:03d}.png"
         try:
-            caption_res = vision_provider.caption(
-                slide_uri, lang=lang, minio_client=minio_client
-            )
+            caption_res = vision_provider.caption(slide_uri, lang=lang, minio_client=minio_client)
         except Exception:
             caption_res = {
                 "caption": "Image present; details unavailable",
@@ -130,18 +129,20 @@ def run_slide_caption_fallback(
         ev_id = _stable_evidence_id(job_id, slide_index)
         # Full slide bbox (normalized 0,0,1,1)
         image_bbox = {"left": 0, "top": 0, "width": 1, "height": 1}
-        slide_evidence_items.append({
-            "evidence_id": ev_id,
-            "kind": KIND_SLIDE_CAPTION,
-            "content": caption,
-            "confidence": confidence,
-            "slide_index": slide_index,
-            "image_bbox": image_bbox,
-            "image_uri": slide_uri,
-            "slide_png_uri": slide_uri,
-            "ppt_picture_shape_id": None,
-            "reason_code": caption_res.get("reason_code"),
-        })
+        slide_evidence_items.append(
+            {
+                "evidence_id": ev_id,
+                "kind": KIND_SLIDE_CAPTION,
+                "content": caption,
+                "confidence": confidence,
+                "slide_index": slide_index,
+                "image_bbox": image_bbox,
+                "image_uri": slide_uri,
+                "slide_png_uri": slide_uri,
+                "ppt_picture_shape_id": None,
+                "reason_code": caption_res.get("reason_code"),
+            }
+        )
         slides_captioned.append(slide_index)
 
     if slide_evidence_items:

@@ -99,8 +99,14 @@ class TranslateStage:
         )
         if notes_translate:
             ctx.per_slide_notes_for_overlay = notes_translated_list
-            notes_clean = [{"slide_index": i + 1, "notes": n, "notes_clean": n} for i, (n, _) in enumerate(slides_notes_and_text)]
-            notes_tr = [{"slide_index": i + 1, "notes_translated": t} for i, t in enumerate(notes_translated_list)]
+            notes_clean = [
+                {"slide_index": i + 1, "notes": n, "notes_clean": n}
+                for i, (n, _) in enumerate(slides_notes_and_text)
+            ]
+            notes_tr = [
+                {"slide_index": i + 1, "notes_translated": t}
+                for i, t in enumerate(notes_translated_list)
+            ]
             notes_prefix = f"jobs/{job_id}/notes/{variant_id}/"
             minio_client.put(
                 f"{notes_prefix}notes_clean.json",
@@ -114,9 +120,13 @@ class TranslateStage:
             )
 
         trans_report = build_translation_report(
-            job_id, variant_id, target_lang,
-            script_report, notes_report if notes_translate else [],
-            script_verified_ok, ctx.translation_degraded,
+            job_id,
+            variant_id,
+            target_lang,
+            script_report,
+            notes_report if notes_translate else [],
+            script_verified_ok,
+            ctx.translation_degraded,
         )
         minio_client.put(
             f"{script_prefix}translation_report.json",

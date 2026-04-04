@@ -64,9 +64,24 @@ def concat_audio(
         fd, sil_in = tempfile.mkstemp(suffix=".wav")
         os.close(fd)
         subprocess.run(
-            ["ffmpeg", "-y", "-f", "lavfi", "-i", f"anullsrc=r={sample_rate}:cl=mono",
-             "-t", str(intro_silence_sec), "-ar", str(sample_rate), "-ac", "1", sil_in],
-            check=True, capture_output=True, timeout=30,
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                f"anullsrc=r={sample_rate}:cl=mono",
+                "-t",
+                str(intro_silence_sec),
+                "-ar",
+                str(sample_rate),
+                "-ac",
+                "1",
+                sil_in,
+            ],
+            check=True,
+            capture_output=True,
+            timeout=30,
         )
         parts.append(sil_in)
         extra_temps.append(sil_in)
@@ -76,9 +91,24 @@ def concat_audio(
         fd, sil_out = tempfile.mkstemp(suffix=".wav")
         os.close(fd)
         subprocess.run(
-            ["ffmpeg", "-y", "-f", "lavfi", "-i", f"anullsrc=r={sample_rate}:cl=mono",
-             "-t", str(outro_silence_sec), "-ar", str(sample_rate), "-ac", "1", sil_out],
-            check=True, capture_output=True, timeout=30,
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "lavfi",
+                "-i",
+                f"anullsrc=r={sample_rate}:cl=mono",
+                "-t",
+                str(outro_silence_sec),
+                "-ar",
+                str(sample_rate),
+                "-ac",
+                "1",
+                sil_out,
+            ],
+            check=True,
+            capture_output=True,
+            timeout=30,
         )
         parts.append(sil_out)
         extra_temps.append(sil_out)
@@ -92,10 +122,18 @@ def concat_audio(
         try:
             subprocess.run(
                 [
-                    "ffmpeg", "-y", "-f", "concat", "-safe", "0",
-                    "-i", list_path,
-                    "-ar", str(sample_rate),
-                    "-ac", "1",
+                    "ffmpeg",
+                    "-y",
+                    "-f",
+                    "concat",
+                    "-safe",
+                    "0",
+                    "-i",
+                    list_path,
+                    "-ar",
+                    str(sample_rate),
+                    "-ac",
+                    "1",
                     output_audio_path,
                 ],
                 check=True,
@@ -127,9 +165,19 @@ def _get_video_duration(path: str) -> float:
         return _get_duration_seconds(path) or 0.0
     try:
         r = subprocess.run(
-            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-             "-of", "default=noprint_wrappers=1:nokey=1", path],
-            capture_output=True, text=True, timeout=5,
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                path,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         if r.returncode == 0 and r.stdout.strip():
             return float(r.stdout.strip())
@@ -158,7 +206,9 @@ def _render_card_mp4(
         font_small = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 36)
     except Exception:
         try:
-            font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 72)
+            font_large = ImageFont.truetype(
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 72
+            )
             font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
         except Exception:
             font_large = ImageFont.load_default()
@@ -178,12 +228,23 @@ def _render_card_mp4(
     try:
         subprocess.run(
             [
-                "ffmpeg", "-y", "-loop", "1", "-i", card_png,
-                "-t", str(duration_sec), "-pix_fmt", "yuv420p",
-                "-vf", f"scale={width}:{height}",
+                "ffmpeg",
+                "-y",
+                "-loop",
+                "1",
+                "-i",
+                card_png,
+                "-t",
+                str(duration_sec),
+                "-pix_fmt",
+                "yuv420p",
+                "-vf",
+                f"scale={width}:{height}",
                 output_path,
             ],
-            check=True, capture_output=True, timeout=60,
+            check=True,
+            capture_output=True,
+            timeout=60,
         )
     finally:
         if os.path.exists(card_png):
@@ -204,6 +265,7 @@ def _compose_with_crossfade(
     if len(video_paths) < 2:
         if len(video_paths) == 1:
             import shutil
+
             shutil.copy(video_paths[0], output_path)
             return output_path
         raise ValueError("Need at least one video")
@@ -220,10 +282,26 @@ def _compose_with_crossfade(
         out_label = "vout" if i == len(video_paths) - 1 else f"v{i:02d}"
         in_a = "[0:v]" if i == 1 else f"[v{i-1:02d}]"
         in_b = f"[{i}:v]"
-        filters.append(f"{in_a}{in_b}xfade=transition=fade:duration={fade_sec:.3f}:offset={offset:.3f}[{out_label}]")
+        filters.append(
+            f"{in_a}{in_b}xfade=transition=fade:duration={fade_sec:.3f}:offset={offset:.3f}[{out_label}]"
+        )
         cum_dur = cum_dur + durations[i] - fade_sec
     filter_str = ";".join(filters)
-    cmd = ["ffmpeg", "-y"] + inputs + ["-filter_complex", filter_str, "-map", "[vout]", "-c:v", "libx264", "-pix_fmt", "yuv420p", output_path]
+    cmd = (
+        ["ffmpeg", "-y"]
+        + inputs
+        + [
+            "-filter_complex",
+            filter_str,
+            "-map",
+            "[vout]",
+            "-c:v",
+            "libx264",
+            "-pix_fmt",
+            "yuv420p",
+            output_path,
+        ]
+    )
     subprocess.run(cmd, check=True, capture_output=True, timeout=600)
     return output_path
 
@@ -249,19 +327,39 @@ def compose_video(
     if not per_slide_mp4_paths:
         raise ValueError("No slide videos to concat")
     config = video_config
-    use_crossfade = config and getattr(config, "transition", "") == TRANSITION_CROSSFADE and len(per_slide_mp4_paths) >= 2
+    use_crossfade = (
+        config
+        and getattr(config, "transition", "") == TRANSITION_CROSSFADE
+        and len(per_slide_mp4_paths) >= 2
+    )
     use_intro = config and getattr(config, "intro_enabled", False)
     use_outro = config and getattr(config, "outro_enabled", False)
     fade_ms = getattr(config, "audio_fade_ms", 0) if config else 0
-    use_subs_burn = config and getattr(config, "subtitles_burn_in", False) and srt_path and os.path.exists(srt_path)
+    use_subs_burn = (
+        config
+        and getattr(config, "subtitles_burn_in", False)
+        and srt_path
+        and os.path.exists(srt_path)
+    )
     use_bgm = config and getattr(config, "bgm_enabled", False) and getattr(config, "bgm_path", None)
     # Get dimensions from first slide
     try:
         r = subprocess.run(
-            ["ffprobe", "-v", "error", "-select_streams", "v:0",
-             "-show_entries", "stream=width,height", "-of", "csv=p=0",
-             per_slide_mp4_paths[0]],
-            capture_output=True, text=True, timeout=5,
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-select_streams",
+                "v:0",
+                "-show_entries",
+                "stream=width,height",
+                "-of",
+                "csv=p=0",
+                per_slide_mp4_paths[0],
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
         )
         wh = (r.stdout or "").strip().split(",")
         width = int(wh[0]) if len(wh) >= 1 and wh[0].isdigit() else 1280
@@ -282,7 +380,9 @@ def compose_video(
             getattr(config, "intro_title", deck_title or "Presentation"),
             getattr(config, "intro_subtitle", deck_subtitle),
             getattr(config, "intro_duration", 2.0),
-            width, height, intro_path,
+            width,
+            height,
+            intro_path,
         )
         video_paths.insert(0, intro_path)
         durations.insert(0, getattr(config, "intro_duration", 2.0))
@@ -293,7 +393,9 @@ def compose_video(
             getattr(config, "outro_text", "Thanks for watching"),
             "",
             getattr(config, "outro_duration", 2.0),
-            width, height, outro_path,
+            width,
+            height,
+            outro_path,
         )
         video_paths.append(outro_path)
         durations.append(getattr(config, "outro_duration", 2.0))
@@ -322,8 +424,22 @@ def compose_video(
             concat_path = tempfile.mktemp(suffix=".mp4")
             try:
                 subprocess.run(
-                    ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", list_path, "-c", "copy", concat_path],
-                    check=True, capture_output=True, timeout=300,
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-f",
+                        "concat",
+                        "-safe",
+                        "0",
+                        "-i",
+                        list_path,
+                        "-c",
+                        "copy",
+                        concat_path,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    timeout=300,
                 )
             finally:
                 if os.path.exists(list_path):
@@ -368,8 +484,20 @@ def compose_video(
                         out.write(f.read())
                 srt_uri = "file://" + os.path.abspath(srt_temp).replace("\\", "/")
                 subprocess.run(
-                    ["ffmpeg", "-y", "-i", video_input, "-vf", f"subtitles={srt_uri}", "-c:a", "copy", sub_path_temp],
-                    check=True, capture_output=True, timeout=300,
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        video_input,
+                        "-vf",
+                        f"subtitles={srt_uri}",
+                        "-c:a",
+                        "copy",
+                        sub_path_temp,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    timeout=300,
                 )
                 video_input = sub_path_temp
             except Exception:
@@ -383,7 +511,9 @@ def compose_video(
         total_video_dur = sum(durations) if durations else total_duration_seconds
         if final_audio_path and os.path.exists(final_audio_path):
             audio_dur = _get_video_duration(final_audio_path) if hasattr(subprocess, "run") else 0.0
-            video_dur = _get_video_duration(video_input) if hasattr(subprocess, "run") else total_video_dur
+            video_dur = (
+                _get_video_duration(video_input) if hasattr(subprocess, "run") else total_video_dur
+            )
             if video_dur <= 0:
                 video_dur = total_video_dur
             if audio_dur <= 0:
@@ -395,18 +525,43 @@ def compose_video(
             try:
                 subprocess.run(
                     [
-                        "ffmpeg", "-y", "-i", final_audio_path,
-                        "-af", f"apad=whole_dur={target_dur}",
-                        "-ar", str(audio_sample_rate), "-ac", "1",
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        final_audio_path,
+                        "-af",
+                        f"apad=whole_dur={target_dur}",
+                        "-ar",
+                        str(audio_sample_rate),
+                        "-ac",
+                        "1",
                         padded_audio,
                     ],
-                    check=True, capture_output=True, timeout=60,
+                    check=True,
+                    capture_output=True,
+                    timeout=60,
                 )
                 subprocess.run(
-                    ["ffmpeg", "-y", "-i", video_input, "-i", padded_audio,
-                     "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac",
-                     output_path],
-                    check=True, capture_output=True, timeout=300,
+                    [
+                        "ffmpeg",
+                        "-y",
+                        "-i",
+                        video_input,
+                        "-i",
+                        padded_audio,
+                        "-map",
+                        "0:v",
+                        "-map",
+                        "1:a",
+                        "-c:v",
+                        "copy",
+                        "-c:a",
+                        "aac",
+                        output_path,
+                    ],
+                    check=True,
+                    capture_output=True,
+                    timeout=300,
                 )
             finally:
                 if os.path.exists(padded_audio):
@@ -418,14 +573,28 @@ def compose_video(
             total_dur = sum(durations) if durations else total_duration_seconds
             subprocess.run(
                 [
-                    "ffmpeg", "-y", "-f", "lavfi", "-i",
+                    "ffmpeg",
+                    "-y",
+                    "-f",
+                    "lavfi",
+                    "-i",
                     f"anullsrc=channel_layout=stereo:sample_rate={audio_sample_rate}:duration={total_dur}",
-                    "-i", video_input,
-                    "-c:v", "copy", "-c:a", "aac", "-shortest",
-                    "-map", "1:v", "-map", "0:a",
+                    "-i",
+                    video_input,
+                    "-c:v",
+                    "copy",
+                    "-c:a",
+                    "aac",
+                    "-shortest",
+                    "-map",
+                    "1:v",
+                    "-map",
+                    "0:a",
                     output_path,
                 ],
-                check=True, capture_output=True, timeout=300,
+                check=True,
+                capture_output=True,
+                timeout=300,
             )
         if final_audio_path and final_audio_path != audio_path and os.path.exists(final_audio_path):
             try:

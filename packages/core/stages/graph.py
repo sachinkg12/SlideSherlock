@@ -44,7 +44,11 @@ class GraphStage:
 
         # 7. Vision pipeline (optional) + merge -> G_unified
         vision_enabled = os.environ.get("VISION_ENABLED", "").lower() in ("1", "true", "yes")
-        image_understand_enabled = os.environ.get("IMAGE_UNDERSTAND_ENABLED", "1").lower() in ("1", "true", "yes")
+        image_understand_enabled = os.environ.get("IMAGE_UNDERSTAND_ENABLED", "1").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         all_merge_flags = []
         vision_graphs_by_slide: Dict[int, Dict[str, Any]] = {}
 
@@ -65,14 +69,34 @@ class GraphStage:
                 if vision_enabled and build_vision_graph_slide and i < len(slides):
                     slide_img = slides[i]
                     try:
-                        vision_out = build_vision_graph_slide(slide_img, slide_index, ocr_backend="tesseract", detect_lines=False)
-                        g_vision = {"slide_index": slide_index, "nodes": vision_out["nodes"], "edges": vision_out["edges"]}
+                        vision_out = build_vision_graph_slide(
+                            slide_img, slide_index, ocr_backend="tesseract", detect_lines=False
+                        )
+                        g_vision = {
+                            "slide_index": slide_index,
+                            "nodes": vision_out["nodes"],
+                            "edges": vision_out["edges"],
+                        }
                         # Write ocr/slide_i.json (text_spans)
                         ocr_path = f"jobs/{job_id}/ocr/slide_{slide_num}.json"
-                        minio_client.put(ocr_path, json.dumps({"slide_index": slide_index, "text_spans": vision_out["text_spans"]}, indent=2).encode("utf-8"), "application/json")
+                        minio_client.put(
+                            ocr_path,
+                            json.dumps(
+                                {
+                                    "slide_index": slide_index,
+                                    "text_spans": vision_out["text_spans"],
+                                },
+                                indent=2,
+                            ).encode("utf-8"),
+                            "application/json",
+                        )
                         # Write graphs/vision/slide_i.json
                         vision_path = f"jobs/{job_id}/graphs/vision/slide_{slide_num}.json"
-                        minio_client.put(vision_path, json.dumps(g_vision, indent=2).encode("utf-8"), "application/json")
+                        minio_client.put(
+                            vision_path,
+                            json.dumps(g_vision, indent=2).encode("utf-8"),
+                            "application/json",
+                        )
                     except Exception as e:
                         print(f"  Warning: vision failed for slide {slide_index}: {e}")
                 if g_vision:
@@ -84,12 +108,24 @@ class GraphStage:
                     slide_height_px=float(height_px),
                 )
                 unified_path = f"jobs/{job_id}/graphs/unified/slide_{slide_num}.json"
-                minio_client.put(unified_path, json.dumps(g_unified, indent=2).encode("utf-8"), "application/json")
+                minio_client.put(
+                    unified_path,
+                    json.dumps(g_unified, indent=2).encode("utf-8"),
+                    "application/json",
+                )
                 all_merge_flags.append(flags)
             if all_merge_flags:
                 merge_flags_path = f"jobs/{job_id}/graphs/unified/flags.json"
-                merge_flags_payload = {"job_id": job_id, "slides": all_merge_flags, "created_at": datetime.utcnow().isoformat() + "Z"}
-                minio_client.put(merge_flags_path, json.dumps(merge_flags_payload, indent=2).encode("utf-8"), "application/json")
+                merge_flags_payload = {
+                    "job_id": job_id,
+                    "slides": all_merge_flags,
+                    "created_at": datetime.utcnow().isoformat() + "Z",
+                }
+                minio_client.put(
+                    merge_flags_path,
+                    json.dumps(merge_flags_payload, indent=2).encode("utf-8"),
+                    "application/json",
+                )
                 print(f"  Unified graph written to jobs/{job_id}/graphs/unified/slide_*.json")
 
         ctx.vision_graphs_by_slide = vision_graphs_by_slide
@@ -108,9 +144,12 @@ class GraphStage:
                     db_session=db,
                     vision_graphs_by_slide=vision_graphs_by_slide,
                 )
-                print(f"  Image understand: {img_result.get('image_evidence_count', 0)} evidence items, vision/* written")
+                print(
+                    f"  Image understand: {img_result.get('image_evidence_count', 0)} evidence items, vision/* written"
+                )
             except Exception as e:
                 import traceback
+
                 print(f"  Warning: image_understand failed: {e}\n{traceback.format_exc()}")
 
         # Load unified graphs for downstream stages
@@ -126,7 +165,9 @@ class GraphStage:
                 print(f"  Warning: could not load {unified_path}: {e}")
 
         ctx.unified_graphs = unified_graphs
-        ctx.unified_by_slide = {g.get("slide_index", i + 1): g for i, g in enumerate(unified_graphs)}
+        ctx.unified_by_slide = {
+            g.get("slide_index", i + 1): g for i, g in enumerate(unified_graphs)
+        }
 
         return StageResult(
             status="ok",

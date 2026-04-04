@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 try:
     from PIL import Image
     import numpy as np
+
     PIL_AVAILABLE = True
 except ImportError:
     Image = None  # type: ignore
@@ -21,6 +22,7 @@ except ImportError:
 
 try:
     import cv2
+
     CV2_AVAILABLE = True
 except ImportError:
     cv2 = None  # type: ignore
@@ -62,6 +64,7 @@ def _image_to_array(image: Any) -> Any:
         return np.array(image)
     if isinstance(image, bytes):
         from io import BytesIO
+
         try:
             return np.array(Image.open(BytesIO(image)).convert("RGB"))
         except Exception:
@@ -76,6 +79,7 @@ def _text_density(image: Any) -> Tuple[float, str]:
     try:
         if isinstance(image, bytes):
             from io import BytesIO
+
             img = Image.open(BytesIO(image)).convert("RGB")
         else:
             img = image
@@ -103,13 +107,21 @@ def _line_density(image: Any) -> Tuple[float, int, str]:
             gray = arr
         edges = cv2.Canny(gray, 50, 150)
         lines = cv2.HoughLinesP(
-            edges, rho=1, theta=np.pi / 180, threshold=50,
-            minLineLength=30, maxLineGap=10,
+            edges,
+            rho=1,
+            theta=np.pi / 180,
+            threshold=50,
+            minLineLength=30,
+            maxLineGap=10,
         )
         line_count = len(lines) if lines is not None else 0
         pixels = gray.size
         density = line_count / pixels if pixels else 0.0
-        return min(1.0, density * 1e6), line_count, f"line_density={round(density * 1e6, 2)}e-6,lines={line_count}"
+        return (
+            min(1.0, density * 1e6),
+            line_count,
+            f"line_density={round(density * 1e6, 2)}e-6,lines={line_count}",
+        )
     except Exception:
         return 0.0, 0, "line_density_error"
 
@@ -143,8 +155,12 @@ def _structured_line_ratio(image: Any) -> Tuple[float, str]:
             gray = arr
         edges = cv2.Canny(gray, 50, 150)
         lines = cv2.HoughLinesP(
-            edges, rho=1, theta=np.pi / 180, threshold=50,
-            minLineLength=30, maxLineGap=10,
+            edges,
+            rho=1,
+            theta=np.pi / 180,
+            threshold=50,
+            minLineLength=30,
+            maxLineGap=10,
         )
         if lines is None or len(lines) == 0:
             return 0.0, "structured_lines=0"
@@ -183,8 +199,8 @@ def classify_image(image: Any) -> Dict[str, Any]:
     min_photo = _config_min_confidence_photo()
     min_diagram = _config_min_confidence_diagram()
 
-    diagram_score = (text_dens * 0.3 + line_dens * 0.4 + struct_ratio * 0.3)
-    photo_score = (color_var * 0.5 + (1.0 - line_dens) * 0.3 + (1.0 - text_dens) * 0.2)
+    diagram_score = text_dens * 0.3 + line_dens * 0.4 + struct_ratio * 0.3
+    photo_score = color_var * 0.5 + (1.0 - line_dens) * 0.3 + (1.0 - text_dens) * 0.2
 
     if diagram_score >= min_diagram and diagram_score > photo_score:
         kind = KIND_DIAGRAM
@@ -246,30 +262,36 @@ def run_classify_images(
             kind = result["image_kind"]
             reasons = list(result["reasons"])
             # User override: force_kind_by_slide
-            forced = force_kind_by_slide.get(str(slide_index)) or force_kind_by_slide.get(str(int(slide_index)))
+            forced = force_kind_by_slide.get(str(slide_index)) or force_kind_by_slide.get(
+                str(int(slide_index))
+            )
             if forced and forced.upper() in (KIND_PHOTO, KIND_DIAGRAM, KIND_UNKNOWN):
                 kind = forced.upper()
                 reasons = reasons + ["force_kind_by_slide"]
-            classifications.append({
-                "image_id": image_id,
-                "ppt_shape_id": img.get("ppt_shape_id"),
-                "slide_index": slide_index,
-                "uri": uri,
-                "image_kind": kind,
-                "confidence": result["confidence"],
-                "reasons": reasons,
-                "signals": result.get("signals", {}),
-            })
+            classifications.append(
+                {
+                    "image_id": image_id,
+                    "ppt_shape_id": img.get("ppt_shape_id"),
+                    "slide_index": slide_index,
+                    "uri": uri,
+                    "image_kind": kind,
+                    "confidence": result["confidence"],
+                    "reasons": reasons,
+                    "signals": result.get("signals", {}),
+                }
+            )
         except Exception as e:
-            classifications.append({
-                "image_id": image_id,
-                "ppt_shape_id": img.get("ppt_shape_id"),
-                "slide_index": img.get("slide_index"),
-                "uri": uri,
-                "image_kind": KIND_UNKNOWN,
-                "confidence": 0.0,
-                "reasons": [f"classify_error:{str(e)[:100]}"],
-            })
+            classifications.append(
+                {
+                    "image_id": image_id,
+                    "ppt_shape_id": img.get("ppt_shape_id"),
+                    "slide_index": img.get("slide_index"),
+                    "uri": uri,
+                    "image_kind": KIND_UNKNOWN,
+                    "confidence": 0.0,
+                    "reasons": [f"classify_error:{str(e)[:100]}"],
+                }
+            )
 
     payload = {
         "schema_version": "1.0",

@@ -20,8 +20,20 @@ from script_context import (
 def test_build_context_bundle_includes_image_evidence():
     """Context bundle includes image evidence items with evidence_id and confidence."""
     evidence_items = [
-        {"evidence_id": "ev_cap", "kind": "IMAGE_CAPTION", "content": "A football on grass.", "slide_index": 1, "confidence": 0.9},
-        {"evidence_id": "ev_dia", "kind": "DIAGRAM_SUMMARY", "content": "Actor A sends request to B.", "slide_index": 1, "confidence": 0.7},
+        {
+            "evidence_id": "ev_cap",
+            "kind": "IMAGE_CAPTION",
+            "content": "A football on grass.",
+            "slide_index": 1,
+            "confidence": 0.9,
+        },
+        {
+            "evidence_id": "ev_dia",
+            "kind": "DIAGRAM_SUMMARY",
+            "content": "Actor A sends request to B.",
+            "slide_index": 1,
+            "confidence": 0.7,
+        },
     ]
     bundle = build_context_bundle(1, "Slide title", "", {"nodes": [], "edges": []}, evidence_items)
     assert bundle["slide_index"] == 1
@@ -48,7 +60,12 @@ def test_narration_policy_image_evidence_high_conf():
     bundle = {
         "notes": "",
         "image_evidence_items": [
-            {"evidence_id": "ev_cap", "kind": "IMAGE_CAPTION", "content": "Football.", "confidence": 0.8},
+            {
+                "evidence_id": "ev_cap",
+                "kind": "IMAGE_CAPTION",
+                "content": "Football.",
+                "confidence": 0.8,
+            },
         ],
         "image_evidence_max_confidence": 0.8,
     }
@@ -63,7 +80,12 @@ def test_narration_policy_generic_low_conf():
     bundle = {
         "notes": "",
         "image_evidence_items": [
-            {"evidence_id": "ev_lo", "kind": "IMAGE_CAPTION", "content": "Blurry.", "confidence": 0.3},
+            {
+                "evidence_id": "ev_lo",
+                "kind": "IMAGE_CAPTION",
+                "content": "Blurry.",
+                "confidence": 0.3,
+            },
         ],
         "image_evidence_max_confidence": 0.3,
     }
@@ -75,8 +97,20 @@ def test_narration_policy_generic_low_conf():
 def test_build_context_bundles_per_slide():
     """Build bundles for all slides; filter evidence by slide_index."""
     evidence_items = [
-        {"evidence_id": "e1", "kind": "IMAGE_CAPTION", "content": "First.", "slide_index": 1, "confidence": 0.8},
-        {"evidence_id": "e2", "kind": "DIAGRAM_SUMMARY", "content": "Second.", "slide_index": 2, "confidence": 0.7},
+        {
+            "evidence_id": "e1",
+            "kind": "IMAGE_CAPTION",
+            "content": "First.",
+            "slide_index": 1,
+            "confidence": 0.8,
+        },
+        {
+            "evidence_id": "e2",
+            "kind": "DIAGRAM_SUMMARY",
+            "content": "Second.",
+            "slide_index": 2,
+            "confidence": 0.7,
+        },
     ]
     bundles = build_context_bundles_per_slide(
         2,

@@ -48,8 +48,14 @@ def generate_script(
     context_bundles_by_slide = context_bundles_by_slide or {}
 
     # Build context bundles if not provided but we have slides data
-    if not context_bundles_by_slide and build_context_bundles_per_slide and slides_notes_and_text is not None:
-        slide_count = max((s.get("slide_index", 0) for s in sections), default=0) or len(slides_notes_and_text)
+    if (
+        not context_bundles_by_slide
+        and build_context_bundles_per_slide
+        and slides_notes_and_text is not None
+    ):
+        slide_count = max((s.get("slide_index", 0) for s in sections), default=0) or len(
+            slides_notes_and_text
+        )
         context_bundles_by_slide = build_context_bundles_per_slide(
             slide_count, slides_notes_and_text, unified_graphs_by_slide, evidence_index
         )
@@ -67,7 +73,9 @@ def generate_script(
 
         section_type = section.get("section_type", "")
         # Apply safe-phrasing policy (notes / image evidence / generic) only to intro segment per slide
-        context_bundle = context_bundles_by_slide.get(slide_index) if section_type == "intro" else None
+        context_bundle = (
+            context_bundles_by_slide.get(slide_index) if section_type == "intro" else None
+        )
         policy_override: Optional[str] = None
         used_hedging = False
 
@@ -122,14 +130,16 @@ def generate_script(
         )
 
         claim_id = _claim_id(job_id, slide_index, ix)
-        segments.append({
-            "claim_id": claim_id,
-            "slide_index": slide_index,
-            "text": text,
-            "evidence_ids": evidence_ids,
-            "entity_ids": entity_ids,
-            "used_hedging": used_hedging,
-        })
+        segments.append(
+            {
+                "claim_id": claim_id,
+                "slide_index": slide_index,
+                "text": text,
+                "evidence_ids": evidence_ids,
+                "entity_ids": entity_ids,
+                "used_hedging": used_hedging,
+            }
+        )
 
     script = {
         "schema_version": "1.0",

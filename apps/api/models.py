@@ -32,9 +32,7 @@ class Project(Base):
     name = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     jobs = relationship("Job", back_populates="project")
     artifacts = relationship("Artifact", back_populates="project")
@@ -51,9 +49,7 @@ class Job(Base):
     config_json = Column(Text, nullable=True)  # JSON: vision.enabled, force_kind_by_slide, etc.
     error_message = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
-    )
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     project = relationship("Project", back_populates="jobs")
     artifacts = relationship("Artifact", back_populates="job")
@@ -68,9 +64,7 @@ class Artifact(Base):
     artifact_id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     project_id = Column(String, ForeignKey("projects.project_id"), nullable=False)
     job_id = Column(String, ForeignKey("jobs.job_id"), nullable=True)
-    artifact_type = Column(
-        String, nullable=False
-    )  # e.g., "script", "video", "evidence", "pptx"
+    artifact_type = Column(String, nullable=False)  # e.g., "script", "video", "evidence", "pptx"
     storage_path = Column(String, nullable=False)
     sha256 = Column(String, nullable=True)  # SHA256 hash of file content
     size_bytes = Column(String, nullable=True)  # File size in bytes

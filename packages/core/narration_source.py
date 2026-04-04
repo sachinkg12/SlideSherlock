@@ -147,8 +147,10 @@ def get_narration_with_smart_fallback(
                 text, entity_ids, evidence_ids = result[0], result[1], result[2]
                 entity_ids = entity_ids or []
                 evidence_ids = evidence_ids or []
-                if text and _word_count(text) >= 2 and _verify_grounding(
-                    entity_ids, evidence_ids, graph, evidence_by_id
+                if (
+                    text
+                    and _word_count(text) >= 2
+                    and _verify_grounding(entity_ids, evidence_ids, graph, evidence_by_id)
                 ):
                     return text, SOURCE_LLM, entity_ids, evidence_ids
         except Exception:
@@ -225,10 +227,12 @@ def build_narration_per_slide(
             text, source = get_narration_text_for_slide(
                 slide_index, notes, slide_text, graph, llm_narration_fn
             )
-            entries.append({
-                "slide_index": slide_index,
-                "narration_text": text,
-                "source_used": source,
-                "word_count": _word_count(text),
-            })
+            entries.append(
+                {
+                    "slide_index": slide_index,
+                    "narration_text": text,
+                    "source_used": source,
+                    "word_count": _word_count(text),
+                }
+            )
     return entries

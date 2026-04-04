@@ -83,9 +83,21 @@ class VerifyStage:
             coverage_payload = build_coverage_payload(job_id, coverage)
             verify_report_path = f"{script_prefix}verify_report.json"
             coverage_path = f"{script_prefix}coverage.json"
-            minio_client.put(script_path, json.dumps(verified_script, indent=2).encode("utf-8"), "application/json")
-            minio_client.put(verify_report_path, json.dumps(verify_report_payload, indent=2).encode("utf-8"), "application/json")
-            minio_client.put(coverage_path, json.dumps(coverage_payload, indent=2).encode("utf-8"), "application/json")
+            minio_client.put(
+                script_path,
+                json.dumps(verified_script, indent=2).encode("utf-8"),
+                "application/json",
+            )
+            minio_client.put(
+                verify_report_path,
+                json.dumps(verify_report_payload, indent=2).encode("utf-8"),
+                "application/json",
+            )
+            minio_client.put(
+                coverage_path,
+                json.dumps(coverage_payload, indent=2).encode("utf-8"),
+                "application/json",
+            )
             artifacts_written.extend([script_path, verify_report_path, coverage_path])
 
             for path, payload, art_type in [
@@ -95,18 +107,24 @@ class VerifyStage:
             ]:
                 raw = json.dumps(payload, indent=2).encode("utf-8")
                 sha = hashlib.sha256(raw).hexdigest()
-                db.add(Artifact(
-                    artifact_id=str(uuid.uuid4()),
-                    project_id=ctx.project_id,
-                    job_id=job_id,
-                    artifact_type=art_type,
-                    storage_path=path,
-                    sha256=sha,
-                    size_bytes=str(len(raw)),
-                    metadata_json=json.dumps({"type": art_type, "stage": "verify", "variant_id": variant_id}),
-                    created_at=datetime.utcnow(),
-                ))
-            print(f"  Verifier + rewrite loop: script/script.json (verified), verify_report.json, coverage.json written")
+                db.add(
+                    Artifact(
+                        artifact_id=str(uuid.uuid4()),
+                        project_id=ctx.project_id,
+                        job_id=job_id,
+                        artifact_type=art_type,
+                        storage_path=path,
+                        sha256=sha,
+                        size_bytes=str(len(raw)),
+                        metadata_json=json.dumps(
+                            {"type": art_type, "stage": "verify", "variant_id": variant_id}
+                        ),
+                        created_at=datetime.utcnow(),
+                    )
+                )
+            print(
+                f"  Verifier + rewrite loop: script/script.json (verified), verify_report.json, coverage.json written"
+            )
 
         # Store for downstream
         ctx.verified_script = verified_script
@@ -120,11 +138,15 @@ class VerifyStage:
                 img_idx_debug = None
                 kinds_debug = None
                 try:
-                    img_idx_debug = json.loads(minio_client.get(f"jobs/{job_id}/images/index.json").decode("utf-8"))
+                    img_idx_debug = json.loads(
+                        minio_client.get(f"jobs/{job_id}/images/index.json").decode("utf-8")
+                    )
                 except Exception:
                     pass
                 try:
-                    kinds_debug = json.loads(minio_client.get(f"jobs/{job_id}/vision/image_kinds.json").decode("utf-8"))
+                    kinds_debug = json.loads(
+                        minio_client.get(f"jobs/{job_id}/vision/image_kinds.json").decode("utf-8")
+                    )
                 except Exception:
                     pass
                 write_slide_vision_debug_bundle(
@@ -140,7 +162,10 @@ class VerifyStage:
                 print(f"  Debug: jobs/{job_id}/debug/slide_*_vision_debug.json written")
             except Exception as e:
                 import traceback
-                print(f"  Warning: write_slide_vision_debug_bundle failed: {e}\n{traceback.format_exc()}")
+
+                print(
+                    f"  Warning: write_slide_vision_debug_bundle failed: {e}\n{traceback.format_exc()}"
+                )
 
         return StageResult(
             status="ok",

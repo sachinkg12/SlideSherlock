@@ -62,7 +62,7 @@ def tfidf_retrieve(
         tf_d = _tf(doc_tok)
         score = 0.0
         for t in q_tokens:
-            score += (tf_d.get(t, 0) * idf_map.get(t, 1.0))
+            score += tf_d.get(t, 0) * idf_map.get(t, 1.0)
         if score > 0:
             cid = c.get(id_key) or str(i)
             scores.append((cid, score))

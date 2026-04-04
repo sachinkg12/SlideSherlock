@@ -34,13 +34,27 @@ def process_audio(
         raise FileNotFoundError(input_path)
     filters = []
     if trim_silence:
-        filters.append(f"silenceremove=start_periods=1:start_duration={SILENCE_DURATION_THRESHOLD}:start_threshold={SILENCE_NOISE}")
+        filters.append(
+            f"silenceremove=start_periods=1:start_duration={SILENCE_DURATION_THRESHOLD}:start_threshold={SILENCE_NOISE}"
+        )
     filters.append(f"aresample={sample_rate}")
     if loudness_normalize:
         filters.append(f"loudnorm=I={lufs_target}:LRA=11:TP=-1.5")
     filter_str = ",".join(filters)
     subprocess.run(
-        ["ffmpeg", "-y", "-i", input_path, "-af", filter_str, "-ar", str(sample_rate), "-ac", "1", output_path],
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            input_path,
+            "-af",
+            filter_str,
+            "-ar",
+            str(sample_rate),
+            "-ac",
+            "1",
+            output_path,
+        ],
         check=True,
         capture_output=True,
         timeout=60,
@@ -66,7 +80,19 @@ def apply_audio_fade(
     st_out = max(0, dur - fade_sec)
     af = f"afade=t=in:st=0:d={fade_sec},afade=t=out:st={st_out:.3f}:d={fade_sec},aresample={sample_rate}"
     subprocess.run(
-        ["ffmpeg", "-y", "-i", input_path, "-af", af, "-ar", str(sample_rate), "-ac", "1", output_path],
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            input_path,
+            "-af",
+            af,
+            "-ar",
+            str(sample_rate),
+            "-ac",
+            "1",
+            output_path,
+        ],
         check=True,
         capture_output=True,
         timeout=60,
@@ -77,7 +103,16 @@ def apply_audio_fade(
 def _get_duration_seconds(path: str) -> Optional[float]:
     try:
         result = subprocess.run(
-            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", path],
+            [
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                path,
+            ],
             capture_output=True,
             text=True,
             timeout=5,
@@ -106,7 +141,19 @@ def process_audio_simple(
     else:
         af = f"aresample={sample_rate}"
     subprocess.run(
-        ["ffmpeg", "-y", "-i", input_path, "-af", af, "-ar", str(sample_rate), "-ac", "1", output_path],
+        [
+            "ffmpeg",
+            "-y",
+            "-i",
+            input_path,
+            "-af",
+            af,
+            "-ar",
+            str(sample_rate),
+            "-ac",
+            "1",
+            output_path,
+        ],
         check=True,
         capture_output=True,
         timeout=60,

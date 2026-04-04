@@ -19,10 +19,12 @@ if _core_dir not in sys.path:
 # Stage protocol & data classes
 # ---------------------------------------------------------------------------
 
+
 class Stage(Protocol):
     name: str
 
-    def run(self, ctx: "PipelineContext") -> "StageResult": ...
+    def run(self, ctx: "PipelineContext") -> "StageResult":
+        ...
 
 
 @dataclass
@@ -126,6 +128,7 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
         result = stage.run(ctx)
     except Exception as e:
         import traceback
+
         print(f"  Stage '{stage.name}' FAILED: {e}\n{traceback.format_exc()}")
         result = StageResult(status="failed", metrics={"error": str(e)})
     elapsed_ms = int((time.time() - t0) * 1000)
@@ -137,6 +140,7 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
 # ---------------------------------------------------------------------------
 # run_pipeline — the new entry point (replaces render_stage monolith)
 # ---------------------------------------------------------------------------
+
 
 def run_pipeline(job_id: str):
     """Execute the full pipeline for a job."""
@@ -155,6 +159,7 @@ def run_pipeline(job_id: str):
     # Apply quality preset if SLIDESHERLOCK_PRESET is set
     try:
         from presets import get_current_preset, apply_preset
+
         preset = get_current_preset()
         if preset:
             apply_preset(preset)
@@ -178,6 +183,7 @@ def run_pipeline(job_id: str):
         # Update status to PROCESSING
         job.status = JobStatus.PROCESSING
         from datetime import datetime
+
         job.updated_at = datetime.utcnow()
         db.commit()
 
@@ -191,6 +197,7 @@ def run_pipeline(job_id: str):
         vision_enabled = True
         try:
             from vision_config import get_vision_config
+
             vision_config = get_vision_config(getattr(job, "config_json", None))
             vision_enabled = vision_config.get("enabled", True)
             mc = vision_config.get("min_confidence_for_specific_claims")
@@ -232,6 +239,7 @@ def run_pipeline(job_id: str):
         # AI narration happens in the dedicated NarrateStage (post-verify).
         try:
             from llm_provider import StubLLMProvider
+
             ctx.llm_provider = StubLLMProvider()
         except ImportError:
             pass
@@ -296,6 +304,7 @@ def run_pipeline(job_id: str):
             }
 
         from datetime import datetime
+
         metrics_payload = {
             "job_id": job_id,
             "preset": None,
@@ -305,6 +314,7 @@ def run_pipeline(job_id: str):
         }
         try:
             from presets import get_current_preset
+
             metrics_payload["preset"] = get_current_preset()
         except Exception:
             pass
@@ -315,15 +325,18 @@ def run_pipeline(job_id: str):
 
         import hashlib
         import uuid
-        db.add(Artifact(
-            artifact_id=str(uuid.uuid4()),
-            project_id=job.project_id,
-            job_id=job_id,
-            artifact_type="metrics",
-            storage_path=metrics_path,
-            metadata_json=json.dumps({"type": "metrics", "stage": "pipeline"}),
-            created_at=datetime.utcnow(),
-        ))
+
+        db.add(
+            Artifact(
+                artifact_id=str(uuid.uuid4()),
+                project_id=job.project_id,
+                job_id=job_id,
+                artifact_type="metrics",
+                storage_path=metrics_path,
+                metadata_json=json.dumps({"type": "metrics", "stage": "pipeline"}),
+                created_at=datetime.utcnow(),
+            )
+        )
 
         db.commit()
 
@@ -337,10 +350,12 @@ def run_pipeline(job_id: str):
 
     except Exception as e:
         import traceback
+
         error_msg = f"Error in render stage for job {job_id}: {e}\n{traceback.format_exc()}"
         print(error_msg)
         if job:
             from datetime import datetime
+
             job.status = JobStatus.FAILED
             job.error_message = str(e)
             job.updated_at = datetime.utcnow()
@@ -348,6 +363,7 @@ def run_pipeline(job_id: str):
     finally:
         if temp_dir and os.path.exists(temp_dir):
             import shutil
+
             try:
                 shutil.rmtree(temp_dir)
                 print(f"  Cleaned up temp directory: {temp_dir}")

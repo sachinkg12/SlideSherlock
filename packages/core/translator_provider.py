@@ -55,12 +55,14 @@ class StubTranslatorProvider(TranslatorProvider):
 def get_translator_provider() -> Optional[TranslatorProvider]:
     """Factory: return configured translator or StubTranslatorProvider (no-op)."""
     import os
+
     mode = (os.environ.get("TRANSLATOR_PROVIDER") or "stub").strip().lower()
     if mode == "stub" or mode == "none":
         return StubTranslatorProvider()
     if mode == "llm":
         try:
             from translator_provider_llm import LLMTranslatorProvider
+
             return LLMTranslatorProvider()
         except ImportError:
             return StubTranslatorProvider()

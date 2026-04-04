@@ -36,7 +36,9 @@ def _bbox_to_normalized(
     return (left, top, left + w, top + h)
 
 
-def _iou_bbox(b1: Dict[str, Any], b2: Dict[str, Any], w1: float, h1: float, w2: float, h2: float) -> float:
+def _iou_bbox(
+    b1: Dict[str, Any], b2: Dict[str, Any], w1: float, h1: float, w2: float, h2: float
+) -> float:
     """Intersection over union of two bboxes in their respective coordinate systems."""
     L1, T1, R1, B1 = _bbox_to_normalized(b1, w1, h1)
     L2, T2, R2, B2 = _bbox_to_normalized(b2, w2, h2)
@@ -98,8 +100,10 @@ def _geom_score(
     iou = _iou_bbox(
         node_n.get("bbox") or {},
         node_v.get("bbox") or {},
-        width_n, height_n,
-        width_v, height_v,
+        width_n,
+        height_n,
+        width_v,
+        height_v,
     )
     c_n = _bbox_center(node_n.get("bbox") or {}, width_n, height_n)
     c_v = _bbox_center(node_v.get("bbox") or {}, width_v, height_v)
@@ -169,17 +173,9 @@ def merge_graphs(
 
     # Vision disabled or empty -> pass-through native with provenance
     if not g_vision or not (g_vision.get("nodes")):
-        unified_nodes = [
-            _add_provenance_and_confidence(n, "NATIVE", 1.0)
-            for n in nodes_n
-        ]
-        unified_edges = [
-            _add_provenance_and_confidence(e, "NATIVE", 1.0)
-            for e in edges_n
-        ]
-        unified_clusters = [
-            dict(c) for c in clusters_n
-        ]
+        unified_nodes = [_add_provenance_and_confidence(n, "NATIVE", 1.0) for n in nodes_n]
+        unified_edges = [_add_provenance_and_confidence(e, "NATIVE", 1.0) for e in edges_n]
+        unified_clusters = [dict(c) for c in clusters_n]
         for u in unified_clusters:
             u["provenance"] = "NATIVE"
             u["confidence"] = 1.0
@@ -207,9 +203,12 @@ def merge_graphs(
             if n_v.get("node_id") in used_v:
                 continue
             geom = _geom_score(
-                n_n, n_v,
-                slide_width_emu, slide_height_emu,
-                slide_width_px, slide_height_px,
+                n_n,
+                n_v,
+                slide_width_emu,
+                slide_height_emu,
+                slide_width_px,
+                slide_height_px,
             )
             text = _text_score(n_n, n_v)
             type_s = _type_score(n_n, n_v)
@@ -225,7 +224,10 @@ def merge_graphs(
             merged = dict(n_n)
             merged["provenance"] = "BOTH"
             merged["confidence"] = best_score
-            if not (merged.get("label_text") or "").strip() and (best_v.get("label_text") or "").strip():
+            if (
+                not (merged.get("label_text") or "").strip()
+                and (best_v.get("label_text") or "").strip()
+            ):
                 merged["label_text"] = best_v.get("label_text")
             unified_nodes.append(merged)
         else:
@@ -243,7 +245,9 @@ def merge_graphs(
                 float(n_v.get("confidence", 0.7)),
             )
         )
-        flags["unmatched_vision"].append({"node_id": n_v.get("node_id"), "label": n_v.get("label_text")})
+        flags["unmatched_vision"].append(
+            {"node_id": n_v.get("node_id"), "label": n_v.get("label_text")}
+        )
 
     # Edges: for now carry native edges with NATIVE provenance; vision edges as VISION (no src/dst resolution)
     unified_edges: List[Dict[str, Any]] = []

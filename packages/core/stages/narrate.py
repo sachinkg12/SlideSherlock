@@ -38,7 +38,9 @@ class NarrateStage:
         api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
         is_ai = ctx.config.get("ai_narration", False)
 
-        _log(f"ai_narration={is_ai}, api_key={'set (' + str(len(api_key)) + ' chars)' if api_key else 'UNSET'}")
+        _log(
+            f"ai_narration={is_ai}, api_key={'set (' + str(len(api_key)) + ' chars)' if api_key else 'UNSET'}"
+        )
         _log(f"config keys: {list(ctx.config.keys())}")
 
         if not is_ai:
@@ -67,7 +69,9 @@ class NarrateStage:
         evidence_index = ctx.evidence_index
         unified_by_slide = ctx.unified_by_slide
 
-        _log(f"slide_count={slide_count}, evidence_items={len(evidence_index.get('evidence_items', [])) if evidence_index else 0}")
+        _log(
+            f"slide_count={slide_count}, evidence_items={len(evidence_index.get('evidence_items', [])) if evidence_index else 0}"
+        )
         _log(f"slides_notes_and_text length={len(ctx.slides_notes_and_text)}")
 
         # ---- Gather all context per slide ----
@@ -80,7 +84,9 @@ class NarrateStage:
                 ctx_parts["notes"] = (notes_raw or "").strip()[:600]
                 ctx_parts["slide_text"] = (text_raw or "").strip()[:600]
 
-            segments = [s for s in verified_script.get("segments", []) if s.get("slide_index") == si]
+            segments = [
+                s for s in verified_script.get("segments", []) if s.get("slide_index") == si
+            ]
             template_narration = " ".join(s.get("text", "") for s in segments).strip()
             ctx_parts["template_narration"] = template_narration[:800]
 
@@ -104,7 +110,9 @@ class NarrateStage:
 
         _log(f"Built context for {len(slides_context)} slides")
         for i, sc in enumerate(slides_context[:3], 1):
-            _log(f"  Slide {i}: notes={len(sc.get('notes', ''))}chars, text={len(sc.get('slide_text', ''))}chars, template={len(sc.get('template_narration', ''))}chars, evidence={len(sc.get('evidence', []))} items")
+            _log(
+                f"  Slide {i}: notes={len(sc.get('notes', ''))}chars, text={len(sc.get('slide_text', ''))}chars, template={len(sc.get('template_narration', ''))}chars, evidence={len(sc.get('evidence', []))} items"
+            )
 
         # ---- Call GPT-4o for each slide ----
         import requests
@@ -148,12 +156,14 @@ class NarrateStage:
 
             if not user_parts:
                 _log(f"  Slide {si}: NO context available, using fallback")
-                rewritten_entries.append({
-                    "slide_index": si,
-                    "narration_text": f"Slide {si}.",
-                    "source_used": "fallback",
-                    "word_count": 2,
-                })
+                rewritten_entries.append(
+                    {
+                        "slide_index": si,
+                        "narration_text": f"Slide {si}.",
+                        "source_used": "fallback",
+                        "word_count": 2,
+                    }
+                )
                 continue
 
             user_prompt = f"Narrate slide {si} of {slide_count}:\n\n" + "\n\n".join(user_parts)
@@ -205,12 +215,14 @@ class NarrateStage:
                     _log(f"  Slide {si}: GOT {len(new_text)} chars: '{new_text[:80]}...'")
 
                     if new_text and len(new_text) > 10:
-                        rewritten_entries.append({
-                            "slide_index": si,
-                            "narration_text": new_text,
-                            "source_used": "ai_narrate",
-                            "word_count": len(new_text.split()),
-                        })
+                        rewritten_entries.append(
+                            {
+                                "slide_index": si,
+                                "narration_text": new_text,
+                                "source_used": "ai_narrate",
+                                "word_count": len(new_text.split()),
+                            }
+                        )
                         success_count += 1
                         slide_done = True
                         break
@@ -227,12 +239,14 @@ class NarrateStage:
             if not slide_done:
                 fallback = sc.get("template_narration") or sc.get("notes") or f"Slide {si}."
                 _log(f"  Slide {si}: ALL ATTEMPTS FAILED, using fallback ({len(fallback)} chars)")
-                rewritten_entries.append({
-                    "slide_index": si,
-                    "narration_text": fallback,
-                    "source_used": "template_fallback",
-                    "word_count": len(fallback.split()),
-                })
+                rewritten_entries.append(
+                    {
+                        "slide_index": si,
+                        "narration_text": fallback,
+                        "source_used": "template_fallback",
+                        "word_count": len(fallback.split()),
+                    }
+                )
 
         # ---- Set override for audio stage ----
         _log(f"Setting narration_entries_override: {len(rewritten_entries)} entries")

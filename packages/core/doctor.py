@@ -28,14 +28,22 @@ def _find_libreoffice() -> Tuple[bool, str]:
                     text=True,
                     timeout=5,
                 )
-                version = (out.stdout or out.stderr or "").strip()[:80] if out.returncode == 0 else "found"
+                version = (
+                    (out.stdout or out.stderr or "").strip()[:80]
+                    if out.returncode == 0
+                    else "found"
+                )
                 return True, version or p
             except Exception:
                 return True, p
         if shutil.which(p):
             try:
                 out = subprocess.run([p, "--version"], capture_output=True, text=True, timeout=5)
-                version = (out.stdout or out.stderr or "").strip()[:80] if out.returncode == 0 else "found"
+                version = (
+                    (out.stdout or out.stderr or "").strip()[:80]
+                    if out.returncode == 0
+                    else "found"
+                )
                 return True, version or p
             except Exception:
                 return True, p
@@ -54,7 +62,9 @@ def _check_ffmpeg() -> Tuple[bool, str]:
             text=True,
             timeout=5,
         )
-        first_line = (out.stdout or "").split("\n")[0].strip()[:80] if out.returncode == 0 else "found"
+        first_line = (
+            (out.stdout or "").split("\n")[0].strip()[:80] if out.returncode == 0 else "found"
+        )
         return True, first_line or "found"
     except Exception:
         return True, cmd
@@ -72,7 +82,11 @@ def _check_poppler() -> Tuple[bool, str]:
             text=True,
             timeout=5,
         )
-        first_line = (out.stderr or out.stdout or "").split("\n")[0].strip()[:80] if out.returncode == 0 else "found"
+        first_line = (
+            (out.stderr or out.stdout or "").split("\n")[0].strip()[:80]
+            if out.returncode == 0
+            else "found"
+        )
         return True, first_line or "found"
     except Exception:
         return True, cmd
@@ -90,7 +104,11 @@ def _check_tesseract() -> Tuple[bool, str]:
             text=True,
             timeout=5,
         )
-        first_line = (out.stdout or out.stderr or "").split("\n")[0].strip()[:80] if out.returncode == 0 else "found"
+        first_line = (
+            (out.stdout or out.stderr or "").split("\n")[0].strip()[:80]
+            if out.returncode == 0
+            else "found"
+        )
         return True, first_line or "found"
     except Exception:
         return True, cmd

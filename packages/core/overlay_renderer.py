@@ -23,6 +23,7 @@ def _draw_highlight(
 ) -> None:
     """Draw semi-transparent rectangle on PIL Image (RGBA)."""
     from PIL import ImageDraw
+
     x, y = int(bbox.get("x", 0)), int(bbox.get("y", 0))
     w, h = int(bbox.get("w", 0)), int(bbox.get("h", 0))
     if w <= 0 or h <= 0:
@@ -43,6 +44,7 @@ def _draw_trace(
 ) -> None:
     """Draw line along path on PIL Image (RGBA)."""
     from PIL import ImageDraw
+
     if len(path) < 2:
         return
     draw = ImageDraw.Draw(img, "RGBA")
@@ -90,6 +92,7 @@ def _wrap_text_to_lines(
 def _get_notes_font(font_size: int, font_path: Optional[str] = None) -> Any:
     """Load font for notes. Prefer font_path if set, else default bitmap."""
     from PIL import ImageFont
+
     if font_path:
         try:
             return ImageFont.truetype(font_path, font_size)
@@ -123,6 +126,7 @@ def draw_notes_on_image(
         LAYOUT_SIDE_RIGHT,
         LAYOUT_SIDE_LEFT,
     )
+
     layout = getattr(config, "layout", LAYOUT_BOTTOM_STRIP)
     font_size = getattr(config, "font_size", 28)
     color_rgb = getattr(config, "color_rgb", (255, 255, 255))
@@ -197,6 +201,7 @@ def render_overlay_frames(
     actions: list with type, t_start, t_end, bbox or path (pixel coords).
     """
     from PIL import Image
+
     n_frames = max(1, int(duration_seconds * fps))
     frames: List[bytes] = []
     for i in range(n_frames):
@@ -229,13 +234,18 @@ def render_overlay_mp4(
     Uses imageio to encode frames (requires ffmpeg).
     """
     from PIL import Image
+
     try:
         import imageio
         import numpy as np
     except ImportError:
-        raise RuntimeError("imageio and numpy required for overlay MP4; pip install imageio imageio-ffmpeg numpy")
+        raise RuntimeError(
+            "imageio and numpy required for overlay MP4; pip install imageio imageio-ffmpeg numpy"
+        )
     n_frames = max(1, int(duration_seconds * fps))
-    writer = imageio.get_writer(output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p")
+    writer = imageio.get_writer(
+        output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p"
+    )
     for i in range(n_frames):
         t = i / fps
         img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
@@ -265,9 +275,12 @@ def render_slide_overlay(
     timeline_actions: actions for this slide_index with bbox/path in pixels.
     """
     from PIL import Image
+
     img = Image.open(io.BytesIO(slide_image_bytes))
     width, height = img.size
-    return render_overlay_mp4(width, height, timeline_actions, slide_duration_seconds, output_path, fps=fps)
+    return render_overlay_mp4(
+        width, height, timeline_actions, slide_duration_seconds, output_path, fps=fps
+    )
 
 
 def render_slide_with_overlay_mp4(
@@ -286,6 +299,7 @@ def render_slide_with_overlay_mp4(
     Returns output_path. Used by composer for final concat.
     """
     from PIL import Image
+
     try:
         import imageio
         import numpy as np
@@ -294,11 +308,11 @@ def render_slide_with_overlay_mp4(
     base = Image.open(io.BytesIO(slide_image_bytes)).convert("RGBA")
     width, height = base.size
     n_frames = max(1, int(slide_duration_seconds * fps))
-    writer = imageio.get_writer(output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p")
+    writer = imageio.get_writer(
+        output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p"
+    )
     draw_notes = (
-        notes_config
-        and getattr(notes_config, "enabled", False)
-        and (notes_text or "").strip()
+        notes_config and getattr(notes_config, "enabled", False) and (notes_text or "").strip()
     )
     for i in range(n_frames):
         t = i / fps
@@ -314,7 +328,9 @@ def render_slide_with_overlay_mp4(
                     _draw_highlight(overlay, act["bbox"])
         frame = Image.alpha_composite(frame, overlay)
         if draw_notes:
-            draw_notes_on_image(frame, (notes_text or "").strip(), width, height, notes_config, notes_font_path)
+            draw_notes_on_image(
+                frame, (notes_text or "").strip(), width, height, notes_config, notes_font_path
+            )
         arr = np.array(frame.convert("RGB"))
         writer.append_data(arr)
     writer.close()

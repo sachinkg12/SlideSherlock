@@ -40,28 +40,37 @@ def translate_script_segments(
         if text and translator and translator.is_available():
             translated = translator.translate(text, source_lang, target_lang)
         if translated and (translated or "").strip():
-            translated_segments.append({
-                **seg,
-                "text": translated.strip(),
-            })
-            report_entries.append({
-                "claim_id": claim_id,
-                "slide_index": slide_index,
-                "success": True,
-                "source_len": len(text),
-                "target_len": len(translated),
-            })
+            translated_segments.append(
+                {
+                    **seg,
+                    "text": translated.strip(),
+                }
+            )
+            report_entries.append(
+                {
+                    "claim_id": claim_id,
+                    "slide_index": slide_index,
+                    "success": True,
+                    "source_len": len(text),
+                    "target_len": len(translated),
+                }
+            )
         else:
             translated_segments.append(seg)
-            report_entries.append({
-                "claim_id": claim_id,
-                "slide_index": slide_index,
-                "success": False,
-                "fallback": "en",
-            })
+            report_entries.append(
+                {
+                    "claim_id": claim_id,
+                    "slide_index": slide_index,
+                    "success": False,
+                    "fallback": "en",
+                }
+            )
             all_ok = False
     return (
-        {"segments": translated_segments, "schema_version": verified_script.get("schema_version", "1.0")},
+        {
+            "segments": translated_segments,
+            "schema_version": verified_script.get("schema_version", "1.0"),
+        },
         report_entries,
         all_ok,
     )
@@ -92,7 +101,14 @@ def translate_notes_per_slide(
             tr = translator.translate(notes, source_lang, target_lang)
         if tr and (tr or "").strip():
             translated.append(tr.strip())
-            report.append({"slide_index": i + 1, "success": True, "source_len": len(notes), "target_len": len(tr)})
+            report.append(
+                {
+                    "slide_index": i + 1,
+                    "success": True,
+                    "source_len": len(notes),
+                    "target_len": len(tr),
+                }
+            )
         else:
             translated.append(notes)
             report.append({"slide_index": i + 1, "success": False, "fallback": "en"})
@@ -143,12 +159,14 @@ def derive_narration_from_script(
         slide_index = i + 1
         texts = by_slide.get(slide_index, [])
         narration_text = " ".join(texts).strip() if texts else ""
-        entries.append({
-            "slide_index": slide_index,
-            "narration_text": narration_text,
-            "source_used": "script",
-            "word_count": len(narration_text.split()),
-        })
+        entries.append(
+            {
+                "slide_index": slide_index,
+                "narration_text": narration_text,
+                "source_used": "script",
+                "word_count": len(narration_text.split()),
+            }
+        )
     return entries
 
 

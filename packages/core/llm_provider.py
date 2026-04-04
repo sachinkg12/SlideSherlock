@@ -54,7 +54,9 @@ def _narrate_diagram_from_graph(
     edges = graph.get("edges", [])
     clusters = graph.get("clusters", [])
     node_by_id = {n["node_id"]: n for n in nodes}
-    labels = [n.get("label_text", "").strip() for n in nodes[:6] if (n.get("label_text") or "").strip()]
+    labels = [
+        n.get("label_text", "").strip() for n in nodes[:6] if (n.get("label_text") or "").strip()
+    ]
     if not labels and not edges:
         return None
     parts: List[str] = []
@@ -102,7 +104,9 @@ class LLMProvider(ABC):
         """
         pass
 
-    def generate_narration(self, blueprint: Dict[str, Any]) -> Optional[Tuple[str, List[str], List[str]]]:
+    def generate_narration(
+        self, blueprint: Dict[str, Any]
+    ) -> Optional[Tuple[str, List[str], List[str]]]:
         """
         Optional: Generate per-slide smart narration from blueprint.
         blueprint: slide_index, slide_type, template_narration, llm_context (nodes, edges, evidence_ids).
@@ -168,7 +172,12 @@ class StubLLMProvider(LLMProvider):
 
                 # Day 3: When DIAGRAM_INTERACTIONS exists with medium+ confidence, narrate step-by-step
                 interactions_item = next(
-                    (e for e in items if (e.get("kind") or "") == "DIAGRAM_INTERACTIONS" and float(e.get("confidence", 0)) >= 0.45),
+                    (
+                        e
+                        for e in items
+                        if (e.get("kind") or "") == "DIAGRAM_INTERACTIONS"
+                        and float(e.get("confidence", 0)) >= 0.45
+                    ),
                     None,
                 )
                 if interactions_item:
@@ -185,10 +194,18 @@ class StubLLMProvider(LLMProvider):
                     if not content:
                         continue
                     if kind == "IMAGE_CAPTION" or kind == "SLIDE_CAPTION":
-                        parts.append((prefix_image if tier != "generic" else "This slide shows ").rstrip() + " " + content[:300])
+                        parts.append(
+                            (prefix_image if tier != "generic" else "This slide shows ").rstrip()
+                            + " "
+                            + content[:300]
+                        )
                         break
                     if kind == "DIAGRAM_SUMMARY":
-                        parts.append((prefix_diagram if tier != "generic" else "This slide shows ").rstrip() + " " + content[:300])
+                        parts.append(
+                            (prefix_diagram if tier != "generic" else "This slide shows ").rstrip()
+                            + " "
+                            + content[:300]
+                        )
                         break
                 if parts:
                     return parts[0]
@@ -197,7 +214,15 @@ class StubLLMProvider(LLMProvider):
                     if e.get("content"):
                         parts.append((e.get("content") or "")[:150])
                 if parts:
-                    return (prefix_diagram if "DIAGRAM" in str([x.get("kind") for x in items]) else prefix_image).rstrip() + " " + "; ".join(parts[:2])
+                    return (
+                        (
+                            prefix_diagram
+                            if "DIAGRAM" in str([x.get("kind") for x in items])
+                            else prefix_image
+                        ).rstrip()
+                        + " "
+                        + "; ".join(parts[:2])
+                    )
                 return (
                     "This slide appears to include a diagram or image."
                     if use_hedging
@@ -238,8 +263,12 @@ class StubLLMProvider(LLMProvider):
                 if e:
                     src = node_by_id.get(e.get("src_node_id"))
                     dst = node_by_id.get(e.get("dst_node_id"))
-                    src_label = (src.get("label_text") if src else None) or e.get("src_node_id", "")[:8]
-                    dst_label = (dst.get("label_text") if dst else None) or e.get("dst_node_id", "")[:8]
+                    src_label = (src.get("label_text") if src else None) or e.get(
+                        "src_node_id", ""
+                    )[:8]
+                    dst_label = (dst.get("label_text") if dst else None) or e.get(
+                        "dst_node_id", ""
+                    )[:8]
                     parts.append(f"{src_label} to {dst_label}")
             if parts:
                 return f"Flow: {'; '.join(parts)}."

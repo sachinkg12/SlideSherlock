@@ -127,7 +127,9 @@ class StubVisionExtractor(VisionExtractor):
                 confidence=0.4,
                 reason_code=REASON_SAFE_FALLBACK,
                 slide_png_uri=slide_png_uri,
-                metadata={"vision_nodes_used": min(5, len(vision_graph.get("nodes", [])))} if vision_graph else None,
+                metadata={"vision_nodes_used": min(5, len(vision_graph.get("nodes", [])))}
+                if vision_graph
+                else None,
             )
         ]
 
@@ -144,10 +146,15 @@ def get_vision_extractor() -> VisionExtractor:
     if provider == "openai":
         if not (os.environ.get("OPENAI_API_KEY") or "").strip():
             import sys
-            print("VISION_EXTRACTOR_PROVIDER=openai but OPENAI_API_KEY not set; using stub (see .env.example).", file=sys.stderr)
+
+            print(
+                "VISION_EXTRACTOR_PROVIDER=openai but OPENAI_API_KEY not set; using stub (see .env.example).",
+                file=sys.stderr,
+            )
             return StubVisionExtractor()
         try:
             from vision_provider_openai import OpenAIVisionExtractor
+
             return OpenAIVisionExtractor()
         except (ImportError, AttributeError):
             pass
@@ -171,7 +178,9 @@ class VisionProvider(ABC):
     """
 
     @abstractmethod
-    def caption(self, image_uri: str, lang: str = "en-US", minio_client: Any = None) -> Dict[str, Any]:
+    def caption(
+        self, image_uri: str, lang: str = "en-US", minio_client: Any = None
+    ) -> Dict[str, Any]:
         """
         Generate image caption. Returns {caption, confidence, reason_code?}.
         """
@@ -201,7 +210,9 @@ class StubVisionProvider(VisionProvider):
     NO-HALLUCINATION fallback: "Image present (low confidence), details unavailable"
     """
 
-    def caption(self, image_uri: str, lang: str = "en-US", minio_client: Any = None) -> Dict[str, Any]:
+    def caption(
+        self, image_uri: str, lang: str = "en-US", minio_client: Any = None
+    ) -> Dict[str, Any]:
         return {
             "caption": "Image present (low confidence), details unavailable",
             "confidence": 0.1,
@@ -236,10 +247,15 @@ def get_vision_provider() -> VisionProvider:
     if provider == "openai":
         if not (os.environ.get("OPENAI_API_KEY") or "").strip():
             import sys
-            print("VISION_PROVIDER=openai but OPENAI_API_KEY not set; using stub vision (see .env.example).", file=sys.stderr)
+
+            print(
+                "VISION_PROVIDER=openai but OPENAI_API_KEY not set; using stub vision (see .env.example).",
+                file=sys.stderr,
+            )
             return StubVisionProvider()
         try:
             from vision_provider_openai import OpenAIVisionProvider
+
             return OpenAIVisionProvider()
         except (ImportError, AttributeError):
             pass

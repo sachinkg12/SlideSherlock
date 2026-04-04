@@ -18,11 +18,20 @@ ACTION_TRACE = "TRACE"
 ACTION_ZOOM = "ZOOM"
 
 # Day 3: image/diagram evidence kinds; segment citing these may get HIGHLIGHT/ZOOM on image bbox
-IMAGE_EVIDENCE_KINDS = frozenset({
-    "IMAGE_ASSET", "IMAGE_CAPTION", "IMAGE_OBJECTS", "IMAGE_ACTIONS", "IMAGE_TAGS",
-    "DIAGRAM_TYPE", "DIAGRAM_ENTITIES", "DIAGRAM_INTERACTIONS", "DIAGRAM_SUMMARY",
-    "SLIDE_CAPTION",
-})
+IMAGE_EVIDENCE_KINDS = frozenset(
+    {
+        "IMAGE_ASSET",
+        "IMAGE_CAPTION",
+        "IMAGE_OBJECTS",
+        "IMAGE_ACTIONS",
+        "IMAGE_TAGS",
+        "DIAGRAM_TYPE",
+        "DIAGRAM_ENTITIES",
+        "DIAGRAM_INTERACTIONS",
+        "DIAGRAM_SUMMARY",
+        "SLIDE_CAPTION",
+    }
+)
 
 
 def _f(val: Any) -> float:
@@ -155,7 +164,7 @@ def _resolve_image_bbox_from_evidence(
                 continue
             url = (ref.get("url") or ref.get("image_uri") or "").strip()
             # Match to images index for image_id and EMU bbox
-            for img in (images_index.get("images") or []):
+            for img in images_index.get("images") or []:
                 if (img.get("uri") or "").strip() != url or img.get("slide_index") != slide_index:
                     continue
                 image_id = img.get("image_id", "")

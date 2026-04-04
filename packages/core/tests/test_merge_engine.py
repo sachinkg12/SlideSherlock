@@ -24,6 +24,7 @@ from merge_engine import (
 
 # --- Merge scoring ---
 
+
 def test_text_similarity_empty():
     assert _text_similarity("", "") == 1.0
     assert _text_similarity("", "foo") == 0.0
@@ -65,11 +66,17 @@ def test_add_provenance_and_confidence():
 
 # --- Provenance rules: vision disabled -> unified == native ---
 
+
 def test_merge_vision_disabled_unified_equals_native():
     g_native = {
         "slide_index": 1,
         "nodes": [
-            {"node_id": "n1", "ppt_shape_id": "2", "bbox": {"left": 100, "top": 100, "width": 50, "height": 50}, "label_text": "A"},
+            {
+                "node_id": "n1",
+                "ppt_shape_id": "2",
+                "bbox": {"left": 100, "top": 100, "width": 50, "height": 50},
+                "label_text": "A",
+            },
         ],
         "edges": [
             {"edge_id": "e1", "src_node_id": "n1", "dst_node_id": "n2"},
@@ -102,11 +109,16 @@ def test_merge_vision_empty_nodes_unified_equals_native():
 
 # --- Provenance rules: vision enabled -> NATIVE / VISION / BOTH ---
 
+
 def test_merge_vision_adds_vision_only_node():
     g_native = {
         "slide_index": 1,
         "nodes": [
-            {"node_id": "n1", "bbox": {"left": 100, "top": 100, "width": 50, "height": 50}, "label_text": "A"},
+            {
+                "node_id": "n1",
+                "bbox": {"left": 100, "top": 100, "width": 50, "height": 50},
+                "label_text": "A",
+            },
         ],
         "edges": [],
         "clusters": [],
@@ -115,13 +127,20 @@ def test_merge_vision_adds_vision_only_node():
     g_vision = {
         "slide_index": 1,
         "nodes": [
-            {"node_id": "v1", "det_id": "d1", "bbox": {"left": 500, "top": 500, "width": 60, "height": 30}, "label_text": "OCR only"},
+            {
+                "node_id": "v1",
+                "det_id": "d1",
+                "bbox": {"left": 500, "top": 500, "width": 60, "height": 30},
+                "label_text": "OCR only",
+            },
         ],
         "edges": [],
     }
     g_unified, flags = merge_graphs(
-        g_native, g_vision,
-        slide_width_px=1000, slide_height_px=1000,
+        g_native,
+        g_vision,
+        slide_width_px=1000,
+        slide_height_px=1000,
         match_threshold=0.5,
     )
     # Native node + vision-only node
@@ -138,7 +157,11 @@ def test_merge_vision_matched_both():
     g_native = {
         "slide_index": 1,
         "nodes": [
-            {"node_id": "n1", "bbox": {"left": 100, "top": 100, "width": 100, "height": 50}, "label_text": "Hello"},
+            {
+                "node_id": "n1",
+                "bbox": {"left": 100, "top": 100, "width": 100, "height": 50},
+                "label_text": "Hello",
+            },
         ],
         "edges": [],
         "clusters": [],
@@ -146,13 +169,21 @@ def test_merge_vision_matched_both():
     g_vision = {
         "slide_index": 1,
         "nodes": [
-            {"node_id": "v1", "det_id": "d1", "bbox": {"left": 110, "top": 110, "width": 80, "height": 40}, "label_text": "Hello", "confidence": 0.9},
+            {
+                "node_id": "v1",
+                "det_id": "d1",
+                "bbox": {"left": 110, "top": 110, "width": 80, "height": 40},
+                "label_text": "Hello",
+                "confidence": 0.9,
+            },
         ],
         "edges": [],
     }
     g_unified, _ = merge_graphs(
-        g_native, g_vision,
-        slide_width_px=1000, slide_height_px=1000,
+        g_native,
+        g_vision,
+        slide_width_px=1000,
+        slide_height_px=1000,
         match_threshold=0.3,
     )
     # One merged node (BOTH) + possibly no unmatched

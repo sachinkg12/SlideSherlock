@@ -12,9 +12,7 @@ import uuid
 import json
 
 # Add packages/core to path
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core")
-)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core"))
 from storage import MinIOClient  # noqa: E402
 
 
@@ -79,4 +77,5 @@ def process_job(job_id: str):
 def render_stage(job_id: str):
     """Render stage: delegates to the pipeline orchestrator."""
     from pipeline import run_pipeline
+
     run_pipeline(job_id)

@@ -15,7 +15,13 @@ LAYOUT_LOWER_THIRD = "lower_third"
 LAYOUT_SIDE_RIGHT = "side_right"
 LAYOUT_SIDE_LEFT = "side_left"
 
-VALID_LAYOUTS = (LAYOUT_OFF, LAYOUT_BOTTOM_STRIP, LAYOUT_LOWER_THIRD, LAYOUT_SIDE_RIGHT, LAYOUT_SIDE_LEFT)
+VALID_LAYOUTS = (
+    LAYOUT_OFF,
+    LAYOUT_BOTTOM_STRIP,
+    LAYOUT_LOWER_THIRD,
+    LAYOUT_SIDE_RIGHT,
+    LAYOUT_SIDE_LEFT,
+)
 
 # Defaults
 DEFAULT_FONT_SIZE = 28
@@ -65,6 +71,7 @@ def resolve_notes_font_for_variant(variant_id: str, lang: str) -> str | None:
 @dataclass
 class OnScreenNotesConfig:
     """Configuration for rendering on-screen notes (narration text) on video frames."""
+
     enabled: bool
     layout: str  # off | bottom_strip | lower_third | side_right | side_left
     font_size: int
@@ -78,7 +85,11 @@ class OnScreenNotesConfig:
 
     @classmethod
     def from_env(cls) -> "OnScreenNotesConfig":
-        enabled = (os.environ.get("ON_SCREEN_NOTES_ENABLED", "0")).strip().lower() in ("1", "true", "yes")
+        enabled = (os.environ.get("ON_SCREEN_NOTES_ENABLED", "0")).strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
         layout = (os.environ.get("ON_SCREEN_NOTES_LAYOUT", LAYOUT_BOTTOM_STRIP)).strip().lower()
         if layout not in VALID_LAYOUTS:
             layout = LAYOUT_BOTTOM_STRIP
@@ -96,7 +107,9 @@ class OnScreenNotesConfig:
         padding_px = max(4, min(64, padding_px))
         max_lines = int(os.environ.get("ON_SCREEN_NOTES_MAX_LINES", str(DEFAULT_MAX_LINES)))
         max_lines = max(1, min(10, max_lines))
-        max_width_ratio = float(os.environ.get("ON_SCREEN_NOTES_MAX_WIDTH_RATIO", str(DEFAULT_MAX_WIDTH_RATIO)))
+        max_width_ratio = float(
+            os.environ.get("ON_SCREEN_NOTES_MAX_WIDTH_RATIO", str(DEFAULT_MAX_WIDTH_RATIO))
+        )
         max_width_ratio = max(0.2, min(1.0, max_width_ratio))
         font_file = os.environ.get("ON_SCREEN_NOTES_FONT_PATH")
         if font_file and not os.path.isfile(font_file):

@@ -30,7 +30,10 @@ def test_slide_needs_fallback_no_notes_no_evidence():
 
 def test_slide_needs_fallback_notes_sufficient():
     """Enough notes -> no fallback."""
-    assert _slide_needs_fallback(1, "These are speaker notes with enough words for primary.", []) is False
+    assert (
+        _slide_needs_fallback(1, "These are speaker notes with enough words for primary.", [])
+        is False
+    )
 
 
 def test_slide_needs_fallback_high_conf_image_evidence():
@@ -52,7 +55,12 @@ def test_slide_needs_fallback_low_conf_image_evidence():
 def test_slide_needs_fallback_already_has_slide_caption():
     """Existing SLIDE_CAPTION for slide -> no fallback."""
     evidence = [
-        {"slide_index": 1, "kind": "SLIDE_CAPTION", "content": "Fallback caption.", "confidence": 0.3},
+        {
+            "slide_index": 1,
+            "kind": "SLIDE_CAPTION",
+            "content": "Fallback caption.",
+            "confidence": 0.3,
+        },
     ]
     assert _slide_needs_fallback(1, "", evidence) is False
 
@@ -93,7 +101,9 @@ def test_run_slide_caption_fallback_empty():
         minio_client=minio,
         db_session=MagicMock(),
         evidence_index={"evidence_items": []},
-        slides_notes_and_text=[("Long speaker notes that exceed the minimum word count for primary.", "")],
+        slides_notes_and_text=[
+            ("Long speaker notes that exceed the minimum word count for primary.", "")
+        ],
     )
     assert result2["evidence_count"] == 0
     assert result2["slides_captioned"] == []

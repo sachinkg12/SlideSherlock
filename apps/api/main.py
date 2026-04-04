@@ -33,9 +33,7 @@ except ImportError:
     )
 
 # Add packages/core to path for MinIO client
-sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core")
-)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core"))
 try:
     from storage import MinIOClient  # noqa: E402
 except ImportError:
@@ -153,16 +151,33 @@ def _job_to_response(job: Job, minio_client=None) -> JobResponse:
                     vid = v.get("id", "en")
                     final_path = f"jobs/{job.job_id}/output/{vid}/final.mp4"
                     exists = minio_client.exists(final_path)
-                    variant_statuses.append({
-                        "variant_id": vid,
-                        "status": "ready" if exists else "pending",
-                        "output_url": f"/jobs/{job.job_id}/output/{vid}/final.mp4" if exists else None,
-                    })
+                    variant_statuses.append(
+                        {
+                            "variant_id": vid,
+                            "status": "ready" if exists else "pending",
+                            "output_url": f"/jobs/{job.job_id}/output/{vid}/final.mp4"
+                            if exists
+                            else None,
+                        }
+                    )
             else:
                 legacy_path = f"jobs/{job.job_id}/output/final.mp4"
                 if minio_client.exists(legacy_path):
-                    output_variants = [{"id": "en", "lang": "en-US", "voice_id": "default_en", "notes_translate": False}]
-                    variant_statuses = [{"variant_id": "en", "status": "ready", "output_url": f"jobs/{job.job_id}/output/final.mp4"}]
+                    output_variants = [
+                        {
+                            "id": "en",
+                            "lang": "en-US",
+                            "voice_id": "default_en",
+                            "notes_translate": False,
+                        }
+                    ]
+                    variant_statuses = [
+                        {
+                            "variant_id": "en",
+                            "status": "ready",
+                            "output_url": f"jobs/{job.job_id}/output/final.mp4",
+                        }
+                    ]
         except Exception:
             pass
     data["output_variants"] = output_variants
@@ -194,9 +209,7 @@ async def upload_pptx(
 
     # Validate file extension
     if not file.filename or not file.filename.lower().endswith(".pptx"):
-        raise HTTPException(
-            status_code=400, detail="File must be a PPTX file (.pptx extension)"
-        )
+        raise HTTPException(status_code=400, detail="File must be a PPTX file (.pptx extension)")
 
     # Read file content
     file_content = await file.read()
@@ -218,9 +231,7 @@ async def upload_pptx(
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to upload file to storage: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to upload file to storage: {str(e)}")
 
     # Create artifact record
     artifact = Artifact(
@@ -256,9 +267,7 @@ async def upload_pptx(
             from apps.api.worker import render_stage
         job_queue.enqueue(render_stage, job_id, job_timeout=900)
     else:
-        print(
-            f"Warning: Render stage not enqueued for job {job_id} (Redis unavailable)"
-        )
+        print(f"Warning: Render stage not enqueued for job {job_id} (Redis unavailable)")
 
     return {
         "job_id": job_id,
@@ -328,8 +337,16 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
 
     # Build ordered stage list matching the UI's STAGE_REGISTRY
     all_stage_names = [
-        "ingest", "evidence", "render", "graph",
-        "script", "verify", "translate", "narrate", "audio", "video",
+        "ingest",
+        "evidence",
+        "render",
+        "graph",
+        "script",
+        "verify",
+        "translate",
+        "narrate",
+        "audio",
+        "video",
     ]
 
     # Normalise completed_stages: strip variant suffix (e.g. "script_en" → "script")
@@ -357,15 +374,17 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
             status = "failed"
         else:
             status = "pending"
-        stages.append({
-            "name": name,
-            "status": status,
-            "started_at": None,
-            "finished_at": None,
-            "duration_s": None,
-            "detail": None,
-            "metrics": None,
-        })
+        stages.append(
+            {
+                "name": name,
+                "status": status,
+                "started_at": None,
+                "finished_at": None,
+                "duration_s": None,
+                "detail": None,
+                "metrics": None,
+            }
+        )
 
     total_stages = len(all_stage_names)
     pct = int(100 * len(completed_base) / total_stages) if total_stages else 0
@@ -382,7 +401,9 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
     return {
         "job_id": job_id,
         "status": ui_status,
-        "filename": (job.input_file_path or "").split("/")[-1] if job.input_file_path else "Presentation",
+        "filename": (job.input_file_path or "").split("/")[-1]
+        if job.input_file_path
+        else "Presentation",
         "preset": "standard",
         "percent": min(pct, 100),
         "stages": stages,
@@ -598,9 +619,7 @@ async def quick_create_job(
 
     # 3. Upload PPTX
     if not file.filename or not file.filename.lower().endswith(".pptx"):
-        raise HTTPException(
-            status_code=400, detail="File must be a PPTX file (.pptx extension)"
-        )
+        raise HTTPException(status_code=400, detail="File must be a PPTX file (.pptx extension)")
 
     file_content = await file.read()
     file_size = len(file_content)
@@ -618,9 +637,7 @@ async def quick_create_job(
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Failed to upload file to storage: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Failed to upload file to storage: {str(e)}")
 
     artifact = Artifact(
         artifact_id=str(uuid.uuid4()),

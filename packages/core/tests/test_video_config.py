@@ -38,7 +38,9 @@ def test_intro_outro_disabled_by_default():
 
 def test_intro_enabled():
     """VIDEO_INTRO_ENABLED=1 enables intro."""
-    with patch.dict(os.environ, {"VIDEO_INTRO_ENABLED": "1", "VIDEO_INTRO_TITLE": "My Deck"}, clear=False):
+    with patch.dict(
+        os.environ, {"VIDEO_INTRO_ENABLED": "1", "VIDEO_INTRO_TITLE": "My Deck"}, clear=False
+    ):
         c = VideoConfig.from_env()
     assert c.intro_enabled is True
     assert c.intro_title == "My Deck"

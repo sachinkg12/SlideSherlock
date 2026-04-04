@@ -264,10 +264,16 @@ class OpenAIVisionProvider(_VisionProvider):
             self._timeout = int(os.environ.get("OPENAI_VISION_TIMEOUT_SECONDS", "60"))
         self._cache_enabled = cache_enabled
         if self._cache_enabled is None:
-            self._cache_enabled = os.environ.get("VISION_CACHE_ENABLED", "true").lower() in ("1", "true", "yes")
+            self._cache_enabled = os.environ.get("VISION_CACHE_ENABLED", "true").lower() in (
+                "1",
+                "true",
+                "yes",
+            )
         self._cache_prefix = cache_prefix
         if self._cache_prefix is None:
-            self._cache_prefix = os.environ.get("VISION_CACHE_PREFIX", "jobs/{job_id}/cache/vision/").strip()
+            self._cache_prefix = os.environ.get(
+                "VISION_CACHE_PREFIX", "jobs/{job_id}/cache/vision/"
+            ).strip()
 
     def _resolve_cache_prefix(self, job_id: Optional[str]) -> str:
         if not job_id or "{job_id}" not in self._cache_prefix:
@@ -385,7 +391,9 @@ class OpenAIVisionProvider(_VisionProvider):
                 out = {
                     "caption": result.caption,
                     "objects": [{"label": o.label, "conf": o.conf} for o in result.objects],
-                    "actions": [{"verb_phrase": a.verb_phrase, "conf": a.conf} for a in result.actions],
+                    "actions": [
+                        {"verb_phrase": a.verb_phrase, "conf": a.conf} for a in result.actions
+                    ],
                     "scene_tags": [{"tag": t.tag, "conf": t.conf} for t in result.scene_tags],
                     "global_confidence": result.global_confidence,
                 }
@@ -393,13 +401,15 @@ class OpenAIVisionProvider(_VisionProvider):
                 result = DiagramExtractResult(**data)
                 interactions = []
                 for i in result.interactions:
-                    interactions.append({
-                        "from": getattr(i, "from_entity", None) or getattr(i, "from", ""),
-                        "to": i.to,
-                        "label": i.label,
-                        "order": i.order,
-                        "conf": i.conf,
-                    })
+                    interactions.append(
+                        {
+                            "from": getattr(i, "from_entity", None) or getattr(i, "from", ""),
+                            "to": i.to,
+                            "label": i.label,
+                            "order": i.order,
+                            "conf": i.conf,
+                        }
+                    )
                 out = {
                     "diagram_type": result.diagram_type,
                     "entities": [{"name": e.name, "conf": e.conf} for e in result.entities],

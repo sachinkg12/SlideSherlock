@@ -38,7 +38,13 @@ def test_build_timeline_actions():
     """Timeline has actions with type, t_start, t_end, entity_ids, claim_id, evidence_ids."""
     script = {
         "segments": [
-            {"claim_id": "c1", "slide_index": 1, "text": "Intro.", "entity_ids": ["n1"], "evidence_ids": ["ev1"]},
+            {
+                "claim_id": "c1",
+                "slide_index": 1,
+                "text": "Intro.",
+                "entity_ids": ["n1"],
+                "evidence_ids": ["ev1"],
+            },
         ],
     }
     align = {
@@ -48,7 +54,9 @@ def test_build_timeline_actions():
     }
     graph = {
         1: {
-            "nodes": [{"node_id": "n1", "bbox": {"left": 0, "top": 0, "width": 914400, "height": 685800}}],
+            "nodes": [
+                {"node_id": "n1", "bbox": {"left": 0, "top": 0, "width": 914400, "height": 685800}}
+            ],
             "edges": [],
             "clusters": [],
         },

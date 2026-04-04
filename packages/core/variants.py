@@ -19,12 +19,14 @@ def build_output_variants(requested_language: Optional[str] = None) -> List[Dict
     if requested_language and (requested_language or "").strip():
         lang = requested_language.strip()
         # Map lang to variant id (e.g. hi-IN -> l2)
-        variants.append({
-            "id": "l2",
-            "lang": lang,
-            "voice_id": f"default_{lang.split('-')[0]}" if "-" in lang else "default_l2",
-            "notes_translate": True,
-        })
+        variants.append(
+            {
+                "id": "l2",
+                "lang": lang,
+                "voice_id": f"default_{lang.split('-')[0]}" if "-" in lang else "default_l2",
+                "notes_translate": True,
+            }
+        )
     return variants
 
 

@@ -33,62 +33,72 @@ def build_explain_plan(
         clusters = g.get("clusters", [])
 
         # 1. Intro: one section per slide (overview)
-        sections.append({
-            "section_type": "intro",
-            "slide_index": slide_index,
-            "entity_ids": [],
-            "evidence_ids": [],
-            "cluster_ids": [],
-            "order_key": (slide_index, 0, "intro"),
-        })
+        sections.append(
+            {
+                "section_type": "intro",
+                "slide_index": slide_index,
+                "entity_ids": [],
+                "evidence_ids": [],
+                "cluster_ids": [],
+                "order_key": (slide_index, 0, "intro"),
+            }
+        )
 
         # 2. Clusters: each cluster gets a section
         for c in clusters:
             member_ids = c.get("member_node_ids", [])
             cid = c.get("cluster_id", "")
-            sections.append({
-                "section_type": "clusters",
-                "slide_index": slide_index,
-                "cluster_id": cid,
-                "entity_ids": member_ids,
-                "evidence_ids": [],
-                "cluster_ids": [cid] if cid else [],
-                "order_key": (slide_index, 1, "clusters", cid),
-            })
+            sections.append(
+                {
+                    "section_type": "clusters",
+                    "slide_index": slide_index,
+                    "cluster_id": cid,
+                    "entity_ids": member_ids,
+                    "evidence_ids": [],
+                    "cluster_ids": [cid] if cid else [],
+                    "order_key": (slide_index, 1, "clusters", cid),
+                }
+            )
 
         # 3. Nodes: one section per node (or grouped by slide for brevity)
         for n in nodes:
             nid = n.get("node_id", "")
-            sections.append({
-                "section_type": "nodes",
-                "slide_index": slide_index,
-                "entity_ids": [nid],
-                "evidence_ids": [],
-                "cluster_ids": [],
-                "order_key": (slide_index, 2, "nodes", nid),
-            })
+            sections.append(
+                {
+                    "section_type": "nodes",
+                    "slide_index": slide_index,
+                    "entity_ids": [nid],
+                    "evidence_ids": [],
+                    "cluster_ids": [],
+                    "order_key": (slide_index, 2, "nodes", nid),
+                }
+            )
 
         # 4. Flows: each edge gets a section
         for e in edges:
             eid = e.get("edge_id", "")
-            sections.append({
-                "section_type": "flows",
-                "slide_index": slide_index,
-                "entity_ids": [eid],
-                "evidence_ids": [],
-                "cluster_ids": [],
-                "order_key": (slide_index, 3, "flows", eid),
-            })
+            sections.append(
+                {
+                    "section_type": "flows",
+                    "slide_index": slide_index,
+                    "entity_ids": [eid],
+                    "evidence_ids": [],
+                    "cluster_ids": [],
+                    "order_key": (slide_index, 3, "flows", eid),
+                }
+            )
 
         # 5. Summary: one section per slide at end
-        sections.append({
-            "section_type": "summary",
-            "slide_index": slide_index,
-            "entity_ids": [],
-            "evidence_ids": [],
-            "cluster_ids": [],
-            "order_key": (slide_index, 4, "summary"),
-        })
+        sections.append(
+            {
+                "section_type": "summary",
+                "slide_index": slide_index,
+                "entity_ids": [],
+                "evidence_ids": [],
+                "cluster_ids": [],
+                "order_key": (slide_index, 4, "summary"),
+            }
+        )
 
     # Sort by order_key so we get intro -> clusters -> nodes -> flows -> summary per slide
     sections.sort(key=lambda s: s["order_key"])

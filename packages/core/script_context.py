@@ -8,11 +8,19 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple
 
 # Image evidence kinds that may be used for narration (photo + diagram + slide fallback)
-IMAGE_EVIDENCE_KINDS = frozenset({
-    "IMAGE_CAPTION", "IMAGE_OBJECTS", "IMAGE_ACTIONS", "IMAGE_TAGS",
-    "DIAGRAM_TYPE", "DIAGRAM_ENTITIES", "DIAGRAM_INTERACTIONS", "DIAGRAM_SUMMARY",
-    "SLIDE_CAPTION",  # Last-resort full-slide caption (Prompt 7)
-})
+IMAGE_EVIDENCE_KINDS = frozenset(
+    {
+        "IMAGE_CAPTION",
+        "IMAGE_OBJECTS",
+        "IMAGE_ACTIONS",
+        "IMAGE_TAGS",
+        "DIAGRAM_TYPE",
+        "DIAGRAM_ENTITIES",
+        "DIAGRAM_INTERACTIONS",
+        "DIAGRAM_SUMMARY",
+        "SLIDE_CAPTION",  # Last-resort full-slide caption (Prompt 7)
+    }
+)
 
 # Minimum words in notes to treat as "primary narrative"
 MIN_NOTES_WORDS = 5
@@ -22,7 +30,7 @@ IMAGE_CONFIDENCE_THRESHOLD = float(
     __import__("os").environ.get("VISION_SCRIPT_IMAGE_CONFIDENCE_THRESHOLD", "0.5")
 )
 # Day 3: 3-tier confidence for image/diagram narration
-HIGH_CONF = 0.70   # definitive: "This diagram shows..."
+HIGH_CONF = 0.70  # definitive: "This diagram shows..."
 MEDIUM_CONF = 0.45  # hedged: "This diagram appears to show..."; below => generic
 
 
@@ -36,7 +44,11 @@ def _graph_summary(graph: Dict[str, Any]) -> str:
     edges = graph.get("edges", [])
     parts = []
     if nodes:
-        labels = [n.get("label_text") or n.get("node_id", "")[:12] for n in nodes[:8] if n.get("label_text") or n.get("node_id")]
+        labels = [
+            n.get("label_text") or n.get("node_id", "")[:12]
+            for n in nodes[:8]
+            if n.get("label_text") or n.get("node_id")
+        ]
         if labels:
             parts.append("Nodes: " + ", ".join(labels))
     if edges:
@@ -64,12 +76,14 @@ def _image_evidence_for_slide(
             continue
         content = (ev.get("content") or "").strip()
         confidence = float(ev.get("confidence", 0.5))
-        out.append({
-            "evidence_id": eid,
-            "kind": kind,
-            "content": content,
-            "confidence": confidence,
-        })
+        out.append(
+            {
+                "evidence_id": eid,
+                "kind": kind,
+                "content": content,
+                "confidence": confidence,
+            }
+        )
     return out
 
 
