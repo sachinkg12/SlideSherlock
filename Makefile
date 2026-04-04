@@ -1,4 +1,4 @@
-.PHONY: help up down test lint migrate worker api install setup check-ports clean test-redis lint-fix migrate-create check-system-deps demo doctor preset-draft preset-standard preset-pro
+.PHONY: help up down test lint migrate worker api install setup check-ports clean test-redis lint-fix migrate-create check-system-deps demo doctor preset-draft preset-standard preset-pro run
 
 help:
 	@echo "SlideSherlock - PPTX to Narrated Video Pipeline"
@@ -16,6 +16,7 @@ help:
 	@echo "  make migrate    - Run database migrations"
 	@echo "  make worker     - Start RQ worker process"
 	@echo "  make api        - Start FastAPI server"
+	@echo "  make run F=deck.pptx - Run pipeline on a PPTX file (no Redis needed)"
 	@echo "  make demo       - Run full pipeline on sample PPTX and produce output/demo/final.mp4"
 	@echo "  make test       - Run tests"
 	@echo "  make lint       - Run linters"
@@ -223,6 +224,17 @@ lint-fix:
 test-redis:
 	@echo "Testing Redis connection..."
 	@which docker-compose > /dev/null 2>&1 && docker-compose exec -T redis redis-cli ping || docker compose exec -T redis redis-cli ping
+
+F ?= sample_connectors.pptx
+P ?= draft
+O ?= ./output
+
+run:
+	@if [ ! -d "venv" ]; then \
+		echo "ERROR: Virtual environment not found. Run 'make setup' first."; \
+		exit 1; \
+	fi
+	@PYTHONPATH=$$(pwd):$$(pwd)/packages/core venv/bin/python scripts/slidesherlock_cli.py run "$(F)" --preset "$(P)" --output "$(O)"
 
 demo:
 	@if [ ! -d "venv" ]; then \

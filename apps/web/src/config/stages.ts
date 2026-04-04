@@ -6,6 +6,7 @@ import {
   FileText,
   ShieldCheck,
   Languages,
+  Sparkles,
   Volume2,
   Film,
 } from 'lucide-react'
@@ -56,6 +57,11 @@ export const STAGE_REGISTRY: Record<string, StageConfig> = {
     icon: Languages,
     label: 'Translate',
     description: 'Translating to target language',
+  },
+  narrate: {
+    icon: Sparkles,
+    label: 'AI Narrate',
+    description: 'Rewriting narration for natural delivery',
   },
   audio: {
     icon: Volume2,

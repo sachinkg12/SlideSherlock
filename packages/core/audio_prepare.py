@@ -146,10 +146,10 @@ def run_audio_prepare(
                 "word_count": 0,
             })
     else:
+        blueprints = None
         if narration_entries_override and len(narration_entries_override) >= slide_count:
             entries = narration_entries_override[:slide_count]
         else:
-            blueprints = None
             llm_smart_fn = None
             if evidence_index:
                 blueprints = build_blueprint_per_slide(

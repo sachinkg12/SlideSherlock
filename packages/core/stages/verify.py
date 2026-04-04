@@ -66,13 +66,17 @@ class VerifyStage:
             except Exception:
                 pass
 
+            # Use deterministic rewrites (not LLM) in the verify loop to avoid
+            # fork-safety issues with OpenAI httpx client in RQ worker processes.
+            # The initial script already has AI-generated text; rewrites only
+            # fix evidence grounding issues with safe deterministic templates.
             verified_script, verify_report, coverage = run_rewrite_loop(
                 job_id=job_id,
                 script_draft=ctx.verified_script,
                 evidence_index=evidence_index,
                 unified_graphs_by_slide=unified_by_slide,
                 explain_plan=explain_plan,
-                llm_provider=ctx.llm_provider,
+                llm_provider=None,
                 max_iters=3,
             )
             verify_report_payload = build_verify_report_payload(job_id, verify_report)

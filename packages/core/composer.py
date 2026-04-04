@@ -388,38 +388,32 @@ def compose_video(
                 video_dur = total_video_dur
             if audio_dur <= 0:
                 audio_dur = total_video_dur
-            if video_dur < audio_dur - 0.5:
-                fd_pad, padded_audio = tempfile.mkstemp(suffix="_padded.wav")
-                os.close(fd_pad)
-                try:
-                    subprocess.run(
-                        [
-                            "ffmpeg", "-y", "-i", final_audio_path,
-                            "-af", f"apad=whole_dur={video_dur}",
-                            "-ar", str(audio_sample_rate), "-ac", "1",
-                            padded_audio,
-                        ],
-                        check=True, capture_output=True, timeout=60,
-                    )
-                    subprocess.run(
-                        ["ffmpeg", "-y", "-i", video_input, "-i", padded_audio,
-                         "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac",
-                         "-shortest", output_path],
-                        check=True, capture_output=True, timeout=300,
-                    )
-                finally:
-                    if os.path.exists(padded_audio):
-                        try:
-                            os.unlink(padded_audio)
-                        except Exception:
-                            pass
-            else:
+            # Pad the shorter stream to match the longer one (no -shortest, avoids abrupt cutoff)
+            target_dur = max(video_dur, audio_dur) + 0.5  # 0.5s tail pad for clean ending
+            fd_pad, padded_audio = tempfile.mkstemp(suffix="_padded.wav")
+            os.close(fd_pad)
+            try:
                 subprocess.run(
-                    ["ffmpeg", "-y", "-i", video_input, "-i", final_audio_path,
+                    [
+                        "ffmpeg", "-y", "-i", final_audio_path,
+                        "-af", f"apad=whole_dur={target_dur}",
+                        "-ar", str(audio_sample_rate), "-ac", "1",
+                        padded_audio,
+                    ],
+                    check=True, capture_output=True, timeout=60,
+                )
+                subprocess.run(
+                    ["ffmpeg", "-y", "-i", video_input, "-i", padded_audio,
                      "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac",
-                     "-shortest", output_path],
+                     output_path],
                     check=True, capture_output=True, timeout=300,
                 )
+            finally:
+                if os.path.exists(padded_audio):
+                    try:
+                        os.unlink(padded_audio)
+                    except Exception:
+                        pass
         else:
             total_dur = sum(durations) if durations else total_duration_seconds
             subprocess.run(

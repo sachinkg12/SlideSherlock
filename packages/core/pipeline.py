@@ -98,6 +98,7 @@ from stages.graph import GraphStage
 from stages.script import ScriptStage
 from stages.verify import VerifyStage
 from stages.translate import TranslateStage
+from stages.narrate import NarrateStage
 from stages.audio import AudioStage
 from stages.video import VideoStage
 
@@ -112,6 +113,7 @@ PER_VARIANT_STAGES: List[Stage] = [
     ScriptStage(),
     VerifyStage(),
     TranslateStage(),
+    NarrateStage(),
     AudioStage(),
     VideoStage(),
 ]
@@ -213,12 +215,34 @@ def run_pipeline(job_id: str):
             temp_dir=temp_dir,
         )
 
-        # Initialize LLM provider
+        # Initialize LLM provider — check job config_json, then env, then default to stub
+        llm_mode = os.environ.get("LLM_PROVIDER", "auto").strip().lower()
+        # Job-level override from config_json (set by API when user toggles AI narration)
+        try:
+            job_config = json.loads(job.config_json) if job.config_json else {}
+            if job_config.get("llm_provider"):
+                llm_mode = job_config["llm_provider"]
+        except Exception:
+            pass
+
+        api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
+        print(f"  [LLM init] llm_mode={llm_mode}, api_key={'set' if api_key else 'unset'}")
+
+        # Script/verify stages always use Stub (fast, deterministic, no API calls).
+        # AI narration happens in the dedicated NarrateStage (post-verify).
         try:
             from llm_provider import StubLLMProvider
             ctx.llm_provider = StubLLMProvider()
         except ImportError:
             pass
+
+        # Store AI narration flag in config so NarrateStage can check it
+        if llm_mode not in ("stub", "auto") and api_key:
+            ctx.config["ai_narration"] = True
+            print("  LLM provider: Stub (script) + AI narration enabled (NarrateStage)")
+        else:
+            ctx.config["ai_narration"] = False
+            print("  LLM provider: Stub (template narration)")
 
         # ---- SHARED STAGES ----
         for stage in SHARED_STAGES:

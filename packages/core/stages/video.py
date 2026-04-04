@@ -28,11 +28,41 @@ try:
 except ImportError:
     render_slide_with_overlay_mp4 = None  # type: ignore
 
+import subprocess as _subprocess
+
 try:
     from composer import compose_video, concat_audio
 except ImportError:
     compose_video = None  # type: ignore
     concat_audio = None  # type: ignore
+
+
+def _get_mp4_duration(path: str) -> float:
+    """Get exact duration of an MP4 via ffprobe."""
+    try:
+        r = _subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=noprint_wrappers=1:nokey=1", path],
+            capture_output=True, text=True, timeout=10,
+        )
+        return float(r.stdout.strip()) if r.stdout.strip() else 0.0
+    except Exception:
+        return 0.0
+
+
+def _pad_audio_to_duration(audio_path: str, target_dur: float, temp_dir: str, slide_index: int) -> str:
+    """Pad a WAV file with silence to exactly match target_dur. Returns path to padded file."""
+    padded = os.path.join(temp_dir, f"slide_{slide_index:03d}_padded.wav")
+    try:
+        _subprocess.run(
+            ["ffmpeg", "-y", "-i", audio_path,
+             "-af", f"apad=whole_dur={target_dur}",
+             "-ar", "48000", "-ac", "1", padded],
+            check=True, capture_output=True, timeout=30,
+        )
+        return padded
+    except Exception:
+        return audio_path
 
 try:
     from notes_config import OnScreenNotesConfig, resolve_notes_font_for_variant
@@ -214,6 +244,14 @@ class VideoStage:
                     notes_config=notes_config,
                     notes_font_path=notes_font_path,
                 )
+                # Measure actual overlay duration (may differ from target due to FPS rounding)
+                actual_overlay_dur = _get_mp4_duration(out_mp4)
+                if actual_overlay_dur > 0 and per_slide_audio_paths and slide_index <= len(per_slide_audio_paths):
+                    audio_file = per_slide_audio_paths[slide_index - 1]
+                    if audio_file and os.path.exists(audio_file):
+                        padded = _pad_audio_to_duration(audio_file, actual_overlay_dur, temp_dir, slide_index)
+                        per_slide_audio_paths[slide_index - 1] = padded
+
                 overlay_storage = f"{overlay_prefix}slide_{slide_num}_overlay.mp4"
                 with open(out_mp4, "rb") as f:
                     minio_client.put(overlay_storage, f.read(), "video/mp4")

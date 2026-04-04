@@ -313,6 +313,7 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
             variant_checks = {
                 f"script_{vid}": f"jobs/{job_id}/script/{vid}/script.json",
                 f"verify_{vid}": f"jobs/{job_id}/script/{vid}/verify_report.json",
+                f"narrate_{vid}": f"jobs/{job_id}/script/{vid}/ai_narration.json",
                 f"audio_{vid}": f"jobs/{job_id}/script/{vid}/narration_per_slide.json",
                 f"video_{vid}": f"jobs/{job_id}/output/{vid}/final.mp4",
             }
@@ -328,7 +329,7 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
     # Build ordered stage list matching the UI's STAGE_REGISTRY
     all_stage_names = [
         "ingest", "evidence", "render", "graph",
-        "script", "verify", "translate", "audio", "video",
+        "script", "verify", "translate", "narrate", "audio", "video",
     ]
 
     # Normalise completed_stages: strip variant suffix (e.g. "script_en" → "script")
@@ -565,6 +566,7 @@ async def quick_create_job(
     name: str = "Quick Project",
     file: UploadFile = File(...),
     requested_language: str = None,
+    ai_narration: bool = False,
     db: Session = Depends(get_db),
 ):
     """Combined create project + job + upload in one call."""
@@ -640,6 +642,11 @@ async def quick_create_job(
     db_job.input_file_path = storage_path
     db_job.updated_at = datetime.utcnow()
     db.commit()
+
+    # Store AI narration preference in job config_json (read by worker)
+    if ai_narration:
+        db_job.config_json = json.dumps({"llm_provider": "openai"})
+        db.commit()
 
     # Queue render stage
     if job_queue:

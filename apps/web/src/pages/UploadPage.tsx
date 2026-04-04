@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Play } from 'lucide-react'
+import { Play, Sparkles } from 'lucide-react'
 import DropZone from '../components/DropZone'
 import PresetCard from '../components/PresetCard'
 import GlowButton from '../components/GlowButton'
@@ -14,6 +14,7 @@ function UploadPage() {
   const navigate = useNavigate()
   const [file, setFile] = useState<File | null>(null)
   const [preset, setPreset] = useState<Preset>('standard')
+  const [aiNarration, setAiNarration] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,7 +29,7 @@ function UploadPage() {
         jobId = startMockJob(file.name)
       } else {
         try {
-          const result = await createQuickJob(file, preset)
+          const result = await createQuickJob(file, preset, aiNarration)
           jobId = result.job_id
         } catch {
           // Backend unreachable — enter demo mode
@@ -98,6 +99,43 @@ function UploadPage() {
             onSelect={() => setPreset(p)}
           />
         ))}
+      </motion.div>
+
+      {/* AI Narration toggle */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.22 }}
+        className="flex items-center justify-between rounded-2xl border border-border-subtle bg-surface px-5 py-4 backdrop-blur-xl"
+      >
+        <div className="flex items-center gap-3">
+          <Sparkles className={`h-5 w-5 ${aiNarration ? 'text-amber-400' : 'text-text-secondary'}`} />
+          <div>
+            <p className="text-base font-medium text-text-primary">AI Narration</p>
+            <p className="text-sm text-text-secondary">
+              {aiNarration
+                ? 'GPT-4o explains slides naturally, like a human presenter'
+                : 'Template narration from slide text and notes'}
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={() => setAiNarration(!aiNarration)}
+          className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
+            aiNarration
+              ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+              : 'bg-white/10'
+          }`}
+          role="switch"
+          aria-checked={aiNarration}
+          aria-label="Toggle AI narration"
+        >
+          <span
+            className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-200 mt-1 ${
+              aiNarration ? 'translate-x-6 ml-0' : 'translate-x-1'
+            }`}
+          />
+        </button>
       </motion.div>
 
       {/* Submit button */}

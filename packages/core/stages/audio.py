@@ -63,6 +63,14 @@ class AudioStage:
             slides_notes_and_text.append((notes, slide_text))
         ctx.slides_notes_and_text = slides_notes_and_text
 
+        # Log narration override status
+        override = ctx.narration_entries_override
+        if override:
+            sources = [e.get("source_used", "?") for e in override[:3]]
+            print(f"  [AudioStage] narration_entries_override: {len(override)} entries, sources={sources}...")
+        else:
+            print(f"  [AudioStage] narration_entries_override: None (using template)")
+
         try:
             config = AudioConfig.from_env()
             narration_entries, per_slide_audio, narration_payload = run_audio_prepare(
