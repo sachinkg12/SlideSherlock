@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "SlideSherlock: Evidence-Grounded Presentation-to-Video Pipeline"
+message: "If you use SlideSherlock in your research, please cite it using this metadata."
+type: software
+authors:
+  - given-names: Sachin
+    family-names: Gupta
+version: 1.0.0
+date-released: "2026-04-03"
+license: Apache-2.0
+repository-code: https://github.com/sachinkg12/SlideSherlock
+keywords:
+  - presentation-to-video
+  - narration-generation
+  - evidence-grounding
+  - hallucination-prevention
+  - knowledge-graph
+  - dual-provenance
+  - verifier-loop
+  - PPTX
+  - pipeline
+  - AI-narration
