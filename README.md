@@ -1,5 +1,8 @@
 # SlideSherlock
 
+[![DOI](https://zenodo.org/badge/1200528949.svg)](https://doi.org/10.5281/zenodo.19413323)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 Convert any PowerPoint presentation into a narrated explainer video with visual guidance — highlights, traces, and zooms synchronized to the narration.
 
 ## Key Features

@@ -5,6 +5,7 @@ type: software
 authors:
   - given-names: Sachin
     family-names: Gupta
+doi: 10.5281/zenodo.19413324
 version: 1.0.0
 date-released: "2026-04-03"
 license: Apache-2.0
