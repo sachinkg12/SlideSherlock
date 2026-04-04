@@ -2,6 +2,7 @@ import type { Config } from 'tailwindcss'
 
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -13,6 +14,11 @@ export default {
         'text-secondary': '#6b7280',
         dark: '#0a0a0f',
         'dark-raised': '#12121a',
+        'status-done': '#3b82f6',
+        'status-active': '#6366f1',
+        'status-warning': '#f97316',
+        'status-error': '#ef4444',
+        'status-pending': '#4b5563',
       },
       fontFamily: {
         sans: [
@@ -35,6 +41,8 @@ export default {
         'fade-in-up': 'fade-in-up 0.5s ease-out',
         'shake': 'shake 0.5s ease-in-out',
         'confetti': 'confetti 1.5s ease-out forwards',
+        'pulse-dot': 'pulse-dot 1.5s ease-in-out infinite',
+        'slide-in-right': 'slide-in-right 0.3s ease-out',
       },
       keyframes: {
         'glow-pulse': {
@@ -59,6 +67,14 @@ export default {
         'confetti': {
           '0%': { transform: 'translateY(0) rotate(0deg)', opacity: '1' },
           '100%': { transform: 'translateY(-200px) rotate(720deg)', opacity: '0' },
+        },
+        'pulse-dot': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.3)' },
+        },
+        'slide-in-right': {
+          '0%': { opacity: '0', transform: 'translateX(20px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
         },
       },
     },

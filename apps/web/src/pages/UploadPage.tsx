@@ -124,7 +124,7 @@ function UploadPage() {
           className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full transition-colors duration-200 ${
             aiNarration
               ? 'bg-gradient-to-r from-amber-500 to-orange-500'
-              : 'bg-white/10'
+              : 'bg-[var(--color-surface)]'
           }`}
           role="switch"
           aria-checked={aiNarration}
@@ -158,7 +158,7 @@ function UploadPage() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-center text-base text-rose-400"
+          className="text-center text-base text-status-error"
         >
           {error}
         </motion.p>

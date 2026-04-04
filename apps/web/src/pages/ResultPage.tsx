@@ -5,9 +5,11 @@ import { Download, ArrowLeft, FileText, AlertTriangle } from 'lucide-react'
 import VideoPlayer from '../components/VideoPlayer'
 import MetricBar from '../components/MetricBar'
 import GlowButton from '../components/GlowButton'
+import PipelineTrack from '../components/PipelineTrack'
 import { getMetrics, getProgress, getVideoUrl, getEvidenceReportUrl } from '../api/client'
 import { isDemoMode, getMockMetrics, getMockProgress } from '../api/mock'
-import type { JobMetrics, JobProgress } from '../api/client'
+import type { JobMetrics, JobProgress, StageProgress } from '../api/client'
+import { STAGE_REGISTRY } from '../config/stages'
 
 function ResultPage() {
   const { jobId } = useParams<{ jobId: string }>()
@@ -65,6 +67,21 @@ function ResultPage() {
   const videoUrl = getVideoUrl(jobId)
   const evidenceUrl = getEvidenceReportUrl(jobId)
 
+  // Build all-done stages array for PipelineTrack
+  const allDoneStages: StageProgress[] = (
+    progress.stages.length > 0
+      ? progress.stages
+      : Object.keys(STAGE_REGISTRY).map((name) => ({
+          name,
+          status: 'done' as const,
+          started_at: null,
+          finished_at: null,
+          duration_s: null,
+          detail: null,
+          metrics: null,
+        }))
+  ).map((s) => ({ ...s, status: 'done' as const }))
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -73,6 +90,9 @@ function ResultPage() {
       transition={{ duration: 0.3 }}
       className="flex flex-col gap-8 pt-8"
     >
+      {/* Pipeline track - all done */}
+      <PipelineTrack stages={allDoneStages} />
+
       {/* Header */}
       <motion.h1
         initial={{ opacity: 0, y: 10 }}
@@ -137,13 +157,13 @@ function ResultPage() {
           <MetricBar
             label="Verification Pass Rate"
             value={metrics.verification_pass_rate}
-            color="emerald"
+            color="blue"
           />
         </div>
 
         {/* Summary stats */}
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-center">
+          <div className="rounded-xl bg-[var(--color-surface)] px-4 py-3 text-center">
             <p className="text-sm text-text-secondary">Verifier</p>
             <p className="mt-1 text-base font-medium text-text-primary">
               {metrics.verifier_iterations} iterations &middot;{' '}
@@ -151,14 +171,14 @@ function ResultPage() {
               {metrics.claims_rewrite} REWRITE
             </p>
           </div>
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-center">
+          <div className="rounded-xl bg-[var(--color-surface)] px-4 py-3 text-center">
             <p className="text-sm text-text-secondary">Knowledge Graph</p>
             <p className="mt-1 text-base font-medium text-text-primary">
               {metrics.graph_nodes} nodes &middot;{' '}
               {metrics.dual_provenance_pct.toFixed(0)}% dual-provenance
             </p>
           </div>
-          <div className="rounded-xl bg-white/5 px-4 py-3 text-center">
+          <div className="rounded-xl bg-[var(--color-surface)] px-4 py-3 text-center">
             <p className="text-sm text-text-secondary">Duration</p>
             <p className="mt-1 text-base font-medium text-text-primary">
               {metrics.total_duration_s.toFixed(0)}s total &middot;{' '}

@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 interface ProgressBarProps {
   percent: number
   size?: 'sm' | 'md'
-  color?: 'indigo' | 'emerald' | 'amber'
+  color?: 'indigo' | 'blue' | 'amber'
 }
 
 const colorMap = {
@@ -12,10 +12,10 @@ const colorMap = {
     fill: 'from-indigo-500 to-violet-500',
     glow: 'shadow-indigo-500/30',
   },
-  emerald: {
-    bg: 'bg-emerald-500/20',
-    fill: 'from-emerald-500 to-emerald-400',
-    glow: 'shadow-emerald-500/30',
+  blue: {
+    bg: 'bg-blue-500/20',
+    fill: 'from-blue-500 to-blue-400',
+    glow: 'shadow-blue-500/30',
   },
   amber: {
     bg: 'bg-amber-500/20',

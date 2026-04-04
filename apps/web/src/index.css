@@ -3,21 +3,45 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-bg: #f8f9fb;
+    --color-bg-raised: #ffffff;
+    --color-surface: rgba(0, 0, 0, 0.03);
+    --color-surface-hover: rgba(0, 0, 0, 0.06);
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: #6b7280;
+    --color-border-subtle: rgba(0, 0, 0, 0.08);
+    --color-border-active: rgba(0, 0, 0, 0.15);
+    --color-glow: rgba(99, 102, 241, 0.05);
+  }
+
+  .dark {
+    --color-bg: #0a0a0f;
+    --color-bg-raised: #12121a;
+    --color-surface: rgba(255, 255, 255, 0.03);
+    --color-surface-hover: rgba(255, 255, 255, 0.06);
+    --color-text-primary: #f0f0f5;
+    --color-text-secondary: #6b7280;
+    --color-border-subtle: rgba(255, 255, 255, 0.08);
+    --color-border-active: rgba(255, 255, 255, 0.15);
+    --color-glow: rgba(99, 102, 241, 0.08);
+  }
+
   html {
     font-size: 16px;
     scroll-behavior: smooth;
   }
 
   body {
-    background-color: #0a0a0f;
-    color: #f0f0f5;
+    background-color: var(--color-bg);
+    color: var(--color-text-primary);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
   ::selection {
     background-color: rgba(99, 102, 241, 0.3);
-    color: #f0f0f5;
+    color: var(--color-text-primary);
   }
 
   /* Custom scrollbar */
@@ -34,15 +58,39 @@
     border-radius: 3px;
   }
 
+  .dark ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  :root ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+  }
+
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.2);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  :root ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
   }
 }
 
 @layer components {
   .glass-card {
-    @apply rounded-2xl border border-border-subtle backdrop-blur-xl;
-    background: rgba(255, 255, 255, 0.03);
+    @apply rounded-2xl border backdrop-blur-xl;
+    background: var(--color-surface);
+    border-color: var(--color-border-subtle);
+  }
+
+  .glass-card-light {
+    @apply rounded-2xl border backdrop-blur-xl;
+    background: rgba(255, 255, 255, 0.7);
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   }
 
   .glass-card-hover {
@@ -50,8 +98,8 @@
   }
 
   .glass-card-hover:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-active);
   }
 
   .gradient-text {

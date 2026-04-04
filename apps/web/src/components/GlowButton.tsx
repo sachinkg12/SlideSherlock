@@ -33,7 +33,7 @@ function GlowButton({
         ${
           isPrimary
             ? disabled
-              ? 'bg-gradient-to-r from-indigo-500/30 to-violet-500/30 text-white/40 cursor-not-allowed'
+              ? 'bg-gradient-to-r from-indigo-500/30 to-violet-500/30 text-[var(--color-text-primary)]/40 cursor-not-allowed'
               : 'bg-gradient-to-r from-indigo-500 to-violet-500 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40'
             : 'glass-card-hover text-text-primary'
         }

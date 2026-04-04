@@ -116,7 +116,7 @@ function DropZone({ file, onFileSelect }: DropZoneProps) {
               transition-colors duration-300 backdrop-blur-xl
               ${
                 isInvalid
-                  ? 'animate-shake border-rose-400/60 bg-rose-500/5'
+                  ? 'animate-shake border-status-error/60 bg-status-error/5'
                   : isDragging
                     ? 'border-indigo-400/60 bg-indigo-500/5'
                     : 'border-border-subtle bg-surface hover:border-indigo-400/40 hover:bg-surface-hover'
@@ -150,7 +150,7 @@ function DropZone({ file, onFileSelect }: DropZoneProps) {
               className="relative"
             >
               {isInvalid ? (
-                <AlertCircle className="h-14 w-14 text-rose-400" />
+                <AlertCircle className="h-14 w-14 text-status-error" />
               ) : (
                 <FileUp className="h-14 w-14 text-indigo-400/70" />
               )}

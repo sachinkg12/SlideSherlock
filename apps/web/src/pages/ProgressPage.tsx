@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { AlertTriangle } from 'lucide-react'
-import StageCard from '../components/StageCard'
+import PipelineTrack from '../components/PipelineTrack'
+import FocusPanel from '../components/FocusPanel'
+import ActivityFeed from '../components/ActivityFeed'
 import ProgressBar from '../components/ProgressBar'
-import EvidenceTrail from '../components/EvidenceTrail'
 import { getProgress, getEvidenceTrail } from '../api/client'
 import { isDemoMode, getMockProgress, getMockEvidenceTrail } from '../api/mock'
 import { spawnConfetti } from '../utils/confetti'
@@ -68,7 +69,7 @@ function ProgressPage() {
         animate={{ opacity: 1 }}
         className="flex flex-col items-center gap-4 pt-24"
       >
-        <AlertTriangle className="h-12 w-12 text-rose-400" />
+        <AlertTriangle className="h-12 w-12 text-status-error" />
         <p className="text-xl text-text-primary">Something went wrong</p>
         <p className="text-base text-text-secondary">{error}</p>
       </motion.div>
@@ -86,6 +87,9 @@ function ProgressPage() {
       </motion.div>
     )
   }
+
+  // Find the currently running stage
+  const currentStage = progress.stages.find((s) => s.status === 'running') ?? null
 
   return (
     <motion.div
@@ -107,21 +111,17 @@ function ProgressPage() {
         </motion.h1>
       </div>
 
-      {/* Overall progress */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <ProgressBar percent={progress.percent} />
-        </div>
-        <span className="text-lg font-bold tabular-nums text-indigo-400 min-w-[4ch]">
-          {Math.round(progress.percent)}%
-        </span>
-      </div>
+      {/* Pipeline track - horizontal dots */}
+      <PipelineTrack stages={progress.stages} />
 
-      {/* Stage cards */}
-      <div className="space-y-3">
-        {progress.stages.map((stage, index) => (
-          <StageCard key={stage.name} stage={stage} index={index} />
-        ))}
+      {/* Two-panel layout: FocusPanel (60%) | ActivityFeed (40%) */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="lg:w-3/5">
+          <FocusPanel stage={currentStage} allStages={progress.stages} />
+        </div>
+        <div className="lg:w-2/5">
+          <ActivityFeed stages={progress.stages} evidence={evidence} />
+        </div>
       </div>
 
       {/* Error banner */}
@@ -129,12 +129,12 @@ function ProgressPage() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card border-rose-500/30 bg-rose-500/5 px-6 py-4"
+          className="glass-card border-status-error/30 bg-status-error/5 px-6 py-4"
         >
           <div className="flex items-center gap-3">
-            <AlertTriangle className="h-6 w-6 flex-shrink-0 text-rose-400" />
+            <AlertTriangle className="h-6 w-6 flex-shrink-0 text-status-error" />
             <div>
-              <p className="text-base font-medium text-rose-400">
+              <p className="text-base font-medium text-status-error">
                 Pipeline failed
               </p>
               <p className="mt-1 text-sm text-text-secondary">
@@ -145,8 +145,15 @@ function ProgressPage() {
         </motion.div>
       )}
 
-      {/* Evidence trail */}
-      <EvidenceTrail entries={evidence} />
+      {/* Overall progress bar + percentage */}
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <ProgressBar percent={progress.percent} />
+        </div>
+        <span className="text-lg font-bold tabular-nums text-indigo-400 min-w-[4ch]">
+          {Math.round(progress.percent)}%
+        </span>
+      </div>
     </motion.div>
   )
 }

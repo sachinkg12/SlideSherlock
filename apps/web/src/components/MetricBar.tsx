@@ -6,7 +6,7 @@ interface MetricBarProps {
   value: number
   maxValue?: number
   suffix?: string
-  color?: 'indigo' | 'emerald' | 'amber'
+  color?: 'indigo' | 'blue' | 'amber'
 }
 
 const colorMap = {
@@ -15,10 +15,10 @@ const colorMap = {
     glow: 'shadow-indigo-500/20',
     text: 'text-indigo-400',
   },
-  emerald: {
-    fill: 'from-emerald-500 to-emerald-400',
-    glow: 'shadow-emerald-500/20',
-    text: 'text-emerald-400',
+  blue: {
+    fill: 'from-blue-500 to-blue-400',
+    glow: 'shadow-blue-500/20',
+    text: 'text-blue-400',
   },
   amber: {
     fill: 'from-amber-500 to-amber-400',
@@ -68,7 +68,7 @@ function MetricBar({
           {displayValue.toFixed(1)}{suffix}
         </span>
       </div>
-      <div className="h-3 w-full overflow-hidden rounded-full bg-white/5">
+      <div className="h-3 w-full overflow-hidden rounded-full bg-[var(--color-surface)]">
         <motion.div
           className={`h-full rounded-full bg-gradient-to-r ${c.fill} shadow-lg ${c.glow}`}
           initial={{ width: 0 }}
