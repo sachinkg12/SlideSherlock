@@ -102,7 +102,6 @@ class LLMProvider(ABC):
           for safe phrasing: notes primary, else image evidence, else generic.
         Returns: narration text string.
         """
-        pass
 
     def generate_narration(
         self, blueprint: Dict[str, Any]
@@ -136,7 +135,7 @@ class StubLLMProvider(LLMProvider):
         slide_index = section.get("slide_index", 0)
         nodes = graph.get("nodes", [])
         edges = graph.get("edges", [])
-        clusters = graph.get("clusters", [])
+        graph.get("clusters", [])
 
         # Safe phrasing: use context_bundle policy when provided
         if context_bundle:
@@ -238,7 +237,7 @@ class StubLLMProvider(LLMProvider):
                 f"It shows {len(nodes)} elements and {len(edges)} connections."
             )
         if section_type == "clusters":
-            cids = section.get("cluster_ids", [])
+            section.get("cluster_ids", [])
             member_labels = []
             for nid in entity_ids:
                 n = node_by_id.get(nid)

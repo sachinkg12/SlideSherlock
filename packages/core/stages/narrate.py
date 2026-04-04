@@ -18,7 +18,7 @@ import json
 import os
 import time
 import traceback
-from typing import Any, Dict, List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pipeline import PipelineContext, StageResult
@@ -150,7 +150,7 @@ class NarrateStage:
             if sc.get("slide_text"):
                 user_parts.append(f"SLIDE TEXT:\n{sc['slide_text']}")
             if sc.get("evidence"):
-                user_parts.append(f"EVIDENCE:\n" + "\n".join(sc["evidence"]))
+                user_parts.append("EVIDENCE:\n" + "\n".join(sc["evidence"]))
             if sc.get("graph_elements"):
                 user_parts.append(f"KEY ELEMENTS: {', '.join(sc['graph_elements'])}")
 

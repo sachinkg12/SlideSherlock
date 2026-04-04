@@ -6,7 +6,6 @@ Merge engine: combine G_native + optional G_vision -> G_unified.
 """
 from __future__ import annotations
 
-import json
 import math
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -198,7 +197,7 @@ def merge_graphs(
     for n_n in nodes_n:
         best_v: Optional[Dict[str, Any]] = None
         best_score = 0.0
-        best_geom = best_text = best_type = 0.0
+        best_geom = best_text = best_type = 0.0  # noqa: F841
         for n_v in nodes_v:
             if n_v.get("node_id") in used_v:
                 continue
@@ -216,7 +215,7 @@ def merge_graphs(
             if score > best_score:
                 best_score = score
                 best_v = n_v
-                best_geom, best_text, best_type = geom, text, type_s
+                best_geom, best_text, best_type = geom, text, type_s  # noqa: F841
 
         if best_v is not None and best_score >= match_threshold:
             used_v.add(best_v.get("node_id"))

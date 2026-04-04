@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 100
+exclude = __pycache__,venv,node_modules,.git,docs
+# E203: whitespace before ':' — conflicts with black formatter
+# E402: module level import not at top — required for sys.path setup in pipeline/tests
+# W503: line break before binary operator — conflicts with black
+# E501: line too long — black handles what it can; remaining are strings/URLs
+extend-ignore = E203, E402, E501, W503

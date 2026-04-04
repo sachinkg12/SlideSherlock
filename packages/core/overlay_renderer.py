@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import io
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 OVERLAY_FPS = 15
 HIGHLIGHT_COLOR = (0, 255, 100, 180)

@@ -210,7 +210,7 @@ def test_run_audio_prepare_artifact_narration_structure():
                 tts_provider=mock_tts,
             )
     narration_put = next(c for c in minio.put.call_args_list if SCRIPT_NARRATION in c[0][0])
-    key, data, _ = narration_put[0][0], narration_put[0][1], narration_put[0][2]
+    _key, data, _ = narration_put[0][0], narration_put[0][1], narration_put[0][2]  # noqa: F841
     obj = json.loads(data.decode("utf-8"))
     assert obj["job_id"] == "job3"
     assert len(obj["slides"]) == 1
@@ -260,7 +260,7 @@ def test_run_audio_prepare_artifact_duration_structure():
         if f"{TIMING_PREFIX}/slide_" in c[0][0] and "_duration.json" in c[0][0]
     ]
     assert len(duration_puts) == 1
-    key, data = duration_puts[0][0][0], duration_puts[0][0][1]
+    _key, data = duration_puts[0][0][0], duration_puts[0][0][1]  # noqa: F841
     obj = json.loads(data.decode("utf-8"))
     assert "audio_duration_seconds" in obj
     assert "fallback_duration_seconds" in obj

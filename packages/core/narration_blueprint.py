@@ -21,7 +21,7 @@ def _has_bullet_pattern(text: str) -> bool:
     """Heuristic: slide text has bullet-like structure (-, •, *, numbers)."""
     if not text or len(text) < 10:
         return False
-    lines = [l.strip() for l in text.split("\n") if l.strip()]
+    lines = [ln.strip() for ln in text.split("\n") if ln.strip()]
     if len(lines) < 2:
         return False
     bullet_chars = ("-", "•", "*", "·", "–", "—")
@@ -92,9 +92,9 @@ def _template_for_diagram_process(
     if labels:
         intro = f"This slide shows a diagram with key elements: {', '.join(labels[:4])}."
         if len(labels) > 4:
-            intro += f" And more."
+            intro += " And more."
     else:
-        intro = f"This slide presents a diagram."
+        intro = "This slide presents a diagram."
     if edges:
         intro += f" There are {len(edges)} connection(s) between the elements."
     if clusters:
@@ -107,7 +107,7 @@ def _template_for_diagram_process(
 def _template_for_bullet_list(slide_index: int, slide_text: str, graph: Dict[str, Any]) -> str:
     """Template narration for bullet list slides."""
     if slide_text and _word_count(slide_text) >= 5:
-        lines = [l.strip() for l in slide_text.split("\n") if l.strip()][:5]
+        lines = [ln.strip() for ln in slide_text.split("\n") if ln.strip()][:5]
         return f"On this slide: {' '.join(lines[:3])}."
     return f"This slide lists several points for slide {slide_index}."
 
@@ -120,7 +120,7 @@ def _template_for_chart(slide_index: int, slide_text: str, graph: Dict[str, Any]
         return f"This slide displays a chart or graph with elements such as {', '.join(labels)}."
     if slide_text and _word_count(slide_text) >= 3:
         return f"This chart shows: {slide_text[:120].strip()}."
-    return f"This slide presents a chart or data visualization."
+    return "This slide presents a chart or data visualization."
 
 
 def _template_for_title_only(slide_index: int, slide_text: str, graph: Dict[str, Any]) -> str:

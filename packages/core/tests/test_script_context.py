@@ -12,8 +12,6 @@ from script_context import (
     build_context_bundle,
     build_context_bundles_per_slide,
     narration_policy,
-    MIN_NOTES_WORDS,
-    IMAGE_EVIDENCE_KINDS,
 )
 
 

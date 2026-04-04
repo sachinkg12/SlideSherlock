@@ -413,7 +413,7 @@ class VideoStage:
                     created_at=datetime.utcnow(),
                 )
             )
-            print(f"  Composed output/final.mp4 written")
+            print("  Composed output/final.mp4 written")
 
             if (
                 srt_local
@@ -437,7 +437,7 @@ class VideoStage:
                             created_at=datetime.utcnow(),
                         )
                     )
-                    print(f"  Wrote output/final.srt")
+                    print("  Wrote output/final.srt")
                 except Exception as e:
                     print(f"  Warning: failed to upload SRT: {e}")
                 finally:
@@ -448,7 +448,7 @@ class VideoStage:
 
             pipeline_elapsed = time.time() - pipeline_start
             # Write per-variant metrics (legacy format)
-            metrics = {
+            _metrics = {  # noqa: F841
                 "schema_version": "1.0",
                 "job_id": job_id,
                 "runtime_seconds": round(pipeline_elapsed, 2),

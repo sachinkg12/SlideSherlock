@@ -18,7 +18,6 @@ import sys
 import time
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any, Dict
 
 # Add repo root and packages/core to path
@@ -439,8 +438,6 @@ def cmd_run(args: argparse.Namespace) -> int:
         minio_client.put(
             metrics_path, json.dumps(metrics_payload, indent=2).encode(), "application/json"
         )
-
-        import hashlib
 
         db.add(
             Artifact(

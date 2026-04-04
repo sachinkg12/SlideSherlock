@@ -4,12 +4,11 @@ Generates narration audio from text per slide.
 """
 from __future__ import annotations
 
-import io
 import os
 import subprocess
 import tempfile
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Optional
 
 # Preferred sample rate for pipeline
 TTS_SAMPLE_RATE = 48000
@@ -24,7 +23,6 @@ class TTSProvider(ABC):
         Synthesize text to audio file. Returns duration in seconds.
         output_path: .wav or .mp3.
         """
-        pass
 
 
 # Voice/lang mapping for system TTS (macOS say, espeak)

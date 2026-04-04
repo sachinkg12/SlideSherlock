@@ -41,9 +41,9 @@ class RenderStage:
         from pipeline import StageResult
 
         try:
-            from apps.api.models import Artifact, Job
+            from apps.api.models import Artifact
         except ImportError:
-            from models import Artifact, Job  # type: ignore
+            from models import Artifact  # type: ignore
 
         minio_client = ctx.minio_client
         db = ctx.db_session

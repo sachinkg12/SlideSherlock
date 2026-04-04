@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import datetime
-from typing import Dict, List, Tuple, TYPE_CHECKING
+from typing import List, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pipeline import PipelineContext, StageResult
@@ -71,7 +71,7 @@ class AudioStage:
                 f"  [AudioStage] narration_entries_override: {len(override)} entries, sources={sources}..."
             )
         else:
-            print(f"  [AudioStage] narration_entries_override: None (using template)")
+            print("  [AudioStage] narration_entries_override: None (using template)")
 
         try:
             config = AudioConfig.from_env()

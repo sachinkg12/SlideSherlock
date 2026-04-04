@@ -1,8 +1,6 @@
 """Tests for translation module."""
 from __future__ import annotations
 
-import pytest
-
 
 def test_derive_narration_from_script():
     from translation import derive_narration_from_script

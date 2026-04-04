@@ -9,7 +9,6 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from slide_caption_fallback import (
-    KIND_SLIDE_CAPTION,
     _slide_needs_fallback,
     _word_count,
     _stable_evidence_id,
@@ -80,7 +79,7 @@ def test_run_slide_caption_fallback_empty():
 
     minio = MagicMock()
     minio.get.side_effect = Exception("no index")
-    result = run_slide_caption_fallback(
+    _result = run_slide_caption_fallback(  # noqa: F841
         job_id="j1",
         project_id="p1",
         slide_count=2,

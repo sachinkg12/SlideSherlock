@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from explain_plan import build_explain_plan, PLAN_ORDER
 from llm_provider import StubLLMProvider
-from rag import retrieve_chunk_ids, tfidf_retrieve
+from rag import retrieve_chunk_ids
 from script_generator import generate_script
 
 

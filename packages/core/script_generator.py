@@ -6,7 +6,6 @@ evidence_ids[], entity_ids[], used_hedging. Narrates from notes or image evidenc
 from __future__ import annotations
 
 import hashlib
-import json
 from datetime import datetime
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
 

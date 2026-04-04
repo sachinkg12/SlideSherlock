@@ -5,7 +5,7 @@ Each preset sets env vars (or exports for shell) for the pipeline.
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 
 PRESET_DRAFT = "draft"
 PRESET_STANDARD = "standard"

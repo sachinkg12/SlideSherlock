@@ -25,7 +25,6 @@ class TranslatorProvider(ABC):
         source_lang, target_lang: BCP-47 (e.g. en-US, hi-IN).
         Returns translated text or None if translation failed/unavailable.
         """
-        pass
 
     def is_available(self) -> bool:
         """Return True if this provider can translate."""

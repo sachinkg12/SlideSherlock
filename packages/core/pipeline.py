@@ -323,7 +323,6 @@ def run_pipeline(job_id: str):
         metrics_json = json.dumps(metrics_payload, indent=2)
         minio_client.put(metrics_path, metrics_json.encode("utf-8"), "application/json")
 
-        import hashlib
         import uuid
 
         db.add(

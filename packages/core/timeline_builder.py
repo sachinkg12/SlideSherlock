@@ -130,7 +130,7 @@ def choose_action_type(
     entity_ids = segment.get("entity_ids") or []
     if not entity_ids:
         return ACTION_HIGHLIGHT
-    nodes = {n.get("node_id"): n for n in graph.get("nodes", [])}
+    _nodes = {n.get("node_id"): n for n in graph.get("nodes", [])}  # noqa: F841
     edges = {e.get("edge_id"): e for e in graph.get("edges", [])}
     clusters = {c.get("cluster_id"): c for c in graph.get("clusters", [])}
     for eid in entity_ids:

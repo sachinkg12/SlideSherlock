@@ -8,7 +8,7 @@ import os
 import shutil
 import subprocess
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 
 def _find_libreoffice() -> Tuple[bool, str]:

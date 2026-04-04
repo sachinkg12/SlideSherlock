@@ -57,7 +57,6 @@ class VisionExtractor(ABC):
         Extract caption, objects, actions from a photo/image region.
         Returns list of results (caption, objects, actions). Confidence < threshold => safe language only.
         """
-        pass
 
     @abstractmethod
     def extract_diagram(
@@ -71,7 +70,6 @@ class VisionExtractor(ABC):
         Extract entities, interactions, summary from a diagram slide.
         vision_graph: optional OCR/vision graph (nodes, edges) for grounding.
         """
-        pass
 
 
 class StubVisionExtractor(VisionExtractor):
@@ -184,7 +182,6 @@ class VisionProvider(ABC):
         """
         Generate image caption. Returns {caption, confidence, reason_code?}.
         """
-        pass
 
     @abstractmethod
     def extract(
@@ -201,7 +198,6 @@ class VisionProvider(ABC):
         diagram: {diagram_type, entities, interactions, summary, global_confidence}
         slide: same as photo (treated as photo for compatibility)
         """
-        pass
 
 
 class StubVisionProvider(VisionProvider):

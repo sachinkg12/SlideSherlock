@@ -1,5 +1,4 @@
 """Worker: thin wrapper that delegates to the pipeline orchestrator."""
-from typing import Any, Dict, List, Optional, Tuple
 
 from sqlalchemy.orm import Session
 from .database import SessionLocal
@@ -9,7 +8,6 @@ import time
 import sys
 import os
 import uuid
-import json
 
 # Add packages/core to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core"))

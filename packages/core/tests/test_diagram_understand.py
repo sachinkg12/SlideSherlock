@@ -16,7 +16,6 @@ from diagram_understand import (
     _run_diagram_parse,
     _build_diagram_summary,
     _extract_entities_sequence,
-    _extract_interactions_sequence,
 )
 
 

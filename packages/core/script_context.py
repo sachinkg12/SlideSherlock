@@ -5,7 +5,7 @@ Used to enforce safe phrasing: narrate from notes or image evidence only; no hal
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 # Image evidence kinds that may be used for narration (photo + diagram + slide fallback)
 IMAGE_EVIDENCE_KINDS = frozenset(

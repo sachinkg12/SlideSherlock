@@ -33,12 +33,13 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       minio:
-        image: bitnami/minio:latest
+        image: quay.io/minio/minio:latest
         ports:
           - 9000:9000
         env:
           MINIO_ROOT_USER: minioadmin
           MINIO_ROOT_PASSWORD: minioadmin
+          MINIO_ADDRESS: ":9000"
         options: >-
           --health-cmd "curl -f http://localhost:9000/minio/health/live || exit 1"
           --health-interval 10s
@@ -91,7 +92,7 @@ jobs:
         run: black --check --line-length 100 packages/core/ apps/api/ scripts/
 
       - name: Lint (flake8)
-        run: flake8 --max-line-length=100 --exclude=__pycache__,venv,node_modules packages/core/ apps/api/ scripts/
+        run: flake8 packages/core/ apps/api/ scripts/
 
   frontend:
     runs-on: ubuntu-latest

@@ -21,7 +21,6 @@ from narration_source import (
     SOURCE_MIXED,
     SOURCE_LLM,
     SOURCE_TEMPLATE,
-    SOURCE_USER_AUDIO,
 )
 
 

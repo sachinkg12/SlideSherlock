@@ -10,9 +10,9 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
-from audio_config import AudioConfig, AUDIO_MODE_USE_SUPPLIED, AUDIO_MODE_GENERATE
+from audio_config import AudioConfig, AUDIO_MODE_USE_SUPPLIED
 from narration_source import build_narration_per_slide
-from audio_processor import process_audio_simple, _get_duration_seconds
+from audio_processor import _get_duration_seconds
 
 # Input path for user-supplied audio (per slide)
 INPUT_AUDIO_PREFIX = "input/audio"

@@ -67,7 +67,7 @@ def create_sample_pptx(output_path: str) -> None:
     center_y = emu(top + h / 2)
     begin_x = emu(left + w)
     end_x = emu(left_b)
-    conn_ab = shapes.add_connector(
+    _conn_ab = shapes.add_connector(  # noqa: F841
         MSO_CONNECTOR_TYPE.STRAIGHT,
         begin_x,
         center_y,
@@ -78,7 +78,7 @@ def create_sample_pptx(output_path: str) -> None:
     # Connector B -> C
     begin_x_bc = emu(left_b + w)
     end_x_bc = emu(left_c)
-    conn_bc = shapes.add_connector(
+    _conn_bc = shapes.add_connector(  # noqa: F841
         MSO_CONNECTOR_TYPE.STRAIGHT,
         begin_x_bc,
         center_y,

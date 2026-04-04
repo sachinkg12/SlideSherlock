@@ -133,6 +133,6 @@ class TranslateStage:
             json.dumps(trans_report, indent=2).encode("utf-8"),
             "application/json",
         )
-        print(f"  Translation: script_translated.json, notes, translation_report.json written")
+        print("  Translation: script_translated.json, notes, translation_report.json written")
 
         return StageResult(status="ok")

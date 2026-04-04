@@ -282,7 +282,7 @@ def main():
     total = len(pptx_files)
     workers = min(args.workers, total)
 
-    print(f"\n  SlideSherlock Batch Run")
+    print("\n  SlideSherlock Batch Run")
     print(f"  Files:   {total}")
     print(f"  Preset:  {args.preset}")
     print(f"  Workers: {workers}")
@@ -320,7 +320,7 @@ def main():
     wall_time = time.time() - t0
     print(f"\n  Wall time: {wall_time:.0f}s ({wall_time/60:.1f} min)")
 
-    summary = aggregate(results, output_dir)
+    aggregate(results, output_dir)
 
     return 0
 

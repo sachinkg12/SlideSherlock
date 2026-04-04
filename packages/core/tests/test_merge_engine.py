@@ -11,11 +11,9 @@ import os
 # Allow importing merge_engine from parent
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-import pytest
 from merge_engine import (
     merge_graphs,
     _geom_score,
-    _text_score,
     _overall_score,
     _text_similarity,
     _add_provenance_and_confidence,

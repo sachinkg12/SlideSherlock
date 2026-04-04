@@ -291,10 +291,9 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="MinIO client not available")
 
     # Try to read metrics.json (written at end of pipeline)
-    metrics = None
     try:
         metrics_data = minio_client.get(f"jobs/{job_id}/metrics.json")
-        metrics = json.loads(metrics_data.decode("utf-8"))
+        json.loads(metrics_data.decode("utf-8"))
     except Exception:
         pass
 

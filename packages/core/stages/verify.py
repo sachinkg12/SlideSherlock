@@ -123,7 +123,7 @@ class VerifyStage:
                     )
                 )
             print(
-                f"  Verifier + rewrite loop: script/script.json (verified), verify_report.json, coverage.json written"
+                "  Verifier + rewrite loop: script/script.json (verified), verify_report.json, coverage.json written"
             )
 
         # Store for downstream

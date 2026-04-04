@@ -3,7 +3,6 @@ Unit tests for embedded image extraction from PPTX.
 """
 from __future__ import annotations
 
-import json
 import os
 import sys
 from unittest.mock import MagicMock
@@ -14,7 +13,6 @@ from image_extract import (
     _stable_image_id,
     _ext_from_content_type,
     extract_images_from_pptx,
-    PRESENTATION_AVAILABLE,
 )
 
 

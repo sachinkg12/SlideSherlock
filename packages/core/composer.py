@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 import subprocess
 import tempfile
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional
 
 # Optional imports for video_config
 try:
@@ -341,7 +341,7 @@ def compose_video(
         and srt_path
         and os.path.exists(srt_path)
     )
-    use_bgm = config and getattr(config, "bgm_enabled", False) and getattr(config, "bgm_path", None)
+    config and getattr(config, "bgm_enabled", False) and getattr(config, "bgm_path", None)
     # Get dimensions from first slide
     try:
         r = subprocess.run(

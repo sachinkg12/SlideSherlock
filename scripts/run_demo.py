@@ -92,7 +92,7 @@ def main():
         except Exception:
             continue
     else:
-        print(f"Warning: could not download final.mp4")
+        print("Warning: could not download final.mp4")
         print(f"  Check MinIO at jobs/{job_id}/output/")
 
 

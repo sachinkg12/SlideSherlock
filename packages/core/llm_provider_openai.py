@@ -175,11 +175,11 @@ class OpenAILLMProvider(LLMProvider):
         """
         slide_index = blueprint.get("slide_index", 0)
         slide_type = blueprint.get("slide_type", "content")
-        template = (blueprint.get("template_narration") or "").strip()
+        (blueprint.get("template_narration") or "").strip()
         llm_ctx = blueprint.get("llm_context") or {}
 
         nodes = llm_ctx.get("nodes", [])
-        edges = llm_ctx.get("edges", [])
+        llm_ctx.get("edges", [])
         evidence_ids = llm_ctx.get("evidence_ids", [])
         notes = (llm_ctx.get("notes") or "").strip()
         slide_text = (llm_ctx.get("slide_text") or "").strip()
