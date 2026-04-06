@@ -66,7 +66,7 @@ def run_one(pptx_path: str, output_dir: str, preset: str, idx: int, total: int) 
             cmd,
             capture_output=True,
             text=True,
-            timeout=900,  # 15 min max per file
+            timeout=1800,  # 30 min max per file
             env=env,
             cwd=repo_root,
         )

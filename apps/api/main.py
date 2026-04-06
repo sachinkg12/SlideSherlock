@@ -265,7 +265,7 @@ async def upload_pptx(
             from .worker import render_stage
         except ImportError:
             from apps.api.worker import render_stage
-        job_queue.enqueue(render_stage, job_id, job_timeout=900)
+        job_queue.enqueue(render_stage, job_id, job_timeout=1800)
     else:
         print(f"Warning: Render stage not enqueued for job {job_id} (Redis unavailable)")
 
@@ -670,7 +670,7 @@ async def quick_create_job(
             from .worker import render_stage
         except ImportError:
             from apps.api.worker import render_stage
-        job_queue.enqueue(render_stage, job_id, job_timeout=900)
+        job_queue.enqueue(render_stage, job_id, job_timeout=1800)
 
     return {
         "project_id": db_project.project_id,

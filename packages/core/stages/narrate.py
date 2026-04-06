@@ -139,8 +139,8 @@ class NarrateStage:
             "8. Output ONLY the narration text. No labels, no slide numbers, no meta-commentary."
         )
 
-        _log(f"Starting GPT-4o calls for {slide_count} slides...")
-
+        # Build prompts for each slide
+        slide_prompts = []
         for si, sc in enumerate(slides_context, 1):
             user_parts = []
             if sc.get("template_narration"):
@@ -155,31 +155,22 @@ class NarrateStage:
                 user_parts.append(f"KEY ELEMENTS: {', '.join(sc['graph_elements'])}")
 
             if not user_parts:
-                _log(f"  Slide {si}: NO context available, using fallback")
-                rewritten_entries.append(
-                    {
-                        "slide_index": si,
-                        "narration_text": f"Slide {si}.",
-                        "source_used": "fallback",
-                        "word_count": 2,
-                    }
-                )
+                slide_prompts.append((si, sc, None))
                 continue
 
             user_prompt = f"Narrate slide {si} of {slide_count}:\n\n" + "\n\n".join(user_parts)
+            slide_prompts.append((si, sc, user_prompt))
 
-            _log(f"  Slide {si}: sending to GPT-4o ({len(user_prompt)} chars prompt)...")
+        # Parallel GPT calls with bounded concurrency to avoid rate limits
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        max_parallel = int(os.environ.get("NARRATE_PARALLEL", "5"))
+        model = os.environ.get("NARRATE_MODEL", "gpt-4o-mini")
+        _log(f"Starting parallel GPT-{model} calls for {slide_count} slides ({max_parallel} concurrent)...")
 
-            # Retry with exponential backoff for rate limits
-            max_retries = 4
-            slide_done = False
-            for attempt in range(max_retries):
+        def call_gpt(slide_idx: int, prompt: str) -> tuple:
+            """Returns (slide_idx, text_or_None, error_msg)."""
+            for attempt in range(3):
                 try:
-                    if si > 1 or attempt > 0:
-                        wait = 1.0 + attempt * 2.0
-                        _log(f"  Slide {si}: waiting {wait:.1f}s before attempt {attempt + 1}")
-                        time.sleep(wait)
-
                     resp = requests.post(
                         "https://api.openai.com/v1/chat/completions",
                         headers={
@@ -187,58 +178,77 @@ class NarrateStage:
                             "Content-Type": "application/json",
                         },
                         json={
-                            "model": os.environ.get("NARRATE_MODEL", "gpt-4o-mini"),
+                            "model": model,
                             "messages": [
                                 {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": user_prompt},
+                                {"role": "user", "content": prompt},
                             ],
                             "max_tokens": 300,
                             "temperature": 0.7,
                         },
                         timeout=30,
                     )
-
-                    _log(f"  Slide {si}: HTTP {resp.status_code} (attempt {attempt + 1})")
-
                     if resp.status_code == 429:
-                        wait = min(2 ** (attempt + 2), 60)
-                        _log(f"  Slide {si}: RATE LIMITED (429), backing off {wait}s")
+                        wait = min(2 ** (attempt + 1), 30)
                         time.sleep(wait)
                         continue
-
                     if resp.status_code != 200:
-                        _log(f"  Slide {si}: ERROR {resp.status_code}: {resp.text[:200]}")
+                        if attempt < 2:
+                            time.sleep(2)
+                            continue
+                        return (slide_idx, None, f"HTTP {resp.status_code}")
+                    text = (resp.json()["choices"][0]["message"]["content"] or "").strip()
+                    if text and len(text) > 10:
+                        return (slide_idx, text, None)
+                    if attempt < 2:
                         continue
-
-                    resp_json = resp.json()
-                    new_text = (resp_json["choices"][0]["message"]["content"] or "").strip()
-                    _log(f"  Slide {si}: GOT {len(new_text)} chars: '{new_text[:80]}...'")
-
-                    if new_text and len(new_text) > 10:
-                        rewritten_entries.append(
-                            {
-                                "slide_index": si,
-                                "narration_text": new_text,
-                                "source_used": "ai_narrate",
-                                "word_count": len(new_text.split()),
-                            }
-                        )
-                        success_count += 1
-                        slide_done = True
-                        break
-                    else:
-                        _log(f"  Slide {si}: response too short, retrying...")
-
+                    return (slide_idx, None, "response too short")
                 except Exception as e:
-                    _log(f"  Slide {si}: EXCEPTION on attempt {attempt + 1}: {e}")
-                    _log(f"  {traceback.format_exc()}")
-                    if attempt < max_retries - 1:
+                    if attempt < 2:
+                        time.sleep(1)
                         continue
-                    break
+                    return (slide_idx, None, str(e)[:80])
+            return (slide_idx, None, "max retries exhausted")
 
-            if not slide_done:
+        results_by_slide: Dict[int, tuple] = {}
+
+        # Handle slides without context (instant fallback)
+        for si, sc, prompt in slide_prompts:
+            if prompt is None:
+                results_by_slide[si] = (None, "no context")
+
+        # Submit all GPT calls in parallel
+        callable_prompts = [(si, sc, p) for si, sc, p in slide_prompts if p is not None]
+        with ThreadPoolExecutor(max_workers=max_parallel) as pool:
+            futures = {pool.submit(call_gpt, si, p): (si, sc) for si, sc, p in callable_prompts}
+            for future in as_completed(futures):
+                si, sc = futures[future]
+                try:
+                    _, text, err = future.result()
+                    results_by_slide[si] = (text, err)
+                    if text:
+                        _log(f"  Slide {si}: OK ({len(text)} chars)")
+                    else:
+                        _log(f"  Slide {si}: FAILED ({err})")
+                except Exception as e:
+                    results_by_slide[si] = (None, str(e)[:80])
+                    _log(f"  Slide {si}: EXCEPTION ({e})")
+
+        # Build output entries in slide order
+        for si, sc, _ in slide_prompts:
+            text, err = results_by_slide.get(si, (None, "missing"))
+            if text:
+                rewritten_entries.append(
+                    {
+                        "slide_index": si,
+                        "narration_text": text,
+                        "source_used": "ai_narrate",
+                        "word_count": len(text.split()),
+                    }
+                )
+                success_count += 1
+            else:
                 fallback = sc.get("template_narration") or sc.get("notes") or f"Slide {si}."
-                _log(f"  Slide {si}: ALL ATTEMPTS FAILED, using fallback ({len(fallback)} chars)")
                 rewritten_entries.append(
                     {
                         "slide_index": si,
