@@ -343,28 +343,25 @@ def cmd_run(args: argparse.Namespace) -> int:
             temp_dir=temp_dir,
         )
 
-        # LLM provider — use OpenAI if key available, else stub
+        # LLM provider — always use Stub for script/verify stages.
+        # AI narration is handled by NarrateStage (reads ctx.config["ai_narration"]).
+        try:
+            from llm_provider import StubLLMProvider
+            ctx.llm_provider = StubLLMProvider()
+        except ImportError:
+            pass
+
+        # AI narration flag: set from --ai-narration flag or LLM_PROVIDER env var
         llm_mode = os.environ.get("LLM_PROVIDER", "auto").strip().lower()
         api_key = os.environ.get("OPENAI_API_KEY", "").strip()
-        if llm_mode != "stub" and api_key:
-            try:
-                from llm_provider_openai import OpenAILLMProvider
-
-                ctx.llm_provider = OpenAILLMProvider(api_key=api_key)
-                logger.stage_detail("LLM: OpenAI (AI narration)")
-            except ImportError:
-                from llm_provider import StubLLMProvider
-
-                ctx.llm_provider = StubLLMProvider()
-                logger.stage_detail("LLM: Stub (template narration)")
+        ai_narration_requested = getattr(args, "ai_narration", False) or (
+            llm_mode not in ("stub", "auto") and bool(api_key)
+        )
+        ctx.config["ai_narration"] = ai_narration_requested
+        if ai_narration_requested:
+            logger.stage_detail("AI narration: ON (NarrateStage will use GPT-4o)")
         else:
-            try:
-                from llm_provider import StubLLMProvider
-
-                ctx.llm_provider = StubLLMProvider()
-                logger.stage_detail("LLM: Stub (template narration)")
-            except ImportError:
-                pass
+            logger.stage_detail("AI narration: OFF (template narration)")
 
         # ---- SHARED STAGES ----
         for stage in SHARED_STAGES:
@@ -477,6 +474,74 @@ def cmd_run(args: argparse.Namespace) -> int:
         # Download metrics.json locally
         logger.write_metrics(metrics_payload)
 
+        # Download paper-relevant artifacts from MinIO
+        paper_data = {}
+        for variant in ctx.output_variants or [{"id": "en"}]:
+            vid = variant.get("id", "en")
+            artifacts_to_download = {
+                "verify_report": f"jobs/{job_id}/script/{vid}/verify_report.json",
+                "coverage": f"jobs/{job_id}/script/{vid}/coverage.json",
+                "evidence_index": f"jobs/{job_id}/evidence/index.json",
+                "ai_narration": f"jobs/{job_id}/script/{vid}/ai_narration.json",
+                "narration_per_slide": f"jobs/{job_id}/script/{vid}/narration_per_slide.json",
+            }
+            for name, key in artifacts_to_download.items():
+                try:
+                    data = minio_client.get(key)
+                    parsed = json.loads(data.decode("utf-8"))
+                    # Save locally
+                    local_path = os.path.join(output_dir, f"{name}.json")
+                    with open(local_path, "w") as f:
+                        json.dump(parsed, f, indent=2)
+                    paper_data[name] = parsed
+                except Exception:
+                    pass
+
+        # Extract paper-relevant metrics into run_log
+        if "coverage" in paper_data:
+            cov = paper_data["coverage"]
+            logger.data["coverage"] = {
+                "total_claims": cov.get("total_claims", 0),
+                "claims_with_evidence": cov.get("claims_with_evidence", 0),
+                "pct_claims_with_evidence": cov.get("pct_claims_with_evidence", 0),
+                "entities_total": cov.get("entities_total", 0),
+                "entities_grounded": cov.get("entities_grounded", 0),
+                "pct_entities_grounded": cov.get("pct_entities_grounded", 0),
+                "pass": cov.get("pass", 0),
+                "rewrite": cov.get("rewrite", 0),
+                "remove": cov.get("remove", 0),
+            }
+        if "evidence_index" in paper_data:
+            items = paper_data["evidence_index"].get("evidence_items", [])
+            kinds: Dict[str, int] = {}
+            for item in items:
+                k = item.get("kind", "unknown")
+                kinds[k] = kinds.get(k, 0) + 1
+            logger.data["evidence"] = {
+                "total_items": len(items),
+                "kinds": kinds,
+            }
+        if "verify_report" in paper_data:
+            decisions = paper_data["verify_report"].get("decisions", [])
+            verdicts: Dict[str, int] = {}
+            reasons_all: Dict[str, int] = {}
+            for d in decisions:
+                v = d.get("verdict", "unknown")
+                verdicts[v] = verdicts.get(v, 0) + 1
+                for r in d.get("reasons", []):
+                    reasons_all[r] = reasons_all.get(r, 0) + 1
+            logger.data["verify"] = {
+                "total_decisions": len(decisions),
+                "verdicts": verdicts,
+                "iterations": paper_data["verify_report"].get("iterations", 1),
+                "reason_distribution": reasons_all,
+            }
+        if "ai_narration" in paper_data:
+            logger.data["ai_narration"] = {
+                "slides_rewritten": paper_data["ai_narration"].get("ai_rewritten", 0),
+                "slides_total": paper_data["ai_narration"].get("slide_count", 0),
+            }
+
         # Summary
         logger.summary(output_video)
         logger.write_log()
@@ -567,6 +632,12 @@ def main() -> int:
     )
     run_parser.add_argument(
         "--lang", "-l", default=None, help="Add a second language variant (e.g. hi-IN)"
+    )
+    run_parser.add_argument(
+        "--ai-narration",
+        action="store_true",
+        default=False,
+        help="Enable AI narration (GPT-4o rewrite, requires OPENAI_API_KEY)",
     )
     run_parser.set_defaults(func=cmd_run)
 

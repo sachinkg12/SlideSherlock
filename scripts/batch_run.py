@@ -49,17 +49,21 @@ def run_one(pptx_path: str, output_dir: str, preset: str, idx: int, total: int) 
 
     try:
         env = {**os.environ, "PYTHONPATH": f"{repo_root}:{repo_root}/packages/core"}
+        cmd = [
+            os.path.join(repo_root, "venv", "bin", "python"),
+            os.path.join(repo_root, "scripts", "slidesherlock_cli.py"),
+            "run",
+            pptx_path,
+            "--preset",
+            preset,
+            "--output",
+            file_output,
+        ]
+        # Pass --ai-narration if LLM_PROVIDER is set to openai
+        if os.environ.get("LLM_PROVIDER", "").strip().lower() == "openai":
+            cmd.append("--ai-narration")
         proc = subprocess.run(
-            [
-                os.path.join(repo_root, "venv", "bin", "python"),
-                os.path.join(repo_root, "scripts", "slidesherlock_cli.py"),
-                "run",
-                pptx_path,
-                "--preset",
-                preset,
-                "--output",
-                file_output,
-            ],
+            cmd,
             capture_output=True,
             text=True,
             timeout=900,  # 15 min max per file
@@ -80,6 +84,27 @@ def run_one(pptx_path: str, output_dir: str, preset: str, idx: int, total: int) 
             result["pipeline_duration_s"] = run_log.get("pipeline_duration_s", elapsed)
             result["stages"] = run_log.get("stages", {})
             result["variant"] = run_log.get("variant")
+
+            # Extract paper-relevant metrics from run_log
+            cov = run_log.get("coverage", {})
+            result["total_claims"] = cov.get("total_claims", 0)
+            result["claims_with_evidence"] = cov.get("claims_with_evidence", 0)
+            result["pct_evidence_coverage"] = cov.get("pct_claims_with_evidence", 0)
+            result["verifier_pass"] = cov.get("pass", 0)
+            result["verifier_rewrite"] = cov.get("rewrite", 0)
+            result["verifier_remove"] = cov.get("remove", 0)
+
+            ev = run_log.get("evidence", {})
+            result["evidence_items"] = ev.get("total_items", 0)
+            result["evidence_kinds"] = ev.get("kinds", {})
+
+            vr = run_log.get("verify", {})
+            result["verify_decisions"] = vr.get("total_decisions", 0)
+            result["verify_verdicts"] = vr.get("verdicts", {})
+            result["verify_iterations"] = vr.get("iterations", 0)
+
+            ai = run_log.get("ai_narration", {})
+            result["ai_slides_rewritten"] = ai.get("slides_rewritten", 0)
 
             # Check for output video
             video_path = os.path.join(file_output, "final.mp4")
@@ -134,6 +159,21 @@ def aggregate(results: list[dict], output_dir: str):
                 "count": len(durations),
             }
 
+    # Aggregate evidence/verifier metrics for paper tables
+    total_evidence = sum(r.get("evidence_items", 0) for r in ok)
+    total_claims = sum(r.get("total_claims", 0) for r in ok)
+    total_claims_with_ev = sum(r.get("claims_with_evidence", 0) for r in ok)
+    total_pass = sum(r.get("verifier_pass", 0) for r in ok)
+    total_rewrite = sum(r.get("verifier_rewrite", 0) for r in ok)
+    total_remove = sum(r.get("verifier_remove", 0) for r in ok)
+    total_verdicts = total_pass + total_rewrite + total_remove
+
+    # Aggregate evidence kind distribution
+    kind_totals: dict[str, int] = {}
+    for r in ok:
+        for k, v in r.get("evidence_kinds", {}).items():
+            kind_totals[k] = kind_totals.get(k, 0) + v
+
     summary = {
         "created_at": datetime.now(timezone.utc).isoformat(),
         "total_files": len(results),
@@ -149,7 +189,31 @@ def aggregate(results: list[dict], output_dir: str):
         "total_input_mb": round(sum(r["input_bytes"] for r in results) / 1e6, 1),
         "total_output_mb": round(sum(r.get("output_bytes", 0) for r in ok) / 1e6, 1),
         "stage_stats": stage_stats,
-        "failures": [{"file": r["file"], "error": r.get("error", "")[:200]} for r in failed],
+        # Paper-relevant aggregates (EMNLP + AAAI)
+        "evidence": {
+            "total_items": total_evidence,
+            "mean_per_file": round(total_evidence / len(ok), 1) if ok else 0,
+            "kind_distribution": kind_totals,
+        },
+        "verification": {
+            "total_claims": total_claims,
+            "claims_with_evidence": total_claims_with_ev,
+            "pct_evidence_coverage": round(total_claims_with_ev / total_claims * 100, 1)
+            if total_claims
+            else 0,
+            "total_verdicts": total_verdicts,
+            "pass": total_pass,
+            "rewrite": total_rewrite,
+            "remove": total_remove,
+            "pass_rate": round(total_pass / total_verdicts * 100, 1) if total_verdicts else 0,
+            "rewrite_rate": round(total_rewrite / total_verdicts * 100, 1) if total_verdicts else 0,
+            "remove_rate": round(total_remove / total_verdicts * 100, 1) if total_verdicts else 0,
+        },
+        "ai_narration": {
+            "files_with_ai": sum(1 for r in ok if r.get("ai_slides_rewritten", 0) > 0),
+            "total_slides_rewritten": sum(r.get("ai_slides_rewritten", 0) for r in ok),
+        },
+        "failures": [{"file": r["file"], "error": (r.get("error") or "")[:200]} for r in failed],
     }
 
     # Write JSON
@@ -166,6 +230,18 @@ def aggregate(results: list[dict], output_dir: str):
         "pipeline_duration_s",
         "input_bytes",
         "output_bytes",
+        # Evidence metrics (EMNLP + AAAI)
+        "evidence_items",
+        "total_claims",
+        "claims_with_evidence",
+        "pct_evidence_coverage",
+        # Verifier metrics (EMNLP + AAAI)
+        "verifier_pass",
+        "verifier_rewrite",
+        "verifier_remove",
+        "verify_iterations",
+        # AI narration metrics
+        "ai_slides_rewritten",
         "error",
     ]
     # Add per-stage duration columns
@@ -177,6 +253,7 @@ def aggregate(results: list[dict], output_dir: str):
         "script",
         "verify",
         "translate",
+        "narrate",
         "audio",
         "video",
     ]
@@ -194,6 +271,15 @@ def aggregate(results: list[dict], output_dir: str):
                 "pipeline_duration_s": r["pipeline_duration_s"],
                 "input_bytes": r["input_bytes"],
                 "output_bytes": r.get("output_bytes", 0),
+                "evidence_items": r.get("evidence_items", 0),
+                "total_claims": r.get("total_claims", 0),
+                "claims_with_evidence": r.get("claims_with_evidence", 0),
+                "pct_evidence_coverage": r.get("pct_evidence_coverage", 0),
+                "verifier_pass": r.get("verifier_pass", 0),
+                "verifier_rewrite": r.get("verifier_rewrite", 0),
+                "verifier_remove": r.get("verifier_remove", 0),
+                "verify_iterations": r.get("verify_iterations", 0),
+                "ai_slides_rewritten": r.get("ai_slides_rewritten", 0),
                 "error": (r.get("error") or "")[:100],
             }
             for sn in stage_names:
@@ -226,10 +312,25 @@ def aggregate(results: list[dict], output_dir: str):
             )
         print()
 
+    # Paper-relevant metrics
+    ev = summary.get("evidence", {})
+    vf = summary.get("verification", {})
+    if ev.get("total_items"):
+        print("  Evidence Metrics:")
+        print(f"    Total evidence items: {ev['total_items']} ({ev['mean_per_file']} mean/file)")
+        for k, v in sorted(ev.get("kind_distribution", {}).items(), key=lambda x: -x[1])[:8]:
+            print(f"      {k}: {v}")
+        print()
+    if vf.get("total_verdicts"):
+        print("  Verification Metrics:")
+        print(f"    Claims: {vf['total_claims']} total, {vf['claims_with_evidence']} grounded ({vf['pct_evidence_coverage']}%)")
+        print(f"    Verdicts: {vf['pass']} PASS ({vf['pass_rate']}%) | {vf['rewrite']} REWRITE ({vf['rewrite_rate']}%) | {vf['remove']} REMOVE ({vf['remove_rate']}%)")
+        print()
+
     if failed:
         print(f"  Failed files ({len(failed)}):")
         for r in failed[:10]:
-            print(f"    {r['file'][:50]}: {r.get('error', '')[:80]}")
+            print(f"    {r['file'][:50]}: {(r.get('error') or '')[:80]}")
         if len(failed) > 10:
             print(f"    ... and {len(failed) - 10} more")
         print()
@@ -291,6 +392,9 @@ def main():
 
     t0 = time.time()
     results = []
+    completed = 0
+    ok_count = 0
+    total_file_time = 0.0
 
     with ProcessPoolExecutor(max_workers=workers) as pool:
         futures = {}
@@ -304,15 +408,30 @@ def main():
                 results.append(result)
             except Exception as e:
                 pptx = futures[future]
-                results.append(
-                    {
-                        "file": os.path.basename(pptx),
-                        "status": "error",
-                        "pipeline_duration_s": 0,
-                        "input_bytes": 0,
-                        "error": str(e),
-                    }
-                )
+                result = {
+                    "file": os.path.basename(pptx),
+                    "status": "error",
+                    "pipeline_duration_s": 0,
+                    "input_bytes": 0,
+                    "error": str(e),
+                }
+                results.append(result)
+
+            # Progress logging with ETA
+            completed += 1
+            if result.get("status") == "ok":
+                ok_count += 1
+                total_file_time += result.get("pipeline_duration_s", 0)
+            elapsed = time.time() - t0
+            avg_per_file = elapsed / completed if completed else 0
+            remaining = (total - completed) * avg_per_file / max(workers, 1)
+            eta_min = remaining / 60
+            avg_file_time = total_file_time / ok_count if ok_count else 0
+            print(
+                f"  Progress: {completed}/{total} done ({ok_count} OK) | "
+                f"Elapsed: {elapsed/60:.1f}m | ETA: {eta_min:.1f}m | "
+                f"Avg: {avg_file_time:.0f}s/file"
+            )
 
     # Sort results by filename for consistent output
     results.sort(key=lambda r: r["file"])

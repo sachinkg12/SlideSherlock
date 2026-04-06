@@ -187,7 +187,7 @@ class NarrateStage:
                             "Content-Type": "application/json",
                         },
                         json={
-                            "model": "gpt-4o",
+                            "model": os.environ.get("NARRATE_MODEL", "gpt-4o-mini"),
                             "messages": [
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt},
