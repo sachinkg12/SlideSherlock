@@ -17,8 +17,7 @@ from __future__ import annotations
 import json
 import os
 import time
-import traceback
-from typing import TYPE_CHECKING
+from typing import Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pipeline import PipelineContext, StageResult
@@ -163,9 +162,12 @@ class NarrateStage:
 
         # Parallel GPT calls with bounded concurrency to avoid rate limits
         from concurrent.futures import ThreadPoolExecutor, as_completed
+
         max_parallel = int(os.environ.get("NARRATE_PARALLEL", "5"))
         model = os.environ.get("NARRATE_MODEL", "gpt-4o-mini")
-        _log(f"Starting parallel GPT-{model} calls for {slide_count} slides ({max_parallel} concurrent)...")
+        _log(
+            f"Starting parallel GPT-{model} calls for {slide_count} slides ({max_parallel} concurrent)..."
+        )
 
         def call_gpt(slide_idx: int, prompt: str) -> tuple:
             """Returns (slide_idx, text_or_None, error_msg)."""

@@ -323,8 +323,12 @@ def aggregate(results: list[dict], output_dir: str):
         print()
     if vf.get("total_verdicts"):
         print("  Verification Metrics:")
-        print(f"    Claims: {vf['total_claims']} total, {vf['claims_with_evidence']} grounded ({vf['pct_evidence_coverage']}%)")
-        print(f"    Verdicts: {vf['pass']} PASS ({vf['pass_rate']}%) | {vf['rewrite']} REWRITE ({vf['rewrite_rate']}%) | {vf['remove']} REMOVE ({vf['remove_rate']}%)")
+        print(
+            f"    Claims: {vf['total_claims']} total, {vf['claims_with_evidence']} grounded ({vf['pct_evidence_coverage']}%)"
+        )
+        print(
+            f"    Verdicts: {vf['pass']} PASS ({vf['pass_rate']}%) | {vf['rewrite']} REWRITE ({vf['rewrite_rate']}%) | {vf['remove']} REMOVE ({vf['remove_rate']}%)"
+        )
         print()
 
     if failed:

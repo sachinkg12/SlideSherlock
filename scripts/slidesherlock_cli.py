@@ -347,6 +347,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         # AI narration is handled by NarrateStage (reads ctx.config["ai_narration"]).
         try:
             from llm_provider import StubLLMProvider
+
             ctx.llm_provider = StubLLMProvider()
         except ImportError:
             pass
