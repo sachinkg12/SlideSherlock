@@ -255,7 +255,7 @@ class OpenAIVisionProvider(_VisionProvider):
         cache_prefix: Optional[str] = None,
     ):
         self._api_key = (api_key or os.environ.get("OPENAI_API_KEY", "")).strip()
-        self._model = (model or os.environ.get("OPENAI_VISION_MODEL", "gpt-4o")).strip()
+        self._model = (model or os.environ.get("OPENAI_VISION_MODEL", "gpt-4o-mini")).strip()
         self._temperature = temperature
         if self._temperature is None:
             self._temperature = float(os.environ.get("OPENAI_VISION_TEMPERATURE", "0"))

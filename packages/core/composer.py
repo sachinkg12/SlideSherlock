@@ -186,6 +186,32 @@ def _get_video_duration(path: str) -> float:
     return 0.0
 
 
+def _wrap_text_to_width(
+    text: str,
+    font: Any,
+    max_width: int,
+    draw: Any,
+) -> List[str]:
+    """Wrap text into lines that fit within max_width pixels."""
+    if not text:
+        return []
+    words = text.split()
+    if not words:
+        return []
+    lines: List[str] = []
+    current = words[0]
+    for word in words[1:]:
+        test = current + " " + word
+        bbox = draw.textbbox((0, 0), test, font=font)
+        if bbox[2] - bbox[0] <= max_width:
+            current = test
+        else:
+            lines.append(current)
+            current = word
+    lines.append(current)
+    return lines
+
+
 def _render_card_mp4(
     title: str,
     subtitle: str,
@@ -194,50 +220,122 @@ def _render_card_mp4(
     height: int,
     output_path: str,
 ) -> str:
-    """Render a title card (intro/outro) as MP4."""
+    """Render a title card (intro/outro) as MP4 with proper text wrapping and centering."""
     try:
         from PIL import Image, ImageDraw, ImageFont
     except ImportError:
         raise RuntimeError("PIL required for intro/outro cards")
-    img = Image.new("RGB", (width, height), (30, 30, 40))
+
+    # Clean and limit title — single sentence, max 80 chars
+    title = (title or "").strip().replace("\n", " ").replace("\r", " ")
+    title = " ".join(title.split())  # collapse whitespace
+    if len(title) > 80:
+        title = title[:77] + "..."
+    subtitle = (subtitle or "").strip().replace("\n", " ").replace("\r", " ")
+    subtitle = " ".join(subtitle.split())
+    if len(subtitle) > 100:
+        subtitle = subtitle[:97] + "..."
+
+    # Adaptive font sizes based on canvas width (works for 1280x720, 1920x1080, etc.)
+    title_font_size = max(48, int(width * 0.045))
+    subtitle_font_size = max(24, int(width * 0.022))
+
+    img = Image.new("RGB", (width, height), (20, 22, 30))
     draw = ImageDraw.Draw(img)
-    try:
-        font_large = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 72)
-        font_small = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 36)
-    except Exception:
-        try:
-            font_large = ImageFont.truetype(
-                "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 72
-            )
-            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-        except Exception:
-            font_large = ImageFont.load_default()
-            font_small = font_large
-    y = height // 2 - 60
-    if title:
-        bbox = draw.textbbox((0, 0), title, font=font_large)
+
+    # Subtle gradient overlay (top to bottom)
+    for i in range(height):
+        shade = 20 + int((i / height) * 12)
+        draw.line([(0, i), (width, i)], fill=(shade, shade + 2, shade + 10))
+
+    # Load fonts with fallback
+    font_large = None
+    font_small = None
+    font_paths = [
+        "/System/Library/Fonts/Helvetica.ttc",
+        "/System/Library/Fonts/SFNSDisplay.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",
+    ]
+    for fp in font_paths:
+        if os.path.exists(fp):
+            try:
+                font_large = ImageFont.truetype(fp, title_font_size)
+                font_small = ImageFont.truetype(fp, subtitle_font_size)
+                break
+            except Exception:
+                continue
+    if font_large is None:
+        font_large = ImageFont.load_default()
+        font_small = font_large
+
+    # Word-wrap title to fit 80% of canvas width
+    max_text_width = int(width * 0.8)
+    title_lines = _wrap_text_to_width(title, font_large, max_text_width, draw)
+    subtitle_lines = _wrap_text_to_width(subtitle, font_small, max_text_width, draw)
+
+    # Calculate total text block height
+    line_height_large = title_font_size + 12
+    line_height_small = subtitle_font_size + 8
+    total_height = len(title_lines) * line_height_large
+    if subtitle_lines:
+        total_height += 30 + len(subtitle_lines) * line_height_small
+
+    # Vertically center the block
+    y = (height - total_height) // 2
+
+    # Draw title lines (centered)
+    for line in title_lines:
+        bbox = draw.textbbox((0, 0), line, font=font_large)
         tw = bbox[2] - bbox[0]
-        draw.text(((width - tw) // 2, y), title, fill=(255, 255, 255), font=font_large)
-        y += 80
-    if subtitle:
-        bbox = draw.textbbox((0, 0), subtitle, font=font_small)
-        tw = bbox[2] - bbox[0]
-        draw.text(((width - tw) // 2, y), subtitle, fill=(180, 180, 190), font=font_small)
+        x = (width - tw) // 2
+        # Subtle shadow for depth
+        draw.text((x + 2, y + 2), line, fill=(0, 0, 0), font=font_large)
+        draw.text((x, y), line, fill=(255, 255, 255), font=font_large)
+        y += line_height_large
+
+    # Draw subtitle lines (centered, lighter color)
+    if subtitle_lines:
+        y += 20
+        for line in subtitle_lines:
+            bbox = draw.textbbox((0, 0), line, font=font_small)
+            tw = bbox[2] - bbox[0]
+            x = (width - tw) // 2
+            draw.text((x, y), line, fill=(170, 175, 195), font=font_small)
+            y += line_height_small
+
+    # Accent line below title
+    accent_y = (height - total_height) // 2 + len(title_lines) * line_height_large + 6
+    if subtitle_lines:
+        line_w = int(width * 0.15)
+        draw.line(
+            [(width // 2 - line_w // 2, accent_y), (width // 2 + line_w // 2, accent_y)],
+            fill=(99, 102, 241),
+            width=3,
+        )
     card_png = output_path.replace(".mp4", "_card.png")
     img.save(card_png)
     try:
+        # Match slide overlay codec params: h264, yuv420p, 15fps
+        # Critical: framerate MUST match slide overlays for concat -c copy to work
         subprocess.run(
             [
                 "ffmpeg",
                 "-y",
                 "-loop",
                 "1",
+                "-framerate",
+                "15",
                 "-i",
                 card_png,
                 "-t",
                 str(duration_sec),
+                "-c:v",
+                "libx264",
                 "-pix_fmt",
                 "yuv420p",
+                "-r",
+                "15",
                 "-vf",
                 f"scale={width}:{height}",
                 output_path,
@@ -376,29 +474,39 @@ def compose_video(
     if use_intro and config:
         fd, intro_path = tempfile.mkstemp(suffix="_intro.mp4")
         os.close(fd)
-        _render_card_mp4(
-            getattr(config, "intro_title", deck_title or "Presentation"),
-            getattr(config, "intro_subtitle", deck_subtitle),
-            getattr(config, "intro_duration", 2.0),
-            width,
-            height,
-            intro_path,
-        )
-        video_paths.insert(0, intro_path)
-        durations.insert(0, getattr(config, "intro_duration", 2.0))
+        try:
+            _render_card_mp4(
+                getattr(config, "intro_title", deck_title or "Presentation"),
+                getattr(config, "intro_subtitle", deck_subtitle),
+                getattr(config, "intro_duration", 2.0),
+                width,
+                height,
+                intro_path,
+            )
+        except Exception as e:
+            print(f"  [composer] intro card render failed: {e}")
+            intro_path = None
+        if intro_path:
+            video_paths.insert(0, intro_path)
+            durations.insert(0, getattr(config, "intro_duration", 2.0))
     if use_outro and config:
         fd, outro_path = tempfile.mkstemp(suffix="_outro.mp4")
         os.close(fd)
-        _render_card_mp4(
-            getattr(config, "outro_text", "Thanks for watching"),
-            "",
-            getattr(config, "outro_duration", 2.0),
-            width,
-            height,
-            outro_path,
-        )
-        video_paths.append(outro_path)
-        durations.append(getattr(config, "outro_duration", 2.0))
+        try:
+            _render_card_mp4(
+                getattr(config, "outro_text", "Thanks for watching"),
+                "",
+                getattr(config, "outro_duration", 2.0),
+                width,
+                height,
+                outro_path,
+            )
+        except Exception as e:
+            print(f"  [composer] outro card render failed: {e}")
+            outro_path = None
+        if outro_path:
+            video_paths.append(outro_path)
+            durations.append(getattr(config, "outro_duration", 2.0))
     concat_path: Optional[str] = None
     sub_path_temp: Optional[str] = None
     try:

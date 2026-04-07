@@ -91,7 +91,7 @@ def test_cache_hit_skips_api_call():
     image_uri = "jobs/job-123/images/slide_001/img_00.png"
     image_bytes = b"\x89PNG\r\n"
     cache_payload = {"caption": "Cached caption", "confidence": 0.95, "scene_tags": []}
-    cache_key = _cache_key(image_bytes, "gpt-4o", "en-US", PROMPT_VERSION, "caption")
+    cache_key = _cache_key(image_bytes, "gpt-4o-mini", "en-US", PROMPT_VERSION, "caption")
     cache_path = f"jobs/job-123/cache/vision/{cache_key}.json"
 
     minio = MagicMock()

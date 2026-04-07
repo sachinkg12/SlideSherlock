@@ -338,7 +338,14 @@ class VideoStage:
             try:
                 ppt1 = minio_client.get(f"jobs/{job_id}/ppt/slide_001.json")
                 ppt1_data = json.loads(ppt1.decode("utf-8"))
-                deck_title = (ppt1_data.get("slide_text") or ppt1_data.get("title") or "")[:200]
+                raw_text = (ppt1_data.get("title") or ppt1_data.get("slide_text") or "").strip()
+                # Extract just the first meaningful line as title (not the entire slide text)
+                lines = [ln.strip() for ln in raw_text.split("\n") if ln.strip()]
+                if lines:
+                    deck_title = lines[0][:80]  # First line, max 80 chars
+                    if len(lines) > 1:
+                        # Second line as subtitle if present
+                        deck_subtitle = lines[1][:100]
             except Exception:
                 pass
             video_config = VideoConfig.from_env(deck_title, deck_subtitle) if VideoConfig else None
