@@ -36,28 +36,21 @@ class OpenAILLMProvider(LLMProvider):
         self._model = model
 
     def _chat(self, messages: list, max_tokens: int = 200, temperature: float = 0.7) -> str:
-        """Call OpenAI chat completions using requests (fork-safe, no httpx/asyncio)."""
-        import requests
+        """Call chat completions via llm_backend (fork-safe, provider-agnostic)."""
+        from llm_backend import call_chat
 
         if not self._api_key:
             raise RuntimeError("OPENAI_API_KEY not set")
-        resp = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {self._api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": self._model,
-                "messages": messages,
-                "max_tokens": max_tokens,
-                "temperature": temperature,
-            },
+        return call_chat(
+            base_url="https://api.openai.com/v1",
+            model=self._model,
+            messages=messages,
+            api_key=self._api_key,
+            max_tokens=max_tokens,
+            temperature=temperature,
             timeout=30,
+            max_retries=3,
         )
-        resp.raise_for_status()
-        data = resp.json()
-        return (data["choices"][0]["message"]["content"] or "").strip()
 
     def generate_segment(
         self,

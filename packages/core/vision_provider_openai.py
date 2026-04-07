@@ -1,9 +1,15 @@
 """
-OpenAI-backed VisionProvider for SlideSherlock (Day 1).
-- Downloads images from MinIO, sends as base64 to OpenAI, returns structured results.
+LLM-backed VisionProvider for SlideSherlock.
+Works with any OpenAI-compatible vision endpoint (OpenAI, Ollama, Together,
+OpenRouter, DeepInfra, LocalAI, etc.) via llm_backend.call_chat_with_image.
+
+- Downloads images from MinIO, sends as base64, returns structured results.
 - Deterministic caching by (sha256(image), model, lang, prompt_version, mode).
-- No secrets in code; uses OPENAI_API_KEY and env config.
-- Validated Pydantic output; PARSE_FAIL raised on invalid JSON (stage-level fallback handles it).
+- No secrets in code; reads provider config from llm_config.get_vision_config().
+- Validated Pydantic output; PARSE_FAIL raised on invalid JSON (stage-level
+  fallback handles it).
+
+Backwards compat: the class name OpenAIVisionProvider is preserved.
 """
 from __future__ import annotations
 
@@ -55,6 +61,14 @@ Schema:
   "global_confidence": <0.0-1.0>
 }
 Do not invent entities or interactions; only list what is clearly visible. Use the given language for labels/summary."""
+
+
+# Prompts are overridable via env vars (1-env-var customization per provider).
+PROMPTS = {
+    "caption": os.environ.get("VISION_CAPTION_PROMPT") or CAPTION_PROMPT_v1,
+    "photo_extract": os.environ.get("VISION_PHOTO_PROMPT") or PHOTO_EXTRACT_PROMPT_v1,
+    "diagram_extract": os.environ.get("VISION_DIAGRAM_PROMPT") or DIAGRAM_EXTRACT_PROMPT_v1,
+}
 
 
 # -----------------------------------------------------------------------------
@@ -235,13 +249,17 @@ def _extract_json_from_response(text: str) -> str:
 
 
 # -----------------------------------------------------------------------------
-# OpenAIVisionProvider
+# LLMVisionProvider (backwards-compat alias: OpenAIVisionProvider)
 # -----------------------------------------------------------------------------
-class OpenAIVisionProvider(_VisionProvider):
+class LLMVisionProvider(_VisionProvider):
     """
-    VisionProvider that uses OpenAI vision API (e.g. gpt-4o).
-    - Reads image from MinIO, encodes as base64, calls API.
+    Generic VisionProvider that uses any OpenAI-compatible vision endpoint
+    (OpenAI, Ollama, Together, OpenRouter, DeepInfra, LocalAI, ...).
+
+    - Reads image from MinIO, encodes as base64, calls the endpoint via
+      llm_backend.call_chat_with_image.
     - Caches results in MinIO by (sha256(image), model, lang, prompt_version, mode).
+      The model name is part of the cache key so different models don't collide.
     - Returns validated dicts; raises VisionProviderError on parse/validation failure.
     """
 
@@ -249,13 +267,39 @@ class OpenAIVisionProvider(_VisionProvider):
         self,
         api_key: Optional[str] = None,
         model: Optional[str] = None,
+        base_url: Optional[str] = None,
         temperature: Optional[float] = None,
         timeout_seconds: Optional[int] = None,
         cache_enabled: Optional[bool] = None,
         cache_prefix: Optional[str] = None,
     ):
-        self._api_key = (api_key or os.environ.get("OPENAI_API_KEY", "")).strip()
-        self._model = (model or os.environ.get("OPENAI_VISION_MODEL", "gpt-4o-mini")).strip()
+        # Resolve base_url/model/api_key: explicit args > llm_config > legacy env
+        resolved_url = base_url
+        resolved_model = model
+        resolved_key = api_key
+        if resolved_url is None or resolved_model is None or resolved_key is None:
+            try:
+                from llm_config import get_vision_config
+
+                cfg_url, cfg_model, cfg_key = get_vision_config()
+                if resolved_url is None:
+                    resolved_url = cfg_url or "https://api.openai.com/v1"
+                if resolved_model is None:
+                    resolved_model = cfg_model
+                if resolved_key is None:
+                    resolved_key = cfg_key
+            except Exception:
+                pass
+        if resolved_url is None:
+            resolved_url = "https://api.openai.com/v1"
+        if resolved_model is None:
+            resolved_model = os.environ.get("OPENAI_VISION_MODEL", "").strip() or "gpt-4o-mini"
+        if resolved_key is None:
+            resolved_key = os.environ.get("OPENAI_API_KEY", "").strip() or None
+
+        self._base_url = resolved_url
+        self._api_key = (resolved_key or "").strip()
+        self._model = (resolved_model or "gpt-4o-mini").strip()
         self._temperature = temperature
         if self._temperature is None:
             self._temperature = float(os.environ.get("OPENAI_VISION_TEMPERATURE", "0"))
@@ -281,31 +325,26 @@ class OpenAIVisionProvider(_VisionProvider):
         return self._cache_prefix.replace("{job_id}", job_id)
 
     def _call_openai(self, prompt: str, data_url: str) -> str:
-        from openai import OpenAI
+        """Vision chat call via llm_backend (OpenAI-compatible; works with any provider).
 
-        client = OpenAI(api_key=self._api_key)
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": data_url, "detail": "high"}},
-                ],
-            }
-        ]
-        resp = client.chat.completions.create(
-            model=self._model,
-            messages=messages,
-            temperature=self._temperature,
-            max_tokens=1024,
-            timeout=self._timeout,
-        )
-        choice = resp.choices[0] if resp.choices else None
-        if not choice or not getattr(choice, "message", None):
-            raise VisionProviderError("Empty OpenAI response", "API_ERROR")
-        msg = choice.message
-        content = getattr(msg, "content", None) or ""
-        return content.strip()
+        Method name kept for backwards compat (test suite patches it).
+        """
+        from llm_backend import call_chat_with_image, LLMBackendError
+
+        try:
+            return call_chat_with_image(
+                base_url=self._base_url,
+                model=self._model,
+                image_b64_data_url=data_url,
+                prompt=prompt,
+                api_key=self._api_key or None,
+                max_tokens=1024,
+                temperature=self._temperature,
+                timeout=self._timeout,
+                max_retries=3,
+            )
+        except LLMBackendError as e:
+            raise VisionProviderError(str(e), "API_ERROR")
 
     def caption(
         self,
@@ -325,7 +364,7 @@ class OpenAIVisionProvider(_VisionProvider):
             cached = _get_cached(minio_client, job_id, cache_prefix, key)
             if cached is not None:
                 return cached
-        prompt = CAPTION_PROMPT_v1 + f"\nLanguage/locale: {lang}"
+        prompt = PROMPTS["caption"] + f"\nLanguage/locale: {lang}"
         try:
             text = self._call_openai(prompt, data_url)
         except Exception as e:
@@ -373,9 +412,9 @@ class OpenAIVisionProvider(_VisionProvider):
             if cached is not None:
                 return cached
         if mode == "photo":
-            prompt = PHOTO_EXTRACT_PROMPT_v1 + f"\nLanguage/locale: {lang}"
+            prompt = PROMPTS["photo_extract"] + f"\nLanguage/locale: {lang}"
         else:
-            prompt = DIAGRAM_EXTRACT_PROMPT_v1 + f"\nLanguage/locale: {lang}"
+            prompt = PROMPTS["diagram_extract"] + f"\nLanguage/locale: {lang}"
         try:
             text = self._call_openai(prompt, data_url)
         except Exception as e:
@@ -422,3 +461,7 @@ class OpenAIVisionProvider(_VisionProvider):
         if self._cache_enabled and job_id and minio_client and cache_prefix:
             _set_cached(minio_client, job_id, cache_prefix, key, out)
         return out
+
+
+# Backwards-compatible alias. Existing imports keep working.
+OpenAIVisionProvider = LLMVisionProvider

@@ -231,28 +231,49 @@ class StubVisionProvider(VisionProvider):
         }
 
 
+def _make_llm_vision_provider() -> "VisionProvider":
+    """Build an LLMVisionProvider from llm_config.get_vision_config()."""
+    import sys
+
+    from llm_config import get_vision_config
+    from vision_provider_llm import LLMVisionProvider
+
+    base_url, model, api_key = get_vision_config()
+    # Require API key for remote providers (local ones like ollama/localai
+    # don't need one). If missing, fall back to stub silently.
+    needs_key = base_url.startswith("https://api.") or "openai.com" in base_url
+    if needs_key and not api_key:
+        print(
+            "VISION_PROVIDER set but API key missing; using stub vision.",
+            file=sys.stderr,
+        )
+        return StubVisionProvider()
+    return LLMVisionProvider(base_url=base_url, model=model, api_key=api_key)
+
+
+# Provider registry — adding a new vision provider = one entry here.
+_VISION_PROVIDER_REGISTRY = {
+    "stub": lambda: StubVisionProvider(),
+    "openai": _make_llm_vision_provider,
+    "ollama": _make_llm_vision_provider,
+    "together": _make_llm_vision_provider,
+    "openrouter": _make_llm_vision_provider,
+    "deepinfra": _make_llm_vision_provider,
+    "localai": _make_llm_vision_provider,
+}
+
+
 def get_vision_provider() -> VisionProvider:
-    """Factory: returns VisionProvider for PHOTO understanding. Default: StubVisionProvider.
-    Set VISION_PROVIDER=openai and OPENAI_API_KEY for real vision; if key is missing, stub is used.
-    """
+    """Factory: returns configured VisionProvider. Default: StubVisionProvider."""
     import os
+    import sys
 
     provider = (os.environ.get("VISION_PROVIDER", "stub")).strip().lower()
-    if provider == "stub":
+    factory = _VISION_PROVIDER_REGISTRY.get(provider)
+    if not factory:
         return StubVisionProvider()
-    if provider == "openai":
-        if not (os.environ.get("OPENAI_API_KEY") or "").strip():
-            import sys
-
-            print(
-                "VISION_PROVIDER=openai but OPENAI_API_KEY not set; using stub vision (see .env.example).",
-                file=sys.stderr,
-            )
-            return StubVisionProvider()
-        try:
-            from vision_provider_openai import OpenAIVisionProvider
-
-            return OpenAIVisionProvider()
-        except (ImportError, AttributeError):
-            pass
-    return StubVisionProvider()
+    try:
+        return factory()
+    except Exception as e:
+        print(f"Failed to create vision provider '{provider}': {e}", file=sys.stderr)
+        return StubVisionProvider()

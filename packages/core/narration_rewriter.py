@@ -12,7 +12,6 @@ Only runs when:
 """
 from __future__ import annotations
 
-import os
 from typing import Any, Dict, List, Optional, Tuple
 
 
@@ -35,14 +34,17 @@ def rewrite_narration_for_delivery(
     Returns:
         Updated entries list with rewritten narration_text.
     """
-    import requests
+    from llm_backend import call_chat, LLMBackendError
+    from llm_config import get_narrate_config
 
-    key = (api_key or os.environ.get("OPENAI_API_KEY", "")).strip()
-    if not key:
-        print("  AI rewrite skipped: no OPENAI_API_KEY")
+    base_url, model, resolved_key = get_narrate_config()
+    key = api_key or resolved_key
+    needs_key = base_url.startswith("https://api.") or "openai.com" in base_url
+    if needs_key and not key:
+        print("  AI rewrite skipped: no API key")
         return entries
 
-    print(f"  AI narration rewrite: {len(entries)} slides...")
+    print(f"  AI narration rewrite: {len(entries)} slides via {base_url} ({model})...")
 
     system_prompt = (
         "You are rewriting presentation narration for natural spoken delivery. "
@@ -89,30 +91,26 @@ def rewrite_narration_for_delivery(
         )
 
         try:
-            resp = requests.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {key}",
-                    "Content-Type": "application/json",
-                },
-                json={
-                    "model": "gpt-4o",
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt},
-                    ],
-                    "max_tokens": 250,
-                    "temperature": 0.7,
-                },
+            new_text = call_chat(
+                base_url=base_url,
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                api_key=key,
+                max_tokens=250,
+                temperature=0.7,
                 timeout=30,
+                max_retries=3,
             )
-            resp.raise_for_status()
-            new_text = (resp.json()["choices"][0]["message"]["content"] or "").strip()
             if new_text and len(new_text) > 10:
                 new_entry = {**entry, "narration_text": new_text, "source_used": "ai_rewrite"}
                 new_entry["word_count"] = len(new_text.split())
                 rewritten.append(new_entry)
                 continue
+        except LLMBackendError as e:
+            print(f"  AI rewrite failed for slide {slide_idx}: {e}")
         except Exception as e:
             print(f"  AI rewrite failed for slide {slide_idx}: {e}")
 

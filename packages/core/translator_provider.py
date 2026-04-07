@@ -51,18 +51,36 @@ class StubTranslatorProvider(TranslatorProvider):
         return False
 
 
+def _make_stub_translator():
+    return StubTranslatorProvider()
+
+
+def _make_llm_translator():
+    try:
+        from translator_provider_llm import LLMTranslatorProvider
+
+        return LLMTranslatorProvider()
+    except ImportError:
+        return StubTranslatorProvider()
+
+
+# Registry: adding a new translator provider = one entry here.
+_TRANSLATOR_PROVIDER_REGISTRY = {
+    "stub": _make_stub_translator,
+    "none": _make_stub_translator,
+    "llm": _make_llm_translator,
+}
+
+
+def register_translator_provider(name: str, factory) -> None:
+    """Register a new translator provider factory."""
+    _TRANSLATOR_PROVIDER_REGISTRY[name] = factory
+
+
 def get_translator_provider() -> Optional[TranslatorProvider]:
     """Factory: return configured translator or StubTranslatorProvider (no-op)."""
     import os
 
     mode = (os.environ.get("TRANSLATOR_PROVIDER") or "stub").strip().lower()
-    if mode == "stub" or mode == "none":
-        return StubTranslatorProvider()
-    if mode == "llm":
-        try:
-            from translator_provider_llm import LLMTranslatorProvider
-
-            return LLMTranslatorProvider()
-        except ImportError:
-            return StubTranslatorProvider()
-    return StubTranslatorProvider()
+    factory = _TRANSLATOR_PROVIDER_REGISTRY.get(mode, _make_stub_translator)
+    return factory()

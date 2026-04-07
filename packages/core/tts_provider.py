@@ -202,26 +202,46 @@ class LocalTTSProvider(TTSProvider):
                 os.unlink(aiff_path)
 
 
+def _make_local_tts(voice_id, lang):
+    return LocalTTSProvider(voice_id=voice_id, lang=lang)
+
+
+def _make_openai_tts(voice_id, lang):
+    try:
+        from tts_provider_openai import OpenAITTSProvider
+
+        return OpenAITTSProvider(voice_id=voice_id, lang=lang)
+    except (ImportError, TypeError):
+        return LocalTTSProvider(voice_id=voice_id, lang=lang)
+
+
+def _make_elevenlabs_tts(voice_id, lang):
+    try:
+        from tts_provider_elevenlabs import ElevenLabsTTSProvider
+
+        return ElevenLabsTTSProvider(voice_id=voice_id, lang=lang)
+    except (ImportError, TypeError):
+        return LocalTTSProvider(voice_id=voice_id, lang=lang)
+
+
+# Registry: adding a new TTS provider = one entry here.
+_TTS_PROVIDER_REGISTRY = {
+    "local": _make_local_tts,
+    "openai": _make_openai_tts,
+    "elevenlabs": _make_elevenlabs_tts,
+}
+
+
+def register_tts_provider(name: str, factory) -> None:
+    """Register a new TTS provider factory. factory(voice_id, lang) -> TTSProvider."""
+    _TTS_PROVIDER_REGISTRY[name] = factory
+
+
 def get_tts_provider(
     voice_provider: str,
     voice_id: Optional[str] = None,
     lang: Optional[str] = None,
 ) -> Optional[TTSProvider]:
-    """Factory: local, openai, elevenlabs. voice_id and lang for multilingual TTS."""
-    if voice_provider == "local":
-        return LocalTTSProvider(voice_id=voice_id, lang=lang)
-    if voice_provider == "openai":
-        try:
-            from tts_provider_openai import OpenAITTSProvider
-
-            return OpenAITTSProvider(voice_id=voice_id, lang=lang)
-        except (ImportError, TypeError):
-            return LocalTTSProvider(voice_id=voice_id, lang=lang)
-    if voice_provider == "elevenlabs":
-        try:
-            from tts_provider_elevenlabs import ElevenLabsTTSProvider
-
-            return ElevenLabsTTSProvider(voice_id=voice_id, lang=lang)
-        except (ImportError, TypeError):
-            return LocalTTSProvider(voice_id=voice_id, lang=lang)
-    return LocalTTSProvider(voice_id=voice_id, lang=lang)
+    """Factory: lookup provider in registry; falls back to local."""
+    factory = _TTS_PROVIDER_REGISTRY.get(voice_provider, _TTS_PROVIDER_REGISTRY["local"])
+    return factory(voice_id, lang)

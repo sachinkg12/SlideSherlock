@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import json
 import os
-import time
 from typing import Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -34,19 +33,27 @@ class NarrateStage:
         from pipeline import StageResult
 
         # ---- Gate checks with verbose logging ----
-        api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
+        from llm_config import get_narrate_config
+
         is_ai = ctx.config.get("ai_narration", False)
 
-        _log(
-            f"ai_narration={is_ai}, api_key={'set (' + str(len(api_key)) + ' chars)' if api_key else 'UNSET'}"
-        )
+        _log(f"ai_narration={is_ai}")
         _log(f"config keys: {list(ctx.config.keys())}")
 
         if not is_ai:
             _log("SKIPPED: ai_narration not set in ctx.config")
             return StageResult(status="skipped", metrics={"reason": "AI narration not enabled"})
-        if not api_key:
-            _log("SKIPPED: OPENAI_API_KEY not set in environment")
+
+        try:
+            base_url, model, api_key = get_narrate_config()
+        except Exception as e:
+            _log(f"SKIPPED: narrate config error: {e}")
+            return StageResult(status="skipped", metrics={"reason": f"config error: {e}"})
+
+        # Require api_key for remote providers; allow empty for local (ollama, lmstudio, etc.)
+        needs_key = base_url.startswith("https://api.") or "openai.com" in base_url
+        if needs_key and not api_key:
+            _log("SKIPPED: API key not set for remote provider")
             return StageResult(status="skipped", metrics={"reason": "no API key"})
 
         variant = ctx.variant or {}
@@ -113,8 +120,8 @@ class NarrateStage:
                 f"  Slide {i}: notes={len(sc.get('notes', ''))}chars, text={len(sc.get('slide_text', ''))}chars, template={len(sc.get('template_narration', ''))}chars, evidence={len(sc.get('evidence', []))} items"
             )
 
-        # ---- Call GPT-4o for each slide ----
-        import requests
+        # ---- Call LLM for each slide ----
+        from llm_backend import call_chat, LLMBackendError
 
         rewritten_entries = []
         success_count = 0
@@ -164,53 +171,34 @@ class NarrateStage:
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
         max_parallel = int(os.environ.get("NARRATE_PARALLEL", "5"))
-        model = os.environ.get("NARRATE_MODEL", "gpt-4o-mini")
         _log(
-            f"Starting parallel GPT-{model} calls for {slide_count} slides ({max_parallel} concurrent)..."
+            f"Starting parallel calls: provider_url={base_url}, model={model}, "
+            f"slides={slide_count}, parallel={max_parallel}"
         )
 
         def call_gpt(slide_idx: int, prompt: str) -> tuple:
             """Returns (slide_idx, text_or_None, error_msg)."""
-            for attempt in range(3):
-                try:
-                    resp = requests.post(
-                        "https://api.openai.com/v1/chat/completions",
-                        headers={
-                            "Authorization": f"Bearer {api_key}",
-                            "Content-Type": "application/json",
-                        },
-                        json={
-                            "model": model,
-                            "messages": [
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": prompt},
-                            ],
-                            "max_tokens": 300,
-                            "temperature": 0.7,
-                        },
-                        timeout=30,
-                    )
-                    if resp.status_code == 429:
-                        wait = min(2 ** (attempt + 1), 30)
-                        time.sleep(wait)
-                        continue
-                    if resp.status_code != 200:
-                        if attempt < 2:
-                            time.sleep(2)
-                            continue
-                        return (slide_idx, None, f"HTTP {resp.status_code}")
-                    text = (resp.json()["choices"][0]["message"]["content"] or "").strip()
-                    if text and len(text) > 10:
-                        return (slide_idx, text, None)
-                    if attempt < 2:
-                        continue
-                    return (slide_idx, None, "response too short")
-                except Exception as e:
-                    if attempt < 2:
-                        time.sleep(1)
-                        continue
-                    return (slide_idx, None, str(e)[:80])
-            return (slide_idx, None, "max retries exhausted")
+            try:
+                text = call_chat(
+                    base_url=base_url,
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt},
+                    ],
+                    api_key=api_key,
+                    max_tokens=300,
+                    temperature=0.7,
+                    timeout=30,
+                    max_retries=3,
+                )
+                if text and len(text) > 10:
+                    return (slide_idx, text, None)
+                return (slide_idx, None, "response too short")
+            except LLMBackendError as e:
+                return (slide_idx, None, str(e)[:100])
+            except Exception as e:
+                return (slide_idx, None, str(e)[:80])
 
         results_by_slide: Dict[int, tuple] = {}
 

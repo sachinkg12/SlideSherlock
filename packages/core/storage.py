@@ -82,3 +82,12 @@ class MinIOClient:
             return True
         except ClientError:
             return False
+
+
+# Auto-register with the storage backend registry
+try:
+    from storage_backend import register_storage_backend
+
+    register_storage_backend("minio", MinIOClient)
+except ImportError:
+    pass
