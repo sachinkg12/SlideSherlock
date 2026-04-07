@@ -11,7 +11,7 @@ import sys
 import os
 
 try:
-    from .database import SessionLocal, engine, Base
+    from .database import SessionLocal, init_db
     from .models import Project, Job, Artifact
     from .schemas import (
         ProjectCreate,
@@ -22,7 +22,7 @@ try:
     )
 except ImportError:
     # Fallback for when running as script
-    from apps.api.database import SessionLocal, engine, Base
+    from apps.api.database import SessionLocal, init_db
     from apps.api.models import Project, Job, Artifact
     from apps.api.schemas import (
         ProjectCreate,
@@ -33,14 +33,18 @@ except ImportError:
     )
 
 # Add packages/core to path for MinIO client
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core")
+)
 try:
     from storage import MinIOClient  # noqa: E402
 except ImportError:
     MinIOClient = None
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Initialize database schema (dialect-aware via OCP registry).
+# - sqlite: create_all() (no alembic support)
+# - postgresql: no-op (alembic owns the schema)
+init_db()
 
 app = FastAPI(title="SlideSherlock API", version="1.0.0")
 
@@ -104,7 +108,9 @@ async def create_job(job: JobCreate, db: Session = Depends(get_db)):
     job_id = str(uuid.uuid4())
     config_json = None
     if getattr(job, "config", None) is not None:
-        config_json = json.dumps(job.config) if isinstance(job.config, dict) else str(job.config)
+        config_json = (
+            json.dumps(job.config) if isinstance(job.config, dict) else str(job.config)
+        )
     db_job = Job(
         job_id=job_id,
         project_id=job.project_id,
@@ -209,7 +215,9 @@ async def upload_pptx(
 
     # Validate file extension
     if not file.filename or not file.filename.lower().endswith(".pptx"):
-        raise HTTPException(status_code=400, detail="File must be a PPTX file (.pptx extension)")
+        raise HTTPException(
+            status_code=400, detail="File must be a PPTX file (.pptx extension)"
+        )
 
     # Read file content
     file_content = await file.read()
@@ -231,7 +239,9 @@ async def upload_pptx(
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to upload file to storage: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload file to storage: {str(e)}"
+        )
 
     # Create artifact record
     artifact = Artifact(
@@ -267,7 +277,9 @@ async def upload_pptx(
             from apps.api.worker import render_stage
         job_queue.enqueue(render_stage, job_id, job_timeout=1800)
     else:
-        print(f"Warning: Render stage not enqueued for job {job_id} (Redis unavailable)")
+        print(
+            f"Warning: Render stage not enqueued for job {job_id} (Redis unavailable)"
+        )
 
     return {
         "job_id": job_id,
@@ -389,7 +401,12 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
     pct = int(100 * len(completed_base) / total_stages) if total_stages else 0
 
     # Map job status to UI status
-    status_map = {"QUEUED": "queued", "PROCESSING": "running", "DONE": "done", "FAILED": "failed"}
+    status_map = {
+        "QUEUED": "queued",
+        "PROCESSING": "running",
+        "DONE": "done",
+        "FAILED": "failed",
+    }
     ui_status = status_map.get(job.status.value, "running")
 
     # If video stage is done, the job is done regardless of DB status
@@ -430,7 +447,9 @@ async def get_job_metrics(job_id: str, db: Session = Depends(get_db)):
     # Transform raw pipeline metrics to UI-friendly shape
     stages = raw.get("stages", {})
     slide_count = stages.get("ingest", {}).get("metrics", {}).get("slide_count", 0)
-    graph_count = stages.get("graph", {}).get("metrics", {}).get("unified_graph_count", 0)
+    graph_count = (
+        stages.get("graph", {}).get("metrics", {}).get("unified_graph_count", 0)
+    )
     total_duration_s = raw.get("pipeline_duration_ms", 0) / 1000.0
 
     # Read verify report for pass/rewrite/remove counts
@@ -441,7 +460,9 @@ async def get_job_metrics(job_id: str, db: Session = Depends(get_db)):
         for v in manifest.get("output_variants", []):
             vid = v.get("id", "en")
             try:
-                report_data = minio_client.get(f"jobs/{job_id}/script/{vid}/verify_report.json")
+                report_data = minio_client.get(
+                    f"jobs/{job_id}/script/{vid}/verify_report.json"
+                )
                 report = json.loads(report_data.decode("utf-8"))
                 for d in report.get("decisions", []):
                     verdict = d.get("verdict", "").upper()
@@ -457,7 +478,9 @@ async def get_job_metrics(job_id: str, db: Session = Depends(get_db)):
     except Exception:
         pass
 
-    total_claims = verify_stats["pass"] + verify_stats["rewrite"] + verify_stats["remove"]
+    total_claims = (
+        verify_stats["pass"] + verify_stats["rewrite"] + verify_stats["remove"]
+    )
     pass_rate = verify_stats["pass"] / total_claims if total_claims > 0 else 1.0
     coverage = 1.0 if total_claims > 0 else 0.0
 
@@ -476,7 +499,9 @@ async def get_job_metrics(job_id: str, db: Session = Depends(get_db)):
 
 
 @app.get("/jobs/{job_id}/evidence-trail")
-async def get_evidence_trail(job_id: str, limit: int = 50, db: Session = Depends(get_db)):
+async def get_evidence_trail(
+    job_id: str, limit: int = 50, db: Session = Depends(get_db)
+):
     """Return last N verifier decisions from verify_report.json."""
     job = db.query(Job).filter(Job.job_id == job_id).first()
     if not job:
@@ -494,7 +519,9 @@ async def get_evidence_trail(job_id: str, limit: int = 50, db: Session = Depends
         for v in manifest.get("output_variants", []):
             vid = v.get("id", "en")
             try:
-                report_data = minio_client.get(f"jobs/{job_id}/script/{vid}/verify_report.json")
+                report_data = minio_client.get(
+                    f"jobs/{job_id}/script/{vid}/verify_report.json"
+                )
                 report = json.loads(report_data.decode("utf-8"))
                 for d in report.get("decisions", []):
                     d["variant_id"] = vid
@@ -618,7 +645,9 @@ async def quick_create_job(
 
     # 3. Upload PPTX
     if not file.filename or not file.filename.lower().endswith(".pptx"):
-        raise HTTPException(status_code=400, detail="File must be a PPTX file (.pptx extension)")
+        raise HTTPException(
+            status_code=400, detail="File must be a PPTX file (.pptx extension)"
+        )
 
     file_content = await file.read()
     file_size = len(file_content)
@@ -636,7 +665,9 @@ async def quick_create_job(
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to upload file to storage: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload file to storage: {str(e)}"
+        )
 
     artifact = Artifact(
         artifact_id=str(uuid.uuid4()),

@@ -12,7 +12,9 @@ from typing import Callable, Dict, Protocol, runtime_checkable
 
 @runtime_checkable
 class StorageBackend(Protocol):
-    def put(self, key: str, data: bytes, content_type: str = "application/octet-stream") -> str:
+    def put(
+        self, key: str, data: bytes, content_type: str = "application/octet-stream"
+    ) -> str:
         ...
 
     def get(self, key: str) -> bytes:
@@ -29,6 +31,18 @@ class StorageBackend(Protocol):
 
 
 _STORAGE_REGISTRY: Dict[str, Callable[[], StorageBackend]] = {}
+
+
+def _default_backend() -> str:
+    """Pick a sensible storage default based on the configured database.
+
+    SQLite users almost certainly don't have MinIO running, so pair them
+    with the LocalFS backend automatically. Everything else gets MinIO.
+    """
+    db_url = os.environ.get("DATABASE_URL", "")
+    if db_url.startswith("sqlite"):
+        return "local"
+    return "minio"
 
 
 def register_storage_backend(name: str, factory: Callable[[], StorageBackend]) -> None:
@@ -57,7 +71,9 @@ def get_storage_backend() -> StorageBackend:
         except Exception:
             pass
 
-    backend_name = (os.environ.get("STORAGE_BACKEND") or "minio").strip().lower()
+    backend_name = (
+        (os.environ.get("STORAGE_BACKEND") or _default_backend()).strip().lower()
+    )
     factory = _STORAGE_REGISTRY.get(backend_name)
     if not factory:
         raise ValueError(
