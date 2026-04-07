@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 
@@ -72,11 +73,12 @@ function Feature({ icon, title, description }) {
 }
 
 function HeroBanner() {
+  const logoUrl = useBaseUrl('/img/logo.svg');
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
         <div style={{ marginBottom: '1.5rem' }}>
-          <img src="/img/logo.svg" alt="SlideSherlock" width={72} height={72} />
+          <img src={logoUrl} alt="SlideSherlock" width={72} height={72} />
         </div>
         <h1 className="hero__title">SlideSherlock</h1>
         <p className="hero__subtitle">

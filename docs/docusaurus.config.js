@@ -9,8 +9,13 @@ const config = {
   tagline: 'Transform any presentation into a grounded, narrated explainer video — hallucination-free.',
   favicon: 'img/favicon.ico',
 
-  url: 'https://slidesherlock.dev',
-  baseUrl: '/',
+  // GitHub Pages serves at https://sachinkg12.github.io/SlideSherlock/
+  // Override URL/baseUrl with env vars when deploying to a custom domain
+  url: process.env.DOCS_URL || 'https://sachinkg12.github.io',
+  baseUrl: process.env.DOCS_BASE_URL || '/SlideSherlock/',
+  organizationName: 'sachinkg12',
+  projectName: 'SlideSherlock',
+  trailingSlash: false,
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
