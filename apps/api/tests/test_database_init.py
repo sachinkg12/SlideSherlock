@@ -43,9 +43,7 @@ def test_init_db_unknown_dialect_is_noop(monkeypatch):
 def test_sqlite_init_creates_tables(tmp_path, monkeypatch):
     """End-to-end: SQLite engine + _sqlite_init creates the schema."""
     db_path = tmp_path / "test.db"
-    engine = create_engine(
-        f"sqlite:///{db_path}", connect_args={"check_same_thread": False}
-    )
+    engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})
     database._sqlite_init(engine)
 
     inspector = inspect(engine)

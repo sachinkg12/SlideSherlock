@@ -12,9 +12,7 @@ from typing import Callable, Dict, Protocol, runtime_checkable
 
 @runtime_checkable
 class StorageBackend(Protocol):
-    def put(
-        self, key: str, data: bytes, content_type: str = "application/octet-stream"
-    ) -> str:
+    def put(self, key: str, data: bytes, content_type: str = "application/octet-stream") -> str:
         ...
 
     def get(self, key: str) -> bytes:
@@ -71,9 +69,7 @@ def get_storage_backend() -> StorageBackend:
         except Exception:
             pass
 
-    backend_name = (
-        (os.environ.get("STORAGE_BACKEND") or _default_backend()).strip().lower()
-    )
+    backend_name = (os.environ.get("STORAGE_BACKEND") or _default_backend()).strip().lower()
     factory = _STORAGE_REGISTRY.get(backend_name)
     if not factory:
         raise ValueError(

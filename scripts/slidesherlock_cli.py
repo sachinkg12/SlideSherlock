@@ -158,11 +158,7 @@ class PipelineLogger:
         # Stage timing table
         print("  Stage Timings:")
         for sname, sdata in self.stages.items():
-            bar = (
-                "█" * max(1, int(sdata["duration_s"] / elapsed * 40))
-                if elapsed > 0
-                else ""
-            )
+            bar = "█" * max(1, int(sdata["duration_s"] / elapsed * 40)) if elapsed > 0 else ""
             pct = sdata["duration_s"] / elapsed * 100 if elapsed > 0 else 0
             print(f"    {sname:<12} {sdata['duration_s']:>7.1f}s  {pct:>5.1f}%  {bar}")
         print(f"    {'TOTAL':<12} {elapsed:>7.1f}s")
@@ -289,9 +285,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     try:
         # Create project + job in DB
-        project = Project(
-            name=os.path.basename(pptx_path), description=f"CLI run {run_id[:8]}"
-        )
+        project = Project(name=os.path.basename(pptx_path), description=f"CLI run {run_id[:8]}")
         db.add(project)
         db.flush()
 
@@ -312,9 +306,7 @@ def cmd_run(args: argparse.Namespace) -> int:
             pptx_data,
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
-        print(
-            f"  Uploaded {os.path.basename(pptx_path)} ({len(pptx_data) / 1024:.0f} KB)"
-        )
+        print(f"  Uploaded {os.path.basename(pptx_path)} ({len(pptx_data) / 1024:.0f} KB)")
         print(f"  Job ID:  {job_id}")
         print()
 
@@ -607,9 +599,7 @@ def cmd_preset(args: argparse.Namespace) -> int:
         print("")
         print("  draft:    no vision, no bgm, cut transitions")
         print("  standard: notes overlay + crossfade + subtitles")
-        print(
-            "  pro:      vision+merge + timeline actions + bgm ducking + loudness normalize"
-        )
+        print("  pro:      vision+merge + timeline actions + bgm ducking + loudness normalize")
         print("")
         print("Usage: slidesherlock preset <preset>")
         print("       SLIDESHERLOCK_PRESET=standard make worker")
@@ -670,17 +660,13 @@ def main() -> int:
 
     # doctor
     doctor_parser = subparsers.add_parser("doctor", help="Check system dependencies")
-    doctor_parser.add_argument(
-        "--json", "-j", action="store_true", help="Also print JSON report"
-    )
+    doctor_parser.add_argument("--json", "-j", action="store_true", help="Also print JSON report")
     doctor_parser.set_defaults(func=cmd_doctor)
 
     # preset
     preset_parser = subparsers.add_parser("preset", help="Show or apply quality preset")
     preset_parser.add_argument("preset", nargs="?", help="Preset name")
-    preset_parser.add_argument(
-        "--export", "-e", action="store_true", help="Print export lines"
-    )
+    preset_parser.add_argument("--export", "-e", action="store_true", help="Print export lines")
     preset_parser.set_defaults(func=cmd_preset)
 
     args = parser.parse_args()
