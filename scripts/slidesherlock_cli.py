@@ -158,7 +158,11 @@ class PipelineLogger:
         # Stage timing table
         print("  Stage Timings:")
         for sname, sdata in self.stages.items():
-            bar = "█" * max(1, int(sdata["duration_s"] / elapsed * 40)) if elapsed > 0 else ""
+            bar = (
+                "█" * max(1, int(sdata["duration_s"] / elapsed * 40))
+                if elapsed > 0
+                else ""
+            )
             pct = sdata["duration_s"] / elapsed * 100 if elapsed > 0 else 0
             print(f"    {sname:<12} {sdata['duration_s']:>7.1f}s  {pct:>5.1f}%  {bar}")
         print(f"    {'TOTAL':<12} {elapsed:>7.1f}s")
@@ -252,7 +256,10 @@ def cmd_run(args: argparse.Namespace) -> int:
     doctor_report = run_doctor()
     logger.set_doctor(doctor_report)
     if not doctor_report.get("all_required_ok"):
-        print("Error: missing required dependencies. Run 'slidesherlock doctor'.", file=sys.stderr)
+        print(
+            "Error: missing required dependencies. Run 'slidesherlock doctor'.",
+            file=sys.stderr,
+        )
         return 1
 
     # Apply preset
@@ -260,7 +267,8 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     if preset not in VALID_PRESETS:
         print(
-            f"Error: unknown preset '{preset}'. Valid: {', '.join(VALID_PRESETS)}", file=sys.stderr
+            f"Error: unknown preset '{preset}'. Valid: {', '.join(VALID_PRESETS)}",
+            file=sys.stderr,
         )
         return 1
     os.environ["SLIDESHERLOCK_PRESET"] = preset
@@ -268,17 +276,22 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     logger.header()
 
-    # DB + MinIO setup
-    from apps.api.database import SessionLocal
+    # DB + storage setup. Storage backend is selected via the OCP registry —
+    # MinIO by default (existing flow), LocalFS when DATABASE_URL=sqlite://…
+    # or STORAGE_BACKEND=local. Both call sites use the same .get/.put/.exists.
+    from apps.api.database import SessionLocal, init_db
     from apps.api.models import Project, Job, JobStatus, Artifact
-    from storage import MinIOClient
+    from storage_backend import get_storage_backend
 
+    init_db()  # no-op for postgres (alembic owns); create_all for sqlite
     db = SessionLocal()
-    minio_client = MinIOClient()
+    minio_client = get_storage_backend()
 
     try:
         # Create project + job in DB
-        project = Project(name=os.path.basename(pptx_path), description=f"CLI run {run_id[:8]}")
+        project = Project(
+            name=os.path.basename(pptx_path), description=f"CLI run {run_id[:8]}"
+        )
         db.add(project)
         db.flush()
 
@@ -299,7 +312,9 @@ def cmd_run(args: argparse.Namespace) -> int:
             pptx_data,
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         )
-        print(f"  Uploaded {os.path.basename(pptx_path)} ({len(pptx_data) / 1024:.0f} KB)")
+        print(
+            f"  Uploaded {os.path.basename(pptx_path)} ({len(pptx_data) / 1024:.0f} KB)"
+        )
         print(f"  Job ID:  {job_id}")
         print()
 
@@ -434,7 +449,9 @@ def cmd_run(args: argparse.Namespace) -> int:
 
         metrics_path = f"jobs/{job_id}/metrics.json"
         minio_client.put(
-            metrics_path, json.dumps(metrics_payload, indent=2).encode(), "application/json"
+            metrics_path,
+            json.dumps(metrics_payload, indent=2).encode(),
+            "application/json",
         )
 
         db.add(
@@ -463,7 +480,8 @@ def cmd_run(args: argparse.Namespace) -> int:
             try:
                 data = minio_client.get(final_key)
                 local_path = os.path.join(
-                    output_dir, f"final_{vid}.mp4" if len(ctx.output_variants) > 1 else "final.mp4"
+                    output_dir,
+                    f"final_{vid}.mp4" if len(ctx.output_variants) > 1 else "final.mp4",
                 )
                 with open(local_path, "wb") as f:
                     f.write(data)
@@ -589,13 +607,18 @@ def cmd_preset(args: argparse.Namespace) -> int:
         print("")
         print("  draft:    no vision, no bgm, cut transitions")
         print("  standard: notes overlay + crossfade + subtitles")
-        print("  pro:      vision+merge + timeline actions + bgm ducking + loudness normalize")
+        print(
+            "  pro:      vision+merge + timeline actions + bgm ducking + loudness normalize"
+        )
         print("")
         print("Usage: slidesherlock preset <preset>")
         print("       SLIDESHERLOCK_PRESET=standard make worker")
         return 0
     if preset not in VALID_PRESETS:
-        print(f"Unknown preset: {preset}. Valid: {', '.join(VALID_PRESETS)}", file=sys.stderr)
+        print(
+            f"Unknown preset: {preset}. Valid: {', '.join(VALID_PRESETS)}",
+            file=sys.stderr,
+        )
         return 1
     if args.export:
         for k, v in get_preset_env_vars(preset).items():
@@ -629,7 +652,10 @@ def main() -> int:
         help="Quality preset: draft|standard|pro (default: draft)",
     )
     run_parser.add_argument(
-        "--output", "-o", default="./output", help="Output directory (default: ./output)"
+        "--output",
+        "-o",
+        default="./output",
+        help="Output directory (default: ./output)",
     )
     run_parser.add_argument(
         "--lang", "-l", default=None, help="Add a second language variant (e.g. hi-IN)"
@@ -644,13 +670,17 @@ def main() -> int:
 
     # doctor
     doctor_parser = subparsers.add_parser("doctor", help="Check system dependencies")
-    doctor_parser.add_argument("--json", "-j", action="store_true", help="Also print JSON report")
+    doctor_parser.add_argument(
+        "--json", "-j", action="store_true", help="Also print JSON report"
+    )
     doctor_parser.set_defaults(func=cmd_doctor)
 
     # preset
     preset_parser = subparsers.add_parser("preset", help="Show or apply quality preset")
     preset_parser.add_argument("preset", nargs="?", help="Preset name")
-    preset_parser.add_argument("--export", "-e", action="store_true", help="Print export lines")
+    preset_parser.add_argument(
+        "--export", "-e", action="store_true", help="Print export lines"
+    )
     preset_parser.set_defaults(func=cmd_preset)
 
     args = parser.parse_args()

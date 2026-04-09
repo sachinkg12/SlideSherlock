@@ -144,7 +144,10 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
 
 def run_pipeline(job_id: str):
     """Execute the full pipeline for a job."""
-    from storage import MinIOClient
+    # Storage backend is selected via the OCP registry. With no env vars set,
+    # this returns MinIOClient (existing Docker/Postgres flow — unchanged).
+    # If DATABASE_URL=sqlite://… or STORAGE_BACKEND=local, returns LocalFSBackend.
+    from storage_backend import get_storage_backend
 
     # DB imports — try relative first (when loaded as part of apps.api package),
     # then fall back to absolute for standalone worker process.
@@ -190,7 +193,7 @@ def run_pipeline(job_id: str):
         print(f"Render stage: Processing job {job_id}...")
         print(f"  Input file: {job.input_file_path}")
 
-        minio_client = MinIOClient()
+        minio_client = get_storage_backend()
 
         # Load vision config
         vision_config: Dict[str, Any] = {}
@@ -233,7 +236,9 @@ def run_pipeline(job_id: str):
             pass
 
         api_key = (os.environ.get("OPENAI_API_KEY") or "").strip()
-        print(f"  [LLM init] llm_mode={llm_mode}, api_key={'set' if api_key else 'unset'}")
+        print(
+            f"  [LLM init] llm_mode={llm_mode}, api_key={'set' if api_key else 'unset'}"
+        )
 
         # Script/verify stages always use Stub (fast, deterministic, no API calls).
         # AI narration happens in the dedicated NarrateStage (post-verify).
@@ -283,7 +288,9 @@ def run_pipeline(job_id: str):
                 ctx.translation_degraded = False
                 ctx.slides_notes_and_text = []
 
-                print(f"  Processing variant: {variant_id} (lang={variant.get('lang')})")
+                print(
+                    f"  Processing variant: {variant_id} (lang={variant.get('lang')})"
+                )
 
                 for stage in PER_VARIANT_STAGES:
                     stage_key = f"{stage.name}_{variant_id}"
@@ -350,7 +357,9 @@ def run_pipeline(job_id: str):
     except Exception as e:
         import traceback
 
-        error_msg = f"Error in render stage for job {job_id}: {e}\n{traceback.format_exc()}"
+        error_msg = (
+            f"Error in render stage for job {job_id}: {e}\n{traceback.format_exc()}"
+        )
         print(error_msg)
         if job:
             from datetime import datetime
