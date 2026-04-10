@@ -25,6 +25,8 @@ except ImportError:
     apply_audio_fade = None  # type: ignore
     _get_duration_seconds = None  # type: ignore
 
+from video_encoder import get_video_encoder, get_video_encoder_args
+
 
 def concat_audio(
     per_slide_audio_paths: List[str],
@@ -331,7 +333,8 @@ def _render_card_mp4(
                 "-t",
                 str(duration_sec),
                 "-c:v",
-                "libx264",
+                get_video_encoder(),
+                *get_video_encoder_args(),
                 "-pix_fmt",
                 "yuv420p",
                 "-r",
@@ -394,7 +397,8 @@ def _compose_with_crossfade(
             "-map",
             "[vout]",
             "-c:v",
-            "libx264",
+            get_video_encoder(),
+            *get_video_encoder_args(),
             "-pix_fmt",
             "yuv420p",
             output_path,

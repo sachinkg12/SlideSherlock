@@ -10,6 +10,8 @@ import io
 import re
 from typing import Any, Dict, List, Optional
 
+from video_encoder import get_video_encoder
+
 OVERLAY_FPS = 15
 HIGHLIGHT_COLOR = (0, 255, 100, 180)
 TRACE_COLOR = (255, 200, 0, 220)
@@ -244,7 +246,7 @@ def render_overlay_mp4(
         )
     n_frames = max(1, int(duration_seconds * fps))
     writer = imageio.get_writer(
-        output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p"
+        output_path, fps=fps, codec=get_video_encoder(), quality=8, pixelformat="yuv420p"
     )
     for i in range(n_frames):
         t = i / fps
@@ -309,7 +311,7 @@ def render_slide_with_overlay_mp4(
     width, height = base.size
     n_frames = max(1, int(slide_duration_seconds * fps))
     writer = imageio.get_writer(
-        output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p"
+        output_path, fps=fps, codec=get_video_encoder(), quality=8, pixelformat="yuv420p"
     )
     draw_notes = (
         notes_config and getattr(notes_config, "enabled", False) and (notes_text or "").strip()

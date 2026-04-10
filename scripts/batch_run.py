@@ -122,8 +122,8 @@ def run_one(pptx_path: str, output_dir: str, preset: str, idx: int, total: int) 
 
     except subprocess.TimeoutExpired:
         result["status"] = "timeout"
-        result["error"] = "exceeded 900s timeout"
-        result["pipeline_duration_s"] = 900
+        result["error"] = "exceeded 1800s timeout"
+        result["pipeline_duration_s"] = 1800
     except Exception as e:
         result["status"] = "error"
         result["error"] = str(e)
