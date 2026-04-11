@@ -44,3 +44,18 @@ docs/.docusaurus/
 # Coverage reports
 coverage.xml
 .coverage.*
+
+# Secrets and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Environment variants
+.env.production
+.env.staging
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
