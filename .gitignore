@@ -40,3 +40,7 @@ sample_connectors.pptx
 
 # Docusaurus build cache
 docs/.docusaurus/
+
+# Coverage reports
+coverage.xml
+.coverage.*
