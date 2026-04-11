@@ -19,8 +19,7 @@ class LLMBackendError(LLMError):
     """Raised when an LLM call fails after all retries."""
 
     def __init__(self, message: str, status_code: Optional[int] = None):
-        self.status_code = status_code
-        super().__init__(message)
+        super().__init__(message, status_code=status_code)
 
 
 def call_chat(

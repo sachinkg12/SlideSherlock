@@ -118,7 +118,8 @@ def test_video_returns_failed_on_exception(tmp_path):
 
     mock_models = MagicMock(Artifact=MagicMock())
 
-    with patch("stages.video.build_alignment", side_effect=RuntimeError("crash")), \
+    from exceptions import MediaProcessingError
+    with patch("stages.video.build_alignment", side_effect=MediaProcessingError("crash")), \
          patch("stages.video.build_timeline", MagicMock()), \
          patch("stages.video.render_slide_with_overlay_mp4", MagicMock()), \
          patch("stages.video.compose_video", MagicMock()), \
