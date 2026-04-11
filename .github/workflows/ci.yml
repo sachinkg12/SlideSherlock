@@ -63,15 +63,27 @@ jobs:
           cache: "pip"
 
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements-dev.txt
 
       - name: Run database migrations
         run: |
           PYTHONPATH=.:packages/core alembic upgrade head
 
-      - name: Run tests (152 tests)
+      - name: Run tests with coverage
         run: |
-          PYTHONPATH=.:packages/core pytest packages/core/tests/ apps/api/tests/ -v --tb=short
+          PYTHONPATH=.:packages/core pytest packages/core/tests/ apps/api/tests/ \
+            -v --tb=short \
+            --cov=packages/core --cov=apps/api \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          retention-days: 30
 
   lint:
     runs-on: ubuntu-latest
