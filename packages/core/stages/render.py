@@ -72,12 +72,23 @@ class RenderStage:
             temp_dir,
             pptx_path,
         ]
-        result = subprocess.run(
-            libreoffice_cmd,
-            capture_output=True,
-            text=True,
-            timeout=300,
-        )
+        # Retry once on failure — LibreOffice crashes are often transient
+        # (process leak, temp file lock, zombie soffice.bin).
+        max_attempts = 2
+        for attempt in range(1, max_attempts + 1):
+            result = subprocess.run(
+                libreoffice_cmd,
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            if result.returncode == 0 and os.path.exists(pdf_path):
+                break
+            if attempt < max_attempts:
+                import time
+
+                print(f"  LibreOffice attempt {attempt} failed, retrying in 2s...")
+                time.sleep(2)
         if result.returncode != 0:
             raise Exception(f"LibreOffice conversion failed: {result.stderr or result.stdout}")
 

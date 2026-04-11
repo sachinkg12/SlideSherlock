@@ -255,6 +255,9 @@ class VideoStage:
             overlay_mp4_paths = []
             total_duration = 0.0
             slide_start = 0.0
+
+            # Pre-compute per-slide render tasks (data + params)
+            render_tasks = []
             for slide_index in range(1, slide_count + 1):
                 actions_slide = actions_by_slide.get(slide_index, [])
                 audio_dur = per_slide_durations_dict.get(slide_index, 2.0)
@@ -286,28 +289,68 @@ class VideoStage:
                 notes_text = (
                     per_slide_notes[slide_index - 1] if slide_index <= len(per_slide_notes) else ""
                 )
+                render_tasks.append(
+                    {
+                        "slide_index": slide_index,
+                        "slide_num": slide_num,
+                        "png_data": png_data,
+                        "actions": actions_slide,
+                        "slide_dur": slide_dur,
+                        "out_mp4": out_mp4,
+                        "notes_text": notes_text,
+                    }
+                )
+
+            # Render overlays in parallel — each slide is independent.
+            from concurrent.futures import ThreadPoolExecutor, as_completed
+
+            max_overlay_parallel = int(os.environ.get("OVERLAY_PARALLEL", "4"))
+
+            def _render_one(task):
                 render_slide_with_overlay_mp4(
-                    png_data,
-                    actions_slide,
-                    slide_dur,
-                    out_mp4,
-                    notes_text=notes_text,
+                    task["png_data"],
+                    task["actions"],
+                    task["slide_dur"],
+                    task["out_mp4"],
+                    notes_text=task["notes_text"],
                     notes_config=notes_config,
                     notes_font_path=notes_font_path,
                 )
-                # Measure actual overlay duration (may differ from target due to FPS rounding)
+                return task
+
+            rendered = {}
+            with ThreadPoolExecutor(max_workers=max_overlay_parallel) as pool:
+                futures = {pool.submit(_render_one, t): t for t in render_tasks}
+                for fut in as_completed(futures):
+                    try:
+                        task = fut.result()
+                        rendered[task["slide_index"]] = task
+                    except Exception as exc:
+                        t = futures[fut]
+                        print(
+                            f"  Warning: overlay render failed for slide {t['slide_index']}: {exc}"
+                        )
+
+            # Reassemble in slide order and upload
+            for task in render_tasks:
+                si = task["slide_index"]
+                if si not in rendered:
+                    continue
+                out_mp4 = task["out_mp4"]
+                slide_num = task["slide_num"]
+
                 actual_overlay_dur = _get_mp4_duration(out_mp4)
                 if (
                     actual_overlay_dur > 0
                     and per_slide_audio_paths
-                    and slide_index <= len(per_slide_audio_paths)
+                    and si <= len(per_slide_audio_paths)
                 ):
-                    audio_file = per_slide_audio_paths[slide_index - 1]
+                    audio_file = per_slide_audio_paths[si - 1]
                     if audio_file and os.path.exists(audio_file):
                         padded = _pad_audio_to_duration(
-                            audio_file, actual_overlay_dur, temp_dir, slide_index
+                            audio_file, actual_overlay_dur, temp_dir, si
                         )
-                        per_slide_audio_paths[slide_index - 1] = padded
+                        per_slide_audio_paths[si - 1] = padded
 
                 overlay_storage = f"{overlay_prefix}slide_{slide_num}_overlay.mp4"
                 with open(out_mp4, "rb") as f:

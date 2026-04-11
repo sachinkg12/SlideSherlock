@@ -121,8 +121,48 @@ PER_VARIANT_STAGES: List[Stage] = [
 ]
 
 
+def _stage_cache_key(stage_name: str, ctx: PipelineContext) -> str:
+    """Storage key for a stage's completion marker."""
+    prefix = getattr(ctx, "script_prefix", f"jobs/{ctx.job_id}/script/en/")
+    # Use job-level prefix for shared stages, variant prefix for per-variant
+    base = (
+        f"jobs/{ctx.job_id}" if stage_name in ("ingest", "evidence", "render", "graph") else prefix
+    )
+    return f"{base}stage_done_{stage_name}.json"
+
+
 def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
-    """Run a single stage, capturing timing and errors."""
+    """Run a single stage, capturing timing and errors.
+
+    Stage caching: if a previous run already completed this stage (marker
+    file exists in storage), skip it and return immediately. This prevents
+    re-doing expensive work (evidence, audio, video) on retries after a
+    late-stage timeout.  Disable with SKIP_STAGE_CACHE=1.
+    """
+    skip_cache = os.environ.get("SKIP_STAGE_CACHE", "").strip().lower() in ("1", "true")
+    if not skip_cache:
+        cache_key = _stage_cache_key(stage.name, ctx)
+        try:
+            from storage_backend import get_storage_backend
+
+            storage = get_storage_backend()
+            if storage.exists(cache_key):
+                import json
+
+                cached = json.loads(storage.get(cache_key).decode("utf-8"))
+                print(
+                    f"  Stage '{stage.name}' — cached (skipping, {cached.get('duration_ms', 0)}ms previous)"
+                )
+                result = StageResult(
+                    status=cached.get("status", "ok"),
+                    metrics=cached.get("metrics", {}),
+                )
+                result.duration_ms = 0
+                ctx.stage_results[stage.name] = result
+                return result
+        except Exception:
+            pass  # Cache miss or storage error — run normally
+
     t0 = time.time()
     try:
         result = stage.run(ctx)
@@ -134,6 +174,27 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
     elapsed_ms = int((time.time() - t0) * 1000)
     result.duration_ms = elapsed_ms
     ctx.stage_results[stage.name] = result
+
+    # Write completion marker for successful stages
+    if result.status == "ok" and not skip_cache:
+        try:
+            import json
+
+            from storage_backend import get_storage_backend
+
+            storage = get_storage_backend()
+            marker = json.dumps(
+                {
+                    "status": result.status,
+                    "duration_ms": elapsed_ms,
+                    "metrics": result.metrics,
+                }
+            ).encode("utf-8")
+            cache_key = _stage_cache_key(stage.name, ctx)
+            storage.put(cache_key, marker, "application/json")
+        except Exception:
+            pass  # Non-critical — caching is best-effort
+
     return result
 
 
@@ -256,13 +317,19 @@ def run_pipeline(job_id: str):
             print("  LLM provider: Stub (template narration)")
 
         # ---- SHARED STAGES ----
+        render_failed = False
         for stage in SHARED_STAGES:
             result = _run_stage(stage, ctx)
             if result.status == "failed":
                 print(f"  Shared stage '{stage.name}' failed, continuing...")
+                if stage.name == "render":
+                    render_failed = True
 
         # ---- PER-VARIANT STAGES ----
-        if ctx.output_variants and ctx.unified_graphs:
+        # Skip if render failed — no PNGs means script/audio/video are all doomed.
+        if render_failed:
+            print("  Render failed — skipping per-variant stages (no slide PNGs available)")
+        if ctx.output_variants and ctx.unified_graphs and not render_failed:
             for variant in ctx.output_variants:
                 variant_id = variant.get("id", "en")
                 ctx.variant = variant

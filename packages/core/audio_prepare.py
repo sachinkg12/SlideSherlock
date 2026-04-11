@@ -10,9 +10,23 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
+import struct
+import wave
+
 from audio_config import AudioConfig, AUDIO_MODE_USE_SUPPLIED
 from narration_source import build_narration_per_slide
 from audio_processor import _get_duration_seconds
+
+
+def _generate_silence(path: str, duration_s: float, sample_rate: int = 48000) -> None:
+    """Write a silent WAV file. Used as fallback when TTS fails for a slide."""
+    n_frames = int(duration_s * sample_rate)
+    with wave.open(path, "w") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(sample_rate)
+        wf.writeframes(struct.pack(f"<{n_frames}h", *([0] * n_frames)))
+
 
 # Input path for user-supplied audio (per slide)
 INPUT_AUDIO_PREFIX = "input/audio"
@@ -177,7 +191,10 @@ def run_audio_prepare(
             voice_id=voice_id,
             lang=lang or "en-US",
         )
-        for i, entry in enumerate(entries):
+
+        def _synthesize_one(entry):
+            """Synthesize TTS for a single slide. Thread-safe — each call
+            writes to its own file path."""
             slide_index = entry["slide_index"]
             text = entry["narration_text"]
             sn = _slide_num(slide_index)
@@ -191,7 +208,6 @@ def run_audio_prepare(
                 lufs_target=config.lufs_target,
                 sample_rate=config.sample_rate,
             )
-            per_slide_audio.append((out_path, dur or dur_raw))
             entry_out = {
                 "slide_index": slide_index,
                 "narration_text": text,
@@ -202,7 +218,45 @@ def run_audio_prepare(
                 entry_out["referenced_entity_ids"] = entry["referenced_entity_ids"]
             if "referenced_evidence_ids" in entry:
                 entry_out["referenced_evidence_ids"] = entry["referenced_evidence_ids"]
-            narration_entries.append(entry_out)
+            return slide_index, out_path, dur or dur_raw, entry_out
+
+        # Parallel TTS: each slide is independent. USE_SYSTEM_TTS spawns
+        # a separate process per call so parallelism is safe.
+        max_tts_parallel = int(os.environ.get("TTS_PARALLEL", "4"))
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        results_by_index = {}
+        with ThreadPoolExecutor(max_workers=max_tts_parallel) as pool:
+            futures = {pool.submit(_synthesize_one, e): e for e in entries}
+            for fut in as_completed(futures):
+                try:
+                    si, out_path, dur, entry_out = fut.result()
+                    results_by_index[si] = (out_path, dur, entry_out)
+                except Exception as exc:
+                    entry = futures[fut]
+                    print(f"  Warning: TTS failed for slide {entry['slide_index']}: {exc}")
+
+        # Reassemble in slide order
+        for entry in entries:
+            si = entry["slide_index"]
+            if si in results_by_index:
+                out_path, dur, entry_out = results_by_index[si]
+                per_slide_audio.append((out_path, dur))
+                narration_entries.append(entry_out)
+            else:
+                # TTS failed for this slide — use silence
+                sn = _slide_num(si)
+                silent_path = os.path.join(audio_dir, f"slide_{sn}.wav")
+                _generate_silence(silent_path, 1.0, config.sample_rate)
+                per_slide_audio.append((silent_path, 1.0))
+                narration_entries.append(
+                    {
+                        "slide_index": si,
+                        "narration_text": entry.get("narration_text", ""),
+                        "source_used": "tts_failed",
+                        "word_count": 0,
+                    }
+                )
 
         if blueprints:
             blueprint_payload = {
