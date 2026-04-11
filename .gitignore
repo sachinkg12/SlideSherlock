@@ -19,6 +19,14 @@ htmlcov/
 *.swp
 *.swo
 *~
+# SQLite databases (created by SQLite + LocalFS mode)
+*.db
+*.sqlite
+*.sqlite3
+# Secrets / keys
+*.pem
+*.key
+.env.production
 # Python
 *.egg-info/
 .venv/
