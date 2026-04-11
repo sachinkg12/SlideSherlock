@@ -115,6 +115,8 @@ try:
 except ImportError:
     get_current_preset = None  # type: ignore
 
+from exceptions import MediaProcessingError, StorageError
+
 
 class VideoStage:
     name = "video"
@@ -279,7 +281,7 @@ class VideoStage:
                 png_storage = f"jobs/{job_id}/render/slides/slide_{slide_num}.png"
                 try:
                     png_data = minio_client.get(png_storage)
-                except Exception as e:
+                except StorageError as e:
                     print(f"  Warning: could not load {png_storage}: {e}")
                     continue
                 out_mp4 = os.path.join(temp_dir, f"slide_{slide_num}_{variant_id}_overlay.mp4")
@@ -530,7 +532,7 @@ class VideoStage:
             )
             print(f"  Diagnostics written to jobs/{job_id}/output/diagnostics.json")
 
-        except Exception as e:
+        except (StorageError, MediaProcessingError) as e:
             import traceback
 
             print(f"  Warning: timeline/overlay/compose failed: {e}\n{traceback.format_exc()}")

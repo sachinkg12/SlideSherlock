@@ -27,6 +27,8 @@ try:
 except ImportError:
     run_classify_images = None  # type: ignore
 
+from exceptions import StorageError, VisionError
+
 
 class IngestStage:
     name = "ingest"
@@ -118,13 +120,13 @@ class IngestStage:
                                     print(
                                         f"  Image classifier: jobs/{job_id}/vision/image_kinds.json"
                                     )
-                                except Exception as ec:
+                                except (StorageError, VisionError) as ec:
                                     import traceback
 
                                     print(
                                         f"  Warning: image classifier failed: {ec}\n{traceback.format_exc()}"
                                     )
-                    except Exception as e:
+                    except (StorageError, VisionError) as e:
                         import traceback
 
                         print(f"  Warning: image extraction failed: {e}\n{traceback.format_exc()}")

@@ -33,6 +33,8 @@ try:
 except ImportError:
     build_output_variants = None  # type: ignore
 
+from exceptions import IngestError, VisionError
+
 
 class RenderStage:
     name = "render"
@@ -79,17 +81,26 @@ class RenderStage:
             timeout=300,
         )
         if result.returncode != 0:
-            raise Exception(f"LibreOffice conversion failed: {result.stderr or result.stdout}")
+            raise IngestError(
+                f"LibreOffice conversion failed: {result.stderr or result.stdout}",
+                input_path=pptx_path,
+            )
 
         if not os.path.exists(pdf_path):
-            raise Exception(f"PDF file not created at {pdf_path}")
+            raise IngestError(
+                f"PDF file not created at {pdf_path}",
+                input_path=pptx_path,
+            )
 
         pdf_size = os.path.getsize(pdf_path)
         print(f"  Created PDF: {pdf_size} bytes")
 
         # 3. Convert PDF to PNG slides using pdf2image
         if not convert_from_path:
-            raise Exception("pdf2image not available. Install with: pip install pdf2image")
+            raise IngestError(
+                "pdf2image not available. Install with: pip install pdf2image",
+                input_path=pdf_path,
+            )
 
         print("  Converting PDF to PNG slides...")
         slides = convert_from_path(pdf_path, dpi=150)
@@ -188,7 +199,7 @@ class RenderStage:
                     print(
                         f"  Slide caption fallback: {n} SLIDE_CAPTION evidence item(s) for slides {cap_result.get('slides_captioned', [])}"
                     )
-            except Exception as e:
+            except VisionError as e:
                 import traceback
 
                 print(f"  Warning: slide_caption_fallback failed: {e}\n{traceback.format_exc()}")
@@ -197,7 +208,7 @@ class RenderStage:
         if write_vision_summary and minio_client:
             try:
                 write_vision_summary(job_id=job_id, minio_client=minio_client)
-            except Exception as e:
+            except VisionError as e:
                 import traceback
 
                 print(f"  Warning: write_vision_summary failed: {e}\n{traceback.format_exc()}")

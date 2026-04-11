@@ -26,6 +26,7 @@ except ImportError:
     _get_duration_seconds = None  # type: ignore
 
 from video_encoder import get_video_encoder, get_video_encoder_args
+from exceptions import ComposerError, MediaProcessingError
 
 
 def concat_audio(
@@ -612,7 +613,8 @@ def compose_video(
             os.close(fd)
             try:
                 _compose_with_crossfade(video_paths, durations, trans_ms, concat_path)
-            except Exception:
+            except MediaProcessingError:
+                print("  [composer] Crossfade failed, falling back to cut transition")
                 use_crossfade = False
                 if concat_path and os.path.exists(concat_path):
                     try:
@@ -664,7 +666,7 @@ def compose_video(
                     outro_silence_sec=outro_silence,
                 )
                 final_audio_path = concat_audio_path
-            except Exception:
+            except MediaProcessingError:
                 concat_audio(
                     per_slide_audio_paths,
                     concat_audio_path,
@@ -704,7 +706,8 @@ def compose_video(
                     timeout=300,
                 )
                 video_input = sub_path_temp
-            except Exception:
+            except MediaProcessingError:
+                print("  [composer] Subtitle burn-in failed, continuing without subtitles")
                 sub_path_temp = None
             finally:
                 if os.path.exists(srt_temp):

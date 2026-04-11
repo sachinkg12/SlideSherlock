@@ -74,7 +74,10 @@ PROMPTS = {
 # -----------------------------------------------------------------------------
 # Exceptions
 # -----------------------------------------------------------------------------
-class VisionProviderError(Exception):
+from exceptions import VisionError
+
+
+class VisionProviderError(VisionError):
     """Raised when vision provider fails in a way callers should handle (e.g. fallback)."""
 
     def __init__(self, message: str, reason_code: str = "UNKNOWN"):

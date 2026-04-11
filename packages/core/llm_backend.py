@@ -12,8 +12,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 
+from exceptions import LLMError
 
-class LLMBackendError(Exception):
+
+class LLMBackendError(LLMError):
     """Raised when an LLM call fails after all retries."""
 
     def __init__(self, message: str, status_code: Optional[int] = None):

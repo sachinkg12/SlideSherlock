@@ -3,11 +3,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Protocol
+import logging
 import time
 import json
 import os
 import tempfile
 import sys
+
+logger = logging.getLogger(__name__)
 
 # Ensure packages/core is on the path
 _core_dir = os.path.dirname(os.path.abspath(__file__))
@@ -93,6 +96,11 @@ class StageResult:
 # Stage registry
 # ---------------------------------------------------------------------------
 
+from exceptions import (
+    SlidesherlockError,
+    PipelineConfigError,
+)
+
 from stages.ingest import IngestStage
 from stages.evidence import EvidenceStage
 from stages.render import RenderStage
@@ -129,7 +137,21 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
     except Exception as e:
         import traceback
 
-        print(f"  Stage '{stage.name}' FAILED: {e}\n{traceback.format_exc()}")
+        if isinstance(e, SlidesherlockError):
+            logger.error(
+                "Stage '%s' FAILED [%s]: %s\n%s",
+                stage.name,
+                type(e).__name__,
+                e,
+                traceback.format_exc(),
+            )
+        else:
+            logger.error(
+                "Stage '%s' FAILED: %s\n%s",
+                stage.name,
+                e,
+                traceback.format_exc(),
+            )
         result = StageResult(status="failed", metrics={"error": str(e)})
     elapsed_ms = int((time.time() - t0) * 1000)
     result.duration_ms = elapsed_ms
@@ -166,7 +188,7 @@ def run_pipeline(job_id: str):
         preset = get_current_preset()
         if preset:
             apply_preset(preset)
-    except Exception:
+    except (ImportError, PipelineConfigError):
         pass
 
     db = SessionLocal()
@@ -181,7 +203,7 @@ def run_pipeline(job_id: str):
             return
 
         if not job.input_file_path:
-            raise Exception("Job has no input file path")
+            raise PipelineConfigError("Job has no input file path")
 
         # Update status to PROCESSING
         job.status = JobStatus.PROCESSING
@@ -353,8 +375,12 @@ def run_pipeline(job_id: str):
     except Exception as e:
         import traceback
 
-        error_msg = f"Error in render stage for job {job_id}: {e}\n{traceback.format_exc()}"
-        print(error_msg)
+        logger.error(
+            "Error in render stage for job %s: %s\n%s",
+            job_id,
+            e,
+            traceback.format_exc(),
+        )
         if job:
             from datetime import datetime
 
