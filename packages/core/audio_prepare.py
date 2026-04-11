@@ -220,43 +220,67 @@ def run_audio_prepare(
                 entry_out["referenced_evidence_ids"] = entry["referenced_evidence_ids"]
             return slide_index, out_path, dur or dur_raw, entry_out
 
-        # Parallel TTS: each slide is independent. USE_SYSTEM_TTS spawns
-        # a separate process per call so parallelism is safe.
-        max_tts_parallel = int(os.environ.get("TTS_PARALLEL", "4"))
-        from concurrent.futures import ThreadPoolExecutor, as_completed
+        # TTS parallelism. Default sequential (TTS_PARALLEL=1) because
+        # macOS pyttsx3 requires the main thread and `say` produces silent
+        # output from worker threads. Set TTS_PARALLEL=4+ only with
+        # thread-safe providers (e.g., OpenAI TTS API).
+        max_tts_parallel = int(os.environ.get("TTS_PARALLEL", "1"))
 
-        results_by_index = {}
-        with ThreadPoolExecutor(max_workers=max_tts_parallel) as pool:
-            futures = {pool.submit(_synthesize_one, e): e for e in entries}
-            for fut in as_completed(futures):
+        if max_tts_parallel <= 1:
+            # Sequential — safe for all TTS providers including macOS say/pyttsx3
+            for entry in entries:
                 try:
-                    si, out_path, dur, entry_out = fut.result()
-                    results_by_index[si] = (out_path, dur, entry_out)
+                    si, out_path, dur, entry_out = _synthesize_one(entry)
+                    per_slide_audio.append((out_path, dur))
+                    narration_entries.append(entry_out)
                 except Exception as exc:
-                    entry = futures[fut]
                     print(f"  Warning: TTS failed for slide {entry['slide_index']}: {exc}")
+                    sn = _slide_num(entry["slide_index"])
+                    silent_path = os.path.join(audio_dir, f"slide_{sn}.wav")
+                    _generate_silence(silent_path, 1.0, config.sample_rate)
+                    per_slide_audio.append((silent_path, 1.0))
+                    narration_entries.append(
+                        {
+                            "slide_index": entry["slide_index"],
+                            "narration_text": entry.get("narration_text", ""),
+                            "source_used": "tts_failed",
+                            "word_count": 0,
+                        }
+                    )
+        else:
+            # Parallel — only for thread-safe TTS providers
+            from concurrent.futures import ThreadPoolExecutor, as_completed
 
-        # Reassemble in slide order
-        for entry in entries:
-            si = entry["slide_index"]
-            if si in results_by_index:
-                out_path, dur, entry_out = results_by_index[si]
-                per_slide_audio.append((out_path, dur))
-                narration_entries.append(entry_out)
-            else:
-                # TTS failed for this slide — use silence
-                sn = _slide_num(si)
-                silent_path = os.path.join(audio_dir, f"slide_{sn}.wav")
-                _generate_silence(silent_path, 1.0, config.sample_rate)
-                per_slide_audio.append((silent_path, 1.0))
-                narration_entries.append(
-                    {
-                        "slide_index": si,
-                        "narration_text": entry.get("narration_text", ""),
-                        "source_used": "tts_failed",
-                        "word_count": 0,
-                    }
-                )
+            results_by_index = {}
+            with ThreadPoolExecutor(max_workers=max_tts_parallel) as pool:
+                futures = {pool.submit(_synthesize_one, e): e for e in entries}
+                for fut in as_completed(futures):
+                    try:
+                        si, out_path, dur, entry_out = fut.result()
+                        results_by_index[si] = (out_path, dur, entry_out)
+                    except Exception as exc:
+                        entry = futures[fut]
+                        print(f"  Warning: TTS failed for slide {entry['slide_index']}: {exc}")
+
+            for entry in entries:
+                si = entry["slide_index"]
+                if si in results_by_index:
+                    out_path, dur, entry_out = results_by_index[si]
+                    per_slide_audio.append((out_path, dur))
+                    narration_entries.append(entry_out)
+                else:
+                    sn = _slide_num(si)
+                    silent_path = os.path.join(audio_dir, f"slide_{sn}.wav")
+                    _generate_silence(silent_path, 1.0, config.sample_rate)
+                    per_slide_audio.append((silent_path, 1.0))
+                    narration_entries.append(
+                        {
+                            "slide_index": si,
+                            "narration_text": entry.get("narration_text", ""),
+                            "source_used": "tts_failed",
+                            "word_count": 0,
+                        }
+                    )
 
         if blueprints:
             blueprint_payload = {
