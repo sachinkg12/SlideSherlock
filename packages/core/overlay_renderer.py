@@ -7,10 +7,13 @@ Optional: on-screen notes (narration text) with layout templates and styling.
 from __future__ import annotations
 
 import io
+import os
 import re
 from typing import Any, Dict, List, Optional
 
-from video_encoder import get_video_encoder
+# Note: per-slide overlays use libx264 directly (not get_video_encoder())
+# to ensure all slides have matching H.264 profiles for concat -c copy.
+# The video_encoder module is only used by composer.py for xfade compose.
 
 OVERLAY_FPS = 15
 HIGHLIGHT_COLOR = (0, 255, 100, 180)
@@ -245,8 +248,10 @@ def render_overlay_mp4(
             "imageio and numpy required for overlay MP4; pip install imageio imageio-ffmpeg numpy"
         )
     n_frames = max(1, int(duration_seconds * fps))
+    # Use libx264 for per-slide overlays so all slides have matching H.264
+    # profile for concat -c copy. VT is only used in crossfade compose step.
     writer = imageio.get_writer(
-        output_path, fps=fps, codec=get_video_encoder(), quality=8, pixelformat="yuv420p"
+        output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p"
     )
     for i in range(n_frames):
         t = i / fps
@@ -299,9 +304,78 @@ def render_slide_with_overlay_mp4(
     Composite slide PNG + overlay per frame and encode to MP4 (no alpha in output).
     If notes_config.enabled and notes_text is set, draws on-screen notes on each frame.
     Returns output_path. Used by composer for final concat.
+
+    Fast path: when there are no timeline actions AND no on-screen notes,
+    uses ffmpeg -loop 1 to create a static video from the slide PNG in
+    ~0.5s instead of frame-by-frame rendering (18-45s per slide). This
+    is the dominant speedup for large decks where most slides are static.
     """
+    import subprocess
+    import tempfile
+
     from PIL import Image
 
+    draw_notes = (
+        notes_config and getattr(notes_config, "enabled", False) and (notes_text or "").strip()
+    )
+    has_actions = any(
+        act.get("type") in ("HIGHLIGHT", "TRACE", "ZOOM") for act in (timeline_actions or [])
+    )
+
+    if not has_actions:
+        # Fast path: no animations — render a single frame (slide + optional
+        # notes) then ffmpeg -loop 1.  ~0.5s per slide vs 18-45s frame-by-frame.
+        # Falls back to slow path if ffmpeg crashes (exit 187 on some PNGs).
+        from PIL import Image as PILImage  # noqa: F811
+
+        base = PILImage.open(io.BytesIO(slide_image_bytes)).convert("RGBA")
+        width, height = base.size
+        frame = base.copy()
+        if draw_notes:
+            draw_notes_on_image(
+                frame, (notes_text or "").strip(), width, height, notes_config, notes_font_path
+            )
+        fd, tmp_png = tempfile.mkstemp(suffix=".png")
+        os.close(fd)
+        try:
+            frame.convert("RGB").save(tmp_png)
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-y",
+                    "-loop",
+                    "1",
+                    "-framerate",
+                    str(int(fps)),
+                    "-i",
+                    tmp_png,
+                    "-t",
+                    str(slide_duration_seconds),
+                    "-c:v",
+                    "libx264",
+                    "-pix_fmt",
+                    "yuv420p",
+                    "-r",
+                    str(int(fps)),
+                    output_path,
+                ],
+                check=True,
+                capture_output=True,
+                timeout=30,
+            )
+            return output_path
+        except (subprocess.SubprocessError, OSError):
+            # ffmpeg -loop 1 crashes on some PNGs (exit 187). Fall through
+            # to the slow frame-by-frame path below.
+            pass
+        finally:
+            if os.path.exists(tmp_png):
+                try:
+                    os.unlink(tmp_png)
+                except Exception:
+                    pass
+
+    # Slow path: frame-by-frame rendering for slides with overlays or notes
     try:
         import imageio
         import numpy as np
@@ -310,11 +384,10 @@ def render_slide_with_overlay_mp4(
     base = Image.open(io.BytesIO(slide_image_bytes)).convert("RGBA")
     width, height = base.size
     n_frames = max(1, int(slide_duration_seconds * fps))
+    # Use libx264 for per-slide overlays so all slides have matching H.264
+    # profile for concat -c copy. VT is only used in crossfade compose step.
     writer = imageio.get_writer(
-        output_path, fps=fps, codec=get_video_encoder(), quality=8, pixelformat="yuv420p"
-    )
-    draw_notes = (
-        notes_config and getattr(notes_config, "enabled", False) and (notes_text or "").strip()
+        output_path, fps=fps, codec="libx264", quality=8, pixelformat="yuv420p"
     )
     for i in range(n_frames):
         t = i / fps

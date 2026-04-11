@@ -20,14 +20,14 @@ PRESET_ENV_VARS: Dict[str, Dict[str, str]] = {
         "VISION_ENABLED": "0",
         "AUDIO_BGM_ENABLED": "0",
         "VIDEO_TRANSITION": "cut",
-        "ON_SCREEN_NOTES_ENABLED": "0",
+        "ON_SCREEN_NOTES_ENABLED": "0",  # Disabled: covers slide content, 16× slower video encode
         "SUBTITLES_ENABLED": "0",
         "VIDEO_INTRO_ENABLED": "0",
         "VIDEO_OUTRO_ENABLED": "0",
         "AUDIO_LOUDNESS_NORMALIZE": "0",
     },
     PRESET_STANDARD: {
-        "ON_SCREEN_NOTES_ENABLED": "1",
+        "ON_SCREEN_NOTES_ENABLED": "0",  # Disabled: covers slide content, 16× slower video encode
         "VIDEO_TRANSITION": "crossfade",
         "SUBTITLES_ENABLED": "1",
         "VIDEO_INTRO_ENABLED": "1",
@@ -38,7 +38,7 @@ PRESET_ENV_VARS: Dict[str, Dict[str, str]] = {
     },
     PRESET_PRO: {
         "VISION_ENABLED": "1",
-        "ON_SCREEN_NOTES_ENABLED": "1",
+        "ON_SCREEN_NOTES_ENABLED": "0",  # Disabled: covers slide content, 16× slower video encode
         "VIDEO_TRANSITION": "crossfade",
         "SUBTITLES_ENABLED": "1",
         "VIDEO_INTRO_ENABLED": "1",

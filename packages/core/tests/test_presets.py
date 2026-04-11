@@ -30,9 +30,9 @@ def test_get_preset_env_vars_draft():
 
 
 def test_get_preset_env_vars_standard():
-    """Standard preset: notes overlay, crossfade, subtitles."""
+    """Standard preset: no notes overlay, crossfade, subtitles."""
     env = get_preset_env_vars(PRESET_STANDARD)
-    assert env.get("ON_SCREEN_NOTES_ENABLED") == "1"
+    assert env.get("ON_SCREEN_NOTES_ENABLED") == "0"
     assert env.get("VIDEO_TRANSITION") == "crossfade"
     assert env.get("SUBTITLES_ENABLED") == "1"
     assert env.get("AUDIO_LOUDNESS_NORMALIZE") == "1"

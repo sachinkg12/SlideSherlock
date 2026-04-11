@@ -320,6 +320,9 @@ def _render_card_mp4(
     try:
         # Match slide overlay codec params: h264, yuv420p, 15fps
         # Critical: framerate MUST match slide overlays for concat -c copy to work
+        # Use libx264 for -loop 1 image input (h264_videotoolbox sometimes
+        # fails with exit 187 on image loop + scale filter). Card clips are
+        # 2s so software encode is instant.
         subprocess.run(
             [
                 "ffmpeg",
@@ -333,8 +336,7 @@ def _render_card_mp4(
                 "-t",
                 str(duration_sec),
                 "-c:v",
-                get_video_encoder(),
-                *get_video_encoder_args(),
+                "libx264",
                 "-pix_fmt",
                 "yuv420p",
                 "-r",
@@ -362,7 +364,19 @@ def _compose_with_crossfade(
     transition_ms: int,
     output_path: str,
 ) -> str:
-    """Compose videos with xfade transitions. Requires filter_complex."""
+    """Compose videos with xfade transitions using chunked encoding.
+
+    Instead of one giant xfade filter_complex that re-encodes the entire
+    video (O(N × total_duration) — 15-25 min for 30 slides), we split
+    slides into chunks of CROSSFADE_CHUNK_SIZE, apply xfade within each
+    chunk (fast — only a few slides per filter graph), and concat the
+    chunks with stream copy (instant).  Hard cut between chunks is
+    visually unnoticeable in presentation videos.
+
+    Expected speedup: 20-40× for decks with 20+ slides.
+    Override chunk size via CROSSFADE_CHUNK_SIZE env var (default 8).
+    Set to 999 for the old single-pass behavior (slower, seamless).
+    """
     if len(video_paths) < 2:
         if len(video_paths) == 1:
             import shutil
@@ -370,12 +384,88 @@ def _compose_with_crossfade(
             shutil.copy(video_paths[0], output_path)
             return output_path
         raise ValueError("Need at least one video")
+
+    chunk_size = int(os.environ.get("CROSSFADE_CHUNK_SIZE", "8"))
+    if chunk_size >= len(video_paths):
+        # Small deck or chunk_size=999 — single pass (old behavior)
+        return _xfade_single_pass(video_paths, durations, transition_ms, output_path)
+
+    # Split into chunks and xfade each chunk independently
+    chunk_paths: List[str] = []
+    try:
+        for start in range(0, len(video_paths), chunk_size):
+            end = min(start + chunk_size, len(video_paths))
+            chunk_vids = video_paths[start:end]
+            chunk_durs = durations[start:end]
+
+            if len(chunk_vids) == 1:
+                # Single-slide chunk — no xfade needed, use as-is
+                chunk_paths.append(chunk_vids[0])
+                continue
+
+            fd, chunk_out = tempfile.mkstemp(suffix=f"_chunk_{start}.mp4")
+            os.close(fd)
+            chunk_paths.append(chunk_out)
+            _xfade_single_pass(chunk_vids, chunk_durs, transition_ms, chunk_out)
+
+        # Concat chunks with stream copy (instant, no re-encode)
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+            for cp in chunk_paths:
+                f.write(f"file '{os.path.abspath(cp)}'\n")
+            list_path = f.name
+
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-y",
+                "-f",
+                "concat",
+                "-safe",
+                "0",
+                "-i",
+                list_path,
+                "-c",
+                "copy",
+                output_path,
+            ],
+            check=True,
+            capture_output=True,
+            timeout=120,
+        )
+    finally:
+        # Clean up temp chunk files (but not original slide videos)
+        for cp in chunk_paths:
+            if cp not in video_paths and os.path.exists(cp):
+                try:
+                    os.unlink(cp)
+                except Exception:
+                    pass
+        if "list_path" in locals() and os.path.exists(list_path):
+            try:
+                os.unlink(list_path)
+            except Exception:
+                pass
+
+    return output_path
+
+
+def _xfade_single_pass(
+    video_paths: List[str],
+    durations: List[float],
+    transition_ms: int,
+    output_path: str,
+) -> str:
+    """Single-pass xfade filter_complex for a small number of videos.
+
+    This is the original algorithm, now used only within chunks (≤8 slides)
+    where the encode time is bounded. For the full-deck path, see
+    _compose_with_crossfade which calls this per chunk.
+    """
     fade_sec = transition_ms / 1000.0
     fade_sec = min(fade_sec, min(durations) * 0.4)
     inputs: List[str] = []
     for p in video_paths:
         inputs.extend(["-i", p])
-    # Build xfade chain: [0:v][1:v]xfade[v01]; [v01][2:v]xfade[v02]; ...
     filters: List[str] = []
     cum_dur = durations[0]
     for i in range(1, len(video_paths)):
@@ -404,7 +494,9 @@ def _compose_with_crossfade(
             output_path,
         ]
     )
-    subprocess.run(cmd, check=True, capture_output=True, timeout=600)
+    # Per-chunk timeout: 8 slides × ~30s each × 15fps ≈ 3600 frames.
+    # Even on libx264 software encode this finishes in <2 min.
+    subprocess.run(cmd, check=True, capture_output=True, timeout=300)
     return output_path
 
 
