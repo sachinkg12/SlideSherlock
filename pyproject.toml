@@ -70,7 +70,13 @@ Repository = "https://github.com/sachinkg12/SlideSherlock"
 Issues = "https://github.com/sachinkg12/SlideSherlock/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["packages/core", "apps/api", "scripts"]
+packages = ["scripts"]
+
+[tool.hatch.build.targets.wheel.force-include]
+# Flatten packages/core into wheel root for bare imports (from pipeline import ...)
+"packages/core/" = "./"
+# Keep apps/api as apps.api for relative imports
+"apps/" = "apps/"
 
 [tool.hatch.build.targets.sdist]
 include = [
