@@ -26,6 +26,10 @@ DATABASE_URL = os.getenv(
 _connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
     _connect_args["check_same_thread"] = False
+    # Auto-create parent directory for the SQLite file
+    _db_path = DATABASE_URL.replace("sqlite:///", "").replace("sqlite://", "")
+    if _db_path and _db_path != ":memory:":
+        os.makedirs(os.path.dirname(os.path.abspath(_db_path)), exist_ok=True)
 
 engine = create_engine(DATABASE_URL, connect_args=_connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
