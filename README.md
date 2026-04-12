@@ -6,6 +6,25 @@
 
 **SlideSherlock** is an evidence-grounded pipeline that converts PowerPoint presentations into narrated explainer videos. Every narrated claim is traceable to specific slide content — no hallucinations, no invented facts.
 
+### Try it in 60 seconds
+
+```bash
+git clone https://github.com/sachinkg12/SlideSherlock.git
+cd SlideSherlock
+cp .env.example .env          # Add OPENAI_API_KEY for AI narration (optional)
+docker compose up -d           # Start all 6 services
+curl http://localhost:8000/health   # → {"status": "ok"}
+```
+
+Then open http://localhost:8000/docs for the interactive API, or use the CLI:
+
+```bash
+slidesherlock run your_deck.pptx --preset draft -o output/
+open output/final.mp4
+```
+
+No Docker? Use SQLite mode: `DATABASE_URL=sqlite:///./slidesherlock.db slidesherlock run deck.pptx`
+
 ## Why SlideSherlock?
 
 Existing slide-to-video tools either read bullet points verbatim or hallucinate content that doesn't exist in the source material. SlideSherlock solves this with three novel mechanisms:
