@@ -16,8 +16,6 @@ Existing slide-to-video tools either read bullet points verbatim or hallucinate 
 
 3. **Dual-Provenance Knowledge Graph** — Two independent graphs are built per slide: **G_native** from PPT XML (shapes, connectors, groups) and **G_vision** from rendered PNGs + OCR. These merge into **G_unified** where each node carries provenance (NATIVE / VISION / BOTH), confidence scores, and `needs_review` flags.
 
-![No-Hallucination Design](docs/no_hallucination.gif)
-
 ## Features
 
 | Feature | Description |
@@ -114,6 +112,8 @@ class Stage(Protocol):
 | **Video** | `timeline_builder`, `overlay_renderer`, `composer` | `output/{variant}/final.mp4` |
 
 ## No-Hallucination Design
+
+![No-Hallucination Design](docs/no_hallucination.gif)
 
 Image claims must specifically cite `IMAGE_*` or `DIAGRAM_*` evidence kinds. The verifier enforces this — no generic claims about visual content without supporting vision evidence.
 
@@ -274,7 +274,7 @@ The stage registry in `apps/web/src/config/stages.ts` follows the Open/Closed Pr
 |---------|-------|----------|-----|
 | Vision (OpenAI) | Off | Off | **On** |
 | AI Narration | Off (orthogonal) | Off (orthogonal) | Off (orthogonal) |
-| Notes Overlay | Off | On | On |
+| Notes Overlay | Off | Off | Off |
 | Transitions | Cut | Crossfade | Crossfade |
 | Subtitles | Off | On (sidecar) | On (sidecar) |
 | Intro / Outro | Off | On | On |
@@ -292,7 +292,7 @@ SLIDESHERLOCK_PRESET=draft make worker      # Draft preset
 ## Testing
 
 ```bash
-make test               # 152 tests across core pipeline and API
+make test               # 167 tests across core pipeline and API
 make lint               # black --check + flake8 (max-line-length=100)
 make doctor             # Check LibreOffice, FFmpeg, Poppler, Tesseract
 ```
