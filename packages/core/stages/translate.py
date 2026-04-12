@@ -36,9 +36,9 @@ class TranslateStage:
         target_lang = variant.get("lang", "en-US")
         notes_translate = variant.get("notes_translate", False)
 
-        # Only runs for l2 variant with non-English target
-        if variant_id != "l2" or (not notes_translate and target_lang == "en-US"):
-            return StageResult(status="skipped", metrics={"reason": "not l2 or english"})
+        # Only runs for non-English variants (l2, l3, l4, ...)
+        if variant_id == "en" or target_lang.startswith("en"):
+            return StageResult(status="skipped", metrics={"reason": "english variant"})
 
         if not (
             get_translator_provider
