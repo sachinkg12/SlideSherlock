@@ -18,6 +18,25 @@ def _escape_srt_text(text: str) -> str:
     return (text or "").replace("\r\n", "\n").replace("\r", "\n").strip()
 
 
+def _split_into_sentences(text: str) -> list[str]:
+    """Split text into sentences. Simple rule-based splitter."""
+    import re
+
+    # Split on sentence-ending punctuation followed by a space or end of string
+    parts = re.split(r"(?<=[.!?])\s+", text.strip())
+    # Group into chunks of ~2 sentences for readable subtitle cues
+    cues = []
+    buf = []
+    for part in parts:
+        buf.append(part)
+        if len(buf) >= 2:
+            cues.append(" ".join(buf))
+            buf = []
+    if buf:
+        cues.append(" ".join(buf))
+    return cues if cues else [text]
+
+
 def generate_srt(
     per_slide_texts: list[str],
     per_slide_durations: list[float],
@@ -25,24 +44,28 @@ def generate_srt(
 ) -> str:
     """
     Generate SRT content from per-slide narration texts and durations.
-    per_slide_texts[i] = narration for slide i+1
-    per_slide_durations[i] = duration in seconds for slide i+1
-    offset_seconds = start offset (e.g. intro duration)
+    Splits each slide's narration into sentence-level cues (~2 sentences
+    per cue) evenly timed across the slide duration for Netflix-style
+    subtitle display.
     """
     lines: list[str] = []
     t = offset_seconds
-    for i, (text, dur) in enumerate(zip(per_slide_texts, per_slide_durations)):
+    cue_idx = 1
+    for text, dur in zip(per_slide_texts, per_slide_durations):
         if not text.strip():
             t += dur
             continue
-        start = t
-        end = t + dur
-        t = end
-        idx = i + 1
-        lines.append(str(idx))
-        lines.append(f"{_sec_to_srt_timestamp(start)} --> {_sec_to_srt_timestamp(end)}")
-        lines.append(_escape_srt_text(text))
-        lines.append("")
+        cues = _split_into_sentences(text)
+        cue_dur = dur / len(cues) if cues else dur
+        for cue_text in cues:
+            start = t
+            end = t + cue_dur
+            lines.append(str(cue_idx))
+            lines.append(f"{_sec_to_srt_timestamp(start)} --> {_sec_to_srt_timestamp(end)}")
+            lines.append(_escape_srt_text(cue_text))
+            lines.append("")
+            t = end
+            cue_idx += 1
     return "\n".join(lines).strip()
 
 

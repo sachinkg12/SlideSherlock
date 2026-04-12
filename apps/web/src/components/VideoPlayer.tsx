@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Play, Pause, Volume2, Volume1, VolumeX, Maximize } from 'lucide-react'
+import { Play, Pause, Volume2, Volume1, VolumeX, Maximize, Subtitles } from 'lucide-react'
 
 interface VideoPlayerProps {
   src: string
@@ -17,7 +17,30 @@ function VideoPlayer({ src, title, subtitlesSrc }: VideoPlayerProps) {
   const [showOverlay, setShowOverlay] = useState(true)
   const [progress, setProgress] = useState(0)
   const [duration, setDuration] = useState('0:00')
+  const [ccEnabled, setCcEnabled] = useState(false)
   const volumeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Toggle CC track visibility
+  const toggleCC = () => {
+    const v = videoRef.current
+    if (!v) return
+    const track = v.textTracks[0]
+    if (!track) return
+    const next = !ccEnabled
+    track.mode = next ? 'showing' : 'hidden'
+    setCcEnabled(next)
+  }
+
+  // Ensure track starts hidden
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    const onLoad = () => {
+      if (v.textTracks[0]) v.textTracks[0].mode = 'hidden'
+    }
+    v.addEventListener('loadedmetadata', onLoad)
+    return () => v.removeEventListener('loadedmetadata', onLoad)
+  }, [])
 
   const togglePlay = () => {
     const v = videoRef.current
@@ -159,7 +182,6 @@ function VideoPlayer({ src, title, subtitlesSrc }: VideoPlayerProps) {
               src={subtitlesSrc}
               srcLang="en"
               label="English"
-              default
             />
           )}
         </video>
@@ -274,6 +296,17 @@ function VideoPlayer({ src, title, subtitlesSrc }: VideoPlayerProps) {
             )}
           </AnimatePresence>
         </div>
+
+        {subtitlesSrc && (
+          <button
+            onClick={toggleCC}
+            className={`transition-colors ${ccEnabled ? 'text-indigo-400' : 'text-text-primary hover:text-indigo-400'}`}
+            aria-label={ccEnabled ? 'Disable subtitles' : 'Enable subtitles'}
+            title={ccEnabled ? 'Subtitles ON' : 'Subtitles OFF'}
+          >
+            <Subtitles className="h-5 w-5" />
+          </button>
+        )}
 
         <button
           onClick={handleFullscreen}
