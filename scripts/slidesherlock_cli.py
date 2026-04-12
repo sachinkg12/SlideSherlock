@@ -567,6 +567,26 @@ def cmd_run(args: argparse.Namespace) -> int:
                 "slides_total": paper_data["ai_narration"].get("slide_count", 0),
             }
 
+        # Generate evidence trail HTML report
+        if (
+            "evidence_index" in paper_data
+            and "coverage" in paper_data
+            and "verify_report" in paper_data
+        ):
+            try:
+                from evidence_report import generate_evidence_report
+
+                html = generate_evidence_report(
+                    paper_data["evidence_index"],
+                    paper_data["coverage"],
+                    paper_data["verify_report"],
+                )
+                report_path = os.path.join(output_dir, "evidence_report.html")
+                with open(report_path, "w") as f:
+                    f.write(html)
+            except Exception:
+                pass
+
         # Summary
         logger.summary(output_video)
         logger.write_log()
