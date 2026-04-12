@@ -1,0 +1,94 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "slidesherlock"
+version = "1.1.0"
+description = "Evidence-grounded presentation-to-video pipeline. Every claim is traceable — no hallucinations."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Sachin Gupta", email = "sachinkg12@gmail.com"},
+]
+keywords = ["presentation", "video", "narration", "evidence", "hallucination", "pipeline", "pptx"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: Linguistic",
+]
+dependencies = [
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.26",
+    "sqlalchemy>=2.0.23",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "pdf2image>=1.16.3",
+    "Pillow>=10.1.0",
+    "imageio>=2.31.0",
+    "imageio-ffmpeg>=0.4.8",
+    "numpy>=1.24.0",
+    "python-pptx>=0.6.23",
+    "pyttsx3>=2.90",
+    "requests>=2.28.0",
+]
+
+[project.optional-dependencies]
+docker = [
+    "psycopg2-binary>=2.9.9",
+    "alembic>=1.12.1",
+    "redis>=5.0.1",
+    "rq>=1.15.1",
+    "boto3>=1.29.7",
+]
+vision = [
+    "pytesseract>=0.3.10",
+    "openai>=1.0.0",
+]
+dev = [
+    "pytest>=7.4.3",
+    "black>=23.11.0",
+    "flake8>=6.1.0",
+]
+
+[project.scripts]
+slidesherlock = "scripts.slidesherlock_cli:main"
+
+[project.urls]
+Homepage = "https://github.com/sachinkg12/SlideSherlock"
+Documentation = "https://github.com/sachinkg12/SlideSherlock#readme"
+Repository = "https://github.com/sachinkg12/SlideSherlock"
+Issues = "https://github.com/sachinkg12/SlideSherlock/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["packages/core", "apps/api", "scripts"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "packages/",
+    "apps/",
+    "scripts/",
+    "alembic/",
+    "requirements.txt",
+    "README.md",
+    "LICENSE",
+    "CITATION.cff",
+    "SECURITY.md",
+    "CONTRIBUTING.md",
+]
+
+[tool.black]
+line-length = 100
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "E402", "E501", "W503"]
