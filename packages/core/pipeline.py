@@ -220,7 +220,7 @@ def run_pipeline(job_id: str):
         from database import SessionLocal  # type: ignore
         from models import Job, JobStatus, Artifact  # type: ignore
 
-    # Apply quality preset if SLIDESHERLOCK_PRESET is set
+    # Apply quality preset from env var OR job config
     try:
         from presets import get_current_preset, apply_preset
 
@@ -240,6 +240,20 @@ def run_pipeline(job_id: str):
         if not job:
             print(f"Job {job_id} not found")
             return
+
+        # Read preset from job.config_json (set by web UI / API)
+        # This overrides the env var preset if present.
+        try:
+            from presets import apply_preset as _apply
+
+            job_config = json.loads(job.config_json) if job.config_json else {}
+            job_preset = job_config.get("preset")
+            if job_preset:
+                _apply(job_preset)
+                os.environ["SLIDESHERLOCK_PRESET"] = job_preset
+                print(f"  Applied preset from job config: {job_preset}")
+        except Exception:
+            pass
 
         if not job.input_file_path:
             raise Exception("Job has no input file path")

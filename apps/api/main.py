@@ -624,6 +624,7 @@ async def quick_create_job(
     file: UploadFile = File(...),
     requested_language: str = None,
     ai_narration: bool = False,
+    preset: str = "draft",
     db: Session = Depends(get_db),
 ):
     """Combined create project + job + upload in one call."""
@@ -696,10 +697,12 @@ async def quick_create_job(
     db_job.updated_at = datetime.utcnow()
     db.commit()
 
-    # Store AI narration preference in job config_json (read by worker)
+    # Store preset + AI narration preference in job config_json (read by pipeline)
+    config = {"preset": preset}
     if ai_narration:
-        db_job.config_json = json.dumps({"llm_provider": "openai"})
-        db.commit()
+        config["llm_provider"] = "openai"
+    db_job.config_json = json.dumps(config)
+    db.commit()
 
     # Queue render stage
     if job_queue:

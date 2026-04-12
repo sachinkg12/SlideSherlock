@@ -56,9 +56,8 @@ export interface JobMetrics {
 export async function createQuickJob(file: File, preset: string, aiNarration: boolean = false): Promise<QuickJobResponse> {
   const form = new FormData()
   form.append('file', file)
-  form.append('preset', preset)
   const name = file.name.replace(/\.pptx$/i, '')
-  const params = new URLSearchParams({ name })
+  const params = new URLSearchParams({ name, preset })
   if (aiNarration) params.set('ai_narration', 'true')
   const res = await fetch(`${BASE}/jobs/quick?${params.toString()}`, {
     method: 'POST',
