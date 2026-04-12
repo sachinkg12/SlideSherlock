@@ -69,6 +69,21 @@ slidesherlock doctor --json                                   # Machine-readable
 
 Each CLI run produces `metrics.json` and `run_log.json` (structured log for experiment aggregation). Full runs also produce `final.mp4`. Use `--dry-run` for quick validation without video encode.
 
+### Local LLM (no API key needed)
+
+SlideSherlock supports 10 OpenAI-compatible LLM providers. To use [Ollama](https://ollama.com) for fully local operation:
+
+```bash
+# Install and start Ollama
+ollama pull llama3.1:8b        # text model for narration
+ollama pull llava:7b            # vision model for image understanding
+
+# Run SlideSherlock with Ollama
+LLM_PROVIDER=ollama slidesherlock run deck.pptx --preset pro --ai-narration
+```
+
+Other supported providers: OpenAI, Groq, Together, OpenRouter, DeepInfra, Anyscale, LM Studio, vLLM, LocalAI. See `packages/core/llm_config.py` for the full registry.
+
 ## Architecture
 
 ```
