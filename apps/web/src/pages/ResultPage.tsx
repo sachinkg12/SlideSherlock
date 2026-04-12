@@ -109,7 +109,7 @@ function ResultPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <VideoPlayer src={videoUrl} title={filename} />
+        <VideoPlayer src={videoUrl} title={filename} subtitlesSrc={videoUrl.replace('final.mp4', 'subtitles.vtt')} />
       </motion.div>
 
       {/* Download buttons */}

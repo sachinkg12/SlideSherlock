@@ -5,9 +5,10 @@ import { Play, Pause, Volume2, Volume1, VolumeX, Maximize } from 'lucide-react'
 interface VideoPlayerProps {
   src: string
   title: string
+  subtitlesSrc?: string
 }
 
-function VideoPlayer({ src, title }: VideoPlayerProps) {
+function VideoPlayer({ src, title, subtitlesSrc }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
@@ -150,7 +151,18 @@ function VideoPlayer({ src, title }: VideoPlayerProps) {
           playsInline
           preload="metadata"
           aria-label={`Video: ${title}`}
-        />
+          crossOrigin="anonymous"
+        >
+          {subtitlesSrc && (
+            <track
+              kind="subtitles"
+              src={subtitlesSrc}
+              srcLang="en"
+              label="English"
+              default
+            />
+          )}
+        </video>
 
         {/* Big play button overlay */}
         <AnimatePresence>

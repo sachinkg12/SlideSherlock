@@ -90,6 +90,10 @@ export function getVideoUrl(jobId: string): string {
   return `${BASE}/jobs/${jobId}/output/en/final.mp4`
 }
 
+export function getSubtitlesUrl(jobId: string): string {
+  return `${BASE}/jobs/${jobId}/output/en/subtitles.vtt`
+}
+
 export function getEvidenceReportUrl(jobId: string): string {
   return `${BASE}/jobs/${jobId}/output/evidence-report.json`
 }

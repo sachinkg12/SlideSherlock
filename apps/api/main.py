@@ -571,6 +571,29 @@ async def get_video(job_id: str, variant_id: str, request: Request):
     )
 
 
+@app.get("/jobs/{job_id}/output/{variant_id}/subtitles.vtt")
+async def get_subtitles_vtt(job_id: str, variant_id: str):
+    """Serve subtitles as WebVTT (converted from .srt) for HTML5 <track> element."""
+    minio_client = MinIOClient() if MinIOClient else None
+    if not minio_client:
+        raise HTTPException(status_code=500, detail="MinIO client not available")
+    srt_path = f"jobs/{job_id}/output/{variant_id}/final.srt"
+    try:
+        srt_data = minio_client.get(srt_path).decode("utf-8")
+    except Exception:
+        raise HTTPException(status_code=404, detail="Subtitles not found")
+    # Convert SRT → WebVTT (add header, replace comma with dot in timestamps)
+    vtt_lines = ["WEBVTT", ""]
+    for line in srt_data.strip().split("\n"):
+        vtt_lines.append(line.replace(",", ".") if "-->" in line else line)
+    vtt_content = "\n".join(vtt_lines)
+    return Response(
+        content=vtt_content,
+        media_type="text/vtt",
+        headers={"Content-Type": "text/vtt; charset=utf-8"},
+    )
+
+
 @app.get("/jobs/{job_id}/output/{file_path:path}")
 async def get_artifact(job_id: str, file_path: str):
     """Stream any output artifact from MinIO."""
