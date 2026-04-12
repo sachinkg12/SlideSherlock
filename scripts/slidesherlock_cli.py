@@ -314,6 +314,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         import tempfile
         from pipeline import (
             PipelineContext,
+            StageResult,
             _run_stage,
             SHARED_STAGES,
             PER_VARIANT_STAGES,
@@ -412,7 +413,20 @@ def cmd_run(args: argparse.Namespace) -> int:
                 print(f"  --- Variant: {variant_id} (lang={variant.get('lang')}) ---")
                 print()
 
+                # --dry-run: stop after verify (skip translate/narrate/audio/video)
+                dry_run_skip = (
+                    {"translate", "narrate", "audio", "video"}
+                    if getattr(args, "dry_run", False)
+                    else set()
+                )
+
                 for stage in PER_VARIANT_STAGES:
+                    if stage.name in dry_run_skip:
+                        logger.stage_start(stage.name)
+                        logger.stage_end(
+                            stage.name, StageResult(status="skipped", metrics={"reason": "dry-run"})
+                        )
+                        continue
                     stage_key = f"{stage.name}_{variant_id}"
                     logger.stage_start(stage.name)
                     result = _run_stage(stage, ctx)
@@ -655,6 +669,12 @@ def main() -> int:
         action="store_true",
         default=False,
         help="Enable AI narration (GPT-4o rewrite, requires OPENAI_API_KEY)",
+    )
+    run_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Run through verify stage then stop (no audio/video). Outputs metrics + evidence only.",
     )
     run_parser.set_defaults(func=cmd_run)
 
