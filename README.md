@@ -115,24 +115,6 @@ class Stage(Protocol):
 
 ## No-Hallucination Design
 
-```
-         ┌──────────────────────────────────────────────┐
-         │            Evidence Index                      │
-         │  SHA-256(job|slide|kind|offset) → source_ref  │
-         └──────────────────┬───────────────────────────┘
-                            │
-                            ▼
-┌──────────┐    ┌──────────────────┐    ┌───────────┐
-│  Script   │───▶│  Verifier Loop   │───▶│  Verified  │
-│ Generator │    │                  │    │  Script    │
-│           │◀───│ PASS → keep      │    │           │
-│ (claims   │    │ REWRITE → regen  │    │ (all claims│
-│  cite     │    │ REMOVE → drop    │    │  grounded) │
-│  evidence)│    │                  │    │           │
-└──────────┘    └──────────────────┘    └───────────┘
-                  max 3 iterations
-```
-
 Image claims must specifically cite `IMAGE_*` or `DIAGRAM_*` evidence kinds. The verifier enforces this — no generic claims about visual content without supporting vision evidence.
 
 ## AI Narration
