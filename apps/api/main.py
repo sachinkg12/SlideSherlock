@@ -49,10 +49,17 @@ app = FastAPI(title="SlideSherlock API", version="1.0.0")
 # Redis connection for RQ
 # Note: RQ works better with decode_responses=False for binary serialization
 try:
-    redis_conn = redis.Redis(host="localhost", port=6379, db=0, decode_responses=False)
-    redis_conn.ping()  # Test connection
+    redis_conn = redis.Redis(
+        host="localhost",
+        port=6379,
+        db=0,
+        decode_responses=False,
+        socket_connect_timeout=2,
+        socket_timeout=2,
+    )
+    redis_conn.ping()
     job_queue = Queue("jobs", connection=redis_conn)
-except redis.ConnectionError:
+except (redis.ConnectionError, redis.TimeoutError, OSError):
     print("Warning: Redis not available. Job queue disabled.")
     job_queue = None
 
