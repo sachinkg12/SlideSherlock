@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Play, Sparkles } from 'lucide-react'
+import { Play, Sparkles, Globe } from 'lucide-react'
 import DropZone from '../components/DropZone'
 import PresetCard from '../components/PresetCard'
 import GlowButton from '../components/GlowButton'
-import { createQuickJob } from '../api/client'
+import { createQuickJob, getLanguages, Language } from '../api/client'
 import { isDemoMode, startMockJob } from '../api/mock'
 
 type Preset = 'draft' | 'standard' | 'pro'
@@ -15,8 +15,14 @@ function UploadPage() {
   const [file, setFile] = useState<File | null>(null)
   const [preset, setPreset] = useState<Preset>('standard')
   const [aiNarration, setAiNarration] = useState(false)
+  const [language, setLanguage] = useState('en-US')
+  const [languages, setLanguages] = useState<Language[]>([{ name: 'English', code: 'en-US' }])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    getLanguages().then(setLanguages)
+  }, [])
 
   const handleSubmit = async () => {
     if (!file || isSubmitting) return
@@ -29,7 +35,7 @@ function UploadPage() {
         jobId = startMockJob(file.name)
       } else {
         try {
-          const result = await createQuickJob(file, preset, aiNarration)
+          const result = await createQuickJob(file, preset, aiNarration, language)
           jobId = result.job_id
         } catch {
           // Backend unreachable — enter demo mode
@@ -136,6 +142,36 @@ function UploadPage() {
             }`}
           />
         </button>
+      </motion.div>
+
+      {/* Language selector */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.24 }}
+        className="flex items-center justify-between rounded-2xl border border-border-subtle bg-surface px-5 py-4 backdrop-blur-xl"
+      >
+        <div className="flex items-center gap-3">
+          <Globe className={`h-5 w-5 ${language !== 'en-US' ? 'text-blue-400' : 'text-text-secondary'}`} />
+          <div>
+            <p className="text-base font-medium text-text-primary">Narration Language</p>
+            <p className="text-sm text-text-secondary">
+              {language === 'en-US' ? 'Default English narration' : 'Translates narration to selected language'}
+            </p>
+          </div>
+        </div>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="rounded-lg border border-border-subtle bg-[var(--color-bg)] px-3 py-2 text-sm text-text-primary focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          aria-label="Select narration language"
+        >
+          {languages.map((lang) => (
+            <option key={lang.code} value={lang.code}>
+              {lang.name}
+            </option>
+          ))}
+        </select>
       </motion.div>
 
       {/* Submit button */}

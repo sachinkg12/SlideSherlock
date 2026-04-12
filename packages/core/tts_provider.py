@@ -26,14 +26,69 @@ class TTSProvider(ABC):
 
 
 # Voice/lang mapping for system TTS (macOS say, espeak)
-# BCP-47 lang -> system voice/lang code. Extend for more languages.
+# BCP-47 lang -> system voice/lang code. Covers the top 15 languages
+# by internet users. macOS `say` supports all of these with neural voices.
 VOICE_LANG_MAP = {
     "en": "en_US",
     "en-US": "en_US",
     "en-GB": "en_GB",
+    "es": "es_ES",
+    "es-ES": "es_ES",
+    "es-MX": "es_MX",
+    "fr": "fr_FR",
+    "fr-FR": "fr_FR",
+    "de": "de_DE",
+    "de-DE": "de_DE",
+    "pt": "pt_BR",
+    "pt-BR": "pt_BR",
+    "pt-PT": "pt_PT",
+    "it": "it_IT",
+    "it-IT": "it_IT",
+    "zh": "zh_CN",
+    "zh-CN": "zh_CN",
+    "zh-TW": "zh_TW",
+    "ja": "ja_JP",
+    "ja-JP": "ja_JP",
+    "ko": "ko_KR",
+    "ko-KR": "ko_KR",
     "hi": "hi_IN",
     "hi-IN": "hi_IN",
+    "ar": "ar_SA",
+    "ar-SA": "ar_SA",
+    "tr": "tr_TR",
+    "tr-TR": "tr_TR",
+    "nl": "nl_NL",
+    "nl-NL": "nl_NL",
+    "pl": "pl_PL",
+    "pl-PL": "pl_PL",
+    "sv": "sv_SE",
+    "sv-SE": "sv_SE",
+    "ru": "ru_RU",
+    "ru-RU": "ru_RU",
+    "id": "id_ID",
+    "id-ID": "id_ID",
 }
+
+# Supported languages for UI dropdown (display name → BCP-47 code)
+SUPPORTED_LANGUAGES = [
+    ("English", "en-US"),
+    ("Spanish", "es-ES"),
+    ("French", "fr-FR"),
+    ("German", "de-DE"),
+    ("Portuguese (Brazil)", "pt-BR"),
+    ("Italian", "it-IT"),
+    ("Chinese (Mandarin)", "zh-CN"),
+    ("Japanese", "ja-JP"),
+    ("Korean", "ko-KR"),
+    ("Hindi", "hi-IN"),
+    ("Arabic", "ar-SA"),
+    ("Turkish", "tr-TR"),
+    ("Dutch", "nl-NL"),
+    ("Polish", "pl-PL"),
+    ("Swedish", "sv-SE"),
+    ("Russian", "ru-RU"),
+    ("Indonesian", "id-ID"),
+]
 
 
 class LocalTTSProvider(TTSProvider):

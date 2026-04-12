@@ -53,12 +53,28 @@ export interface JobMetrics {
   slide_count: number
 }
 
-export async function createQuickJob(file: File, preset: string, aiNarration: boolean = false): Promise<QuickJobResponse> {
+export interface Language {
+  name: string
+  code: string
+}
+
+export async function getLanguages(): Promise<Language[]> {
+  try {
+    const res = await fetch(`${BASE}/languages`)
+    if (!res.ok) return [{ name: 'English', code: 'en-US' }]
+    return res.json()
+  } catch {
+    return [{ name: 'English', code: 'en-US' }]
+  }
+}
+
+export async function createQuickJob(file: File, preset: string, aiNarration: boolean = false, language: string = 'en-US'): Promise<QuickJobResponse> {
   const form = new FormData()
   form.append('file', file)
   const name = file.name.replace(/\.pptx$/i, '')
   const params = new URLSearchParams({ name, preset })
   if (aiNarration) params.set('ai_narration', 'true')
+  if (language && language !== 'en-US') params.set('requested_language', language)
   const res = await fetch(`${BASE}/jobs/quick?${params.toString()}`, {
     method: 'POST',
     body: form,

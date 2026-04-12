@@ -46,6 +46,18 @@ init_db()
 
 app = FastAPI(title="SlideSherlock API", version="1.0.0")
 
+
+@app.get("/languages")
+async def list_languages():
+    """List supported languages for narration."""
+    try:
+        from tts_provider import SUPPORTED_LANGUAGES
+
+        return [{"name": name, "code": code} for name, code in SUPPORTED_LANGUAGES]
+    except ImportError:
+        return [{"name": "English", "code": "en-US"}]
+
+
 # Redis connection for RQ
 # Note: RQ works better with decode_responses=False for binary serialization
 try:
