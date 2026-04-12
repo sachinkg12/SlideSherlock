@@ -109,6 +109,24 @@ export function getSubtitlesUrl(jobId: string): string {
   return `${BASE}/jobs/${jobId}/output/en/subtitles.vtt`
 }
 
+export interface Variant {
+  id: string
+  lang: string
+  video_url: string
+  download_url: string
+  subtitles_url: string
+}
+
+export async function getVariants(jobId: string): Promise<Variant[]> {
+  try {
+    const res = await fetch(`${BASE}/jobs/${jobId}/variants`)
+    if (!res.ok) return []
+    return res.json()
+  } catch {
+    return []
+  }
+}
+
 export function getVideoDownloadUrl(jobId: string): string {
   return `${BASE}/jobs/${jobId}/output/en/final.mp4?download=1`
 }

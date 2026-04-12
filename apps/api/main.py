@@ -584,6 +584,78 @@ async def get_video(job_id: str, variant_id: str, request: Request, download: in
     return Response(content=data, media_type="video/mp4", headers=headers)
 
 
+@app.get("/jobs/{job_id}/variants")
+async def get_variants(job_id: str):
+    """List available language variants for a completed job."""
+    minio_client = MinIOClient() if MinIOClient else None
+    if not minio_client:
+        return [{"id": "en", "lang": "English"}]
+    # Scan for output/{variant_id}/final.mp4 in storage
+    try:
+        objs = minio_client.client.list_objects_v2(
+            Bucket=minio_client.bucket,
+            Prefix=f"jobs/{job_id}/output/",
+            Delimiter="/",
+        )
+        lang_names = {
+            "en": "English",
+            "l2": "Language 2",
+            "l3": "Language 3",
+            "l4": "Language 4",
+            "l5": "Language 5",
+            "l6": "Language 6",
+        }
+        # Try to get actual language names from manifest
+        try:
+            manifest = json.loads(
+                minio_client.get(f"jobs/{job_id}/render/manifest.json").decode("utf-8")
+            )
+            for v in manifest.get("output_variants", []):
+                lang_names[v["id"]] = v.get("lang", v["id"])
+        except Exception:
+            pass
+        variants = []
+        for prefix in objs.get("CommonPrefixes", []):
+            vid = prefix["Prefix"].rstrip("/").split("/")[-1]
+            # Check if final.mp4 exists for this variant
+            try:
+                minio_client.get(f"jobs/{job_id}/output/{vid}/final.mp4")
+                variants.append(
+                    {
+                        "id": vid,
+                        "lang": lang_names.get(vid, vid),
+                        "video_url": f"/jobs/{job_id}/output/{vid}/final.mp4",
+                        "download_url": f"/jobs/{job_id}/output/{vid}/final.mp4?download=1",
+                        "subtitles_url": f"/jobs/{job_id}/output/{vid}/subtitles.vtt",
+                    }
+                )
+            except Exception:
+                pass
+        return (
+            variants
+            if variants
+            else [
+                {
+                    "id": "en",
+                    "lang": "English",
+                    "video_url": f"/jobs/{job_id}/output/en/final.mp4",
+                    "download_url": f"/jobs/{job_id}/output/en/final.mp4?download=1",
+                    "subtitles_url": f"/jobs/{job_id}/output/en/subtitles.vtt",
+                }
+            ]
+        )
+    except Exception:
+        return [
+            {
+                "id": "en",
+                "lang": "English",
+                "video_url": f"/jobs/{job_id}/output/en/final.mp4",
+                "download_url": f"/jobs/{job_id}/output/en/final.mp4?download=1",
+                "subtitles_url": f"/jobs/{job_id}/output/en/subtitles.vtt",
+            }
+        ]
+
+
 @app.get("/jobs/{job_id}/evidence-report")
 async def get_evidence_report(job_id: str):
     """Generate and serve a self-contained HTML evidence trail report."""

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Download, ArrowLeft, FileText, AlertTriangle } from 'lucide-react'
+import { Download, ArrowLeft, FileText, AlertTriangle, Globe } from 'lucide-react'
 import VideoPlayer from '../components/VideoPlayer'
 import MetricBar from '../components/MetricBar'
 import GlowButton from '../components/GlowButton'
 import PipelineTrack from '../components/PipelineTrack'
-import { getMetrics, getProgress, getVideoUrl, getVideoDownloadUrl, getEvidenceReportUrl } from '../api/client'
+import { getMetrics, getProgress, getVideoUrl, getVideoDownloadUrl, getEvidenceReportUrl, getVariants, Variant } from '../api/client'
 import { isDemoMode, getMockMetrics, getMockProgress } from '../api/mock'
 import type { JobMetrics, JobProgress, StageProgress } from '../api/client'
 import { STAGE_REGISTRY } from '../config/stages'
@@ -16,6 +16,8 @@ function ResultPage() {
   const navigate = useNavigate()
   const [metrics, setMetrics] = useState<JobMetrics | null>(null)
   const [progress, setProgress] = useState<JobProgress | null>(null)
+  const [variants, setVariants] = useState<Variant[]>([])
+  const [activeVariant, setActiveVariant] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
   const demo = isDemoMode()
@@ -27,10 +29,11 @@ function ResultPage() {
       setProgress(getMockProgress() as JobProgress)
       return
     }
-    Promise.all([getMetrics(jobId), getProgress(jobId)])
-      .then(([m, p]) => {
+    Promise.all([getMetrics(jobId), getProgress(jobId), getVariants(jobId)])
+      .then(([m, p, v]) => {
         setMetrics(m)
         setProgress(p)
+        setVariants(v.length > 0 ? v : [])
       })
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load results')
@@ -64,9 +67,19 @@ function ResultPage() {
   }
 
   const filename = progress.filename ?? 'Presentation'
-  const videoUrl = getVideoUrl(jobId)
-  const downloadUrl = getVideoDownloadUrl(jobId)
   const evidenceUrl = getEvidenceReportUrl(jobId)
+
+  // Use variants if available, fallback to default English
+  const currentVariant = variants.length > 0 ? variants[activeVariant] : null
+  const videoSrc = currentVariant
+    ? `/api${currentVariant.video_url}`
+    : getVideoUrl(jobId)
+  const subtitlesSrc = currentVariant
+    ? `/api${currentVariant.subtitles_url}`
+    : getVideoUrl(jobId).replace('final.mp4', 'subtitles.vtt')
+  const downloadHref = currentVariant
+    ? `/api${currentVariant.download_url}`
+    : getVideoDownloadUrl(jobId)
 
   // Build all-done stages array for PipelineTrack
   const allDoneStages: StageProgress[] = (
@@ -100,17 +113,46 @@ function ResultPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-2xl font-bold text-text-primary sm:text-3xl"
       >
-        Your video is{' '}
-        <span className="gradient-text">ready</span>
+        {variants.length > 1 ? (
+          <>Your videos are <span className="gradient-text">ready</span></>
+        ) : (
+          <>Your video is <span className="gradient-text">ready</span></>
+        )}
       </motion.h1>
+
+      {/* Language tabs (only show if multiple variants) */}
+      {variants.length > 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="flex gap-2 flex-wrap"
+        >
+          {variants.map((v, i) => (
+            <button
+              key={v.id}
+              onClick={() => setActiveVariant(i)}
+              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                i === activeVariant
+                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/50'
+                  : 'bg-surface text-text-secondary border border-border-subtle hover:border-border-active'
+              }`}
+            >
+              <Globe className="h-4 w-4" />
+              {v.lang}
+            </button>
+          ))}
+        </motion.div>
+      )}
 
       {/* Video player */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
+        key={activeVariant}
       >
-        <VideoPlayer src={videoUrl} title={filename} subtitlesSrc={videoUrl.replace('final.mp4', 'subtitles.vtt')} />
+        <VideoPlayer src={videoSrc} title={`${filename} — ${currentVariant?.lang || 'English'}`} subtitlesSrc={subtitlesSrc} />
       </motion.div>
 
       {/* Download buttons */}
@@ -121,12 +163,12 @@ function ResultPage() {
         className="flex flex-col gap-4 sm:flex-row"
       >
         <a
-          href={downloadUrl}
+          href={downloadHref}
           download
           className="flex flex-1 items-center justify-center gap-3 rounded-2xl border border-border-subtle bg-surface px-6 py-4 text-lg font-medium text-text-primary backdrop-blur-xl transition-all duration-300 hover:border-border-active hover:bg-surface-hover"
         >
           <Download className="h-5 w-5 text-indigo-400" />
-          Download Video
+          Download {currentVariant?.lang || 'Video'}
         </a>
         <a
           href={evidenceUrl}
