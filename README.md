@@ -115,7 +115,7 @@ class Stage(Protocol):
 
 ![No-Hallucination Design](docs/no_hallucination.gif)
 
-Image claims must specifically cite `IMAGE_*` or `DIAGRAM_*` evidence kinds. The verifier enforces this — no generic claims about visual content without supporting vision evidence.
+The verifier checks every narration claim against the evidence index. Claims grounded in evidence **PASS**. Claims about visual content with low confidence get **REWRITE** (hedging language added, e.g., "appears to show"). Claims with no supporting evidence are **REMOVE**d — fabricated content is never narrated. The loop iterates until all claims converge.
 
 ## AI Narration
 
