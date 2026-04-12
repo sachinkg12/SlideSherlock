@@ -527,7 +527,7 @@ async def get_evidence_trail(job_id: str, limit: int = 50, db: Session = Depends
 
 
 @app.get("/jobs/{job_id}/output/{variant_id}/final.mp4")
-async def get_video(job_id: str, variant_id: str, request: Request):
+async def get_video(job_id: str, variant_id: str, request: Request, download: int = 0):
     """Stream the final video from MinIO with Range request support for seeking."""
     minio_client = MinIOClient() if MinIOClient else None
     if not minio_client:
@@ -561,12 +561,47 @@ async def get_video(job_id: str, variant_id: str, request: Request):
             },
         )
 
+    headers = {
+        "Accept-Ranges": "bytes",
+        "Content-Length": str(total),
+    }
+    if download:
+        headers["Content-Disposition"] = f'attachment; filename="slidesherlock_{job_id[:8]}.mp4"'
+    return Response(content=data, media_type="video/mp4", headers=headers)
+
+
+@app.get("/jobs/{job_id}/evidence-report")
+async def get_evidence_report(job_id: str):
+    """Generate and serve a self-contained HTML evidence trail report."""
+    minio_client = MinIOClient() if MinIOClient else None
+    if not minio_client:
+        raise HTTPException(status_code=500, detail="MinIO client not available")
+    try:
+        ei = json.loads(minio_client.get(f"jobs/{job_id}/evidence/index.json").decode("utf-8"))
+    except Exception:
+        raise HTTPException(status_code=404, detail="Evidence index not found")
+    # Find coverage + verify report (try multiple paths for variant)
+    cov = {}
+    vr = {}
+    for prefix in [f"jobs/{job_id}/script/en/", f"jobs/{job_id}/script/"]:
+        try:
+            cov = json.loads(minio_client.get(f"{prefix}coverage.json").decode("utf-8"))
+            vr = json.loads(minio_client.get(f"{prefix}verify_report.json").decode("utf-8"))
+            break
+        except Exception:
+            continue
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "packages", "core"))
+        from evidence_report import generate_evidence_report
+
+        html = generate_evidence_report(ei, cov, vr)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Report generation failed: {e}")
     return Response(
-        content=data,
-        media_type="video/mp4",
+        content=html,
+        media_type="text/html",
         headers={
-            "Accept-Ranges": "bytes",
-            "Content-Length": str(total),
+            "Content-Disposition": f'attachment; filename="evidence_report_{job_id[:8]}.html"',
         },
     )
 

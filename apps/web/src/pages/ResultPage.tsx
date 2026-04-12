@@ -6,7 +6,7 @@ import VideoPlayer from '../components/VideoPlayer'
 import MetricBar from '../components/MetricBar'
 import GlowButton from '../components/GlowButton'
 import PipelineTrack from '../components/PipelineTrack'
-import { getMetrics, getProgress, getVideoUrl, getEvidenceReportUrl } from '../api/client'
+import { getMetrics, getProgress, getVideoUrl, getVideoDownloadUrl, getEvidenceReportUrl } from '../api/client'
 import { isDemoMode, getMockMetrics, getMockProgress } from '../api/mock'
 import type { JobMetrics, JobProgress, StageProgress } from '../api/client'
 import { STAGE_REGISTRY } from '../config/stages'
@@ -65,6 +65,7 @@ function ResultPage() {
 
   const filename = progress.filename ?? 'Presentation'
   const videoUrl = getVideoUrl(jobId)
+  const downloadUrl = getVideoDownloadUrl(jobId)
   const evidenceUrl = getEvidenceReportUrl(jobId)
 
   // Build all-done stages array for PipelineTrack
@@ -120,7 +121,7 @@ function ResultPage() {
         className="flex flex-col gap-4 sm:flex-row"
       >
         <a
-          href={videoUrl}
+          href={downloadUrl}
           download
           className="flex flex-1 items-center justify-center gap-3 rounded-2xl border border-border-subtle bg-surface px-6 py-4 text-lg font-medium text-text-primary backdrop-blur-xl transition-all duration-300 hover:border-border-active hover:bg-surface-hover"
         >
