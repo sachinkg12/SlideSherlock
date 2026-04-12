@@ -16,6 +16,8 @@ Existing slide-to-video tools either read bullet points verbatim or hallucinate 
 
 3. **Dual-Provenance Knowledge Graph** — Two independent graphs are built per slide: **G_native** from PPT XML (shapes, connectors, groups) and **G_vision** from rendered PNGs + OCR. These merge into **G_unified** where each node carries provenance (NATIVE / VISION / BOTH), confidence scores, and `needs_review` flags.
 
+![No-Hallucination Design](docs/no_hallucination.gif)
+
 ## Features
 
 | Feature | Description |

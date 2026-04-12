@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SlideSherlock — No Hallucination Design</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0e1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'SF Pro Display', -apple-system, 'Segoe UI', sans-serif;
+}
+svg { width: 1200px; height: 620px; }
+.node-box { rx: 12; ry: 12; stroke-width: 2; }
+.label { font-size: 17px; font-weight: 700; fill: #ffffff; text-anchor: middle; dominant-baseline: central; letter-spacing: 0.3px; }
+.sub { font-size: 11.5px; fill: #e2e8f0; text-anchor: middle; dominant-baseline: central; }
+.section { font-size: 11px; font-weight: 700; fill: #94a3b8; letter-spacing: 1.5px; text-transform: uppercase; }
+
+@keyframes edgeGlow {
+  0%, 100% { stroke-opacity: 0.35; }
+  50% { stroke-opacity: 1; }
+}
+.eg { stroke-width: 3; fill: none; animation: edgeGlow 2.5s ease-in-out infinite; }
+
+@keyframes loopGlow {
+  0%, 100% { stroke-opacity: 0.25; }
+  50% { stroke-opacity: 1; }
+}
+.lg { animation: loopGlow 1.8s ease-in-out infinite; }
+
+@keyframes bp {
+  0%, 100% { r: 4; opacity: 0.5; }
+  50% { r: 7; opacity: 1; }
+}
+.pd { animation: bp 2s ease-in-out infinite; }
+
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gB" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#1a3d6e"/><stop offset="100%" style="stop-color:#2563eb"/></linearGradient>
+    <linearGradient id="gT" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#115e59"/><stop offset="100%" style="stop-color:#0d9488"/></linearGradient>
+    <linearGradient id="gO" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7c2d12"/><stop offset="100%" style="stop-color:#ea580c"/></linearGradient>
+    <linearGradient id="gV" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#7f1d1d"/><stop offset="100%" style="stop-color:#dc2626"/></linearGradient>
+    <linearGradient id="gP" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b0764"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient>
+    <linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#14532d"/><stop offset="100%" style="stop-color:#16a34a"/></linearGradient>
+    <linearGradient id="gY" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#422006"/><stop offset="100%" style="stop-color:#854d0e"/></linearGradient>
+
+    <marker id="aT" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L12 6L0 12z" fill="#2DD4A8"/></marker>
+    <marker id="aO" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L12 6L0 12z" fill="#FFB347"/></marker>
+    <marker id="aV" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L12 6L0 12z" fill="#FF6B35"/></marker>
+    <marker id="aG" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L12 6L0 12z" fill="#4ade80"/></marker>
+    <marker id="aY" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L12 6L0 12z" fill="#FFE066"/></marker>
+    <marker id="aB" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L12 6L0 12z" fill="#4DA6FF"/></marker>
+
+    <filter id="pg"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <!-- BG -->
+  <rect width="1200" height="620" fill="#0a0e1a"/>
+  <g opacity="0.03"><pattern id="gr" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0L0 0 0 40" fill="none" stroke="#fff" stroke-width="0.5"/></pattern><rect width="1200" height="620" fill="url(#gr)"/></g>
+
+  <!-- Title -->
+  <text x="600" y="42" text-anchor="middle" fill="#f1f5f9" font-size="24" font-weight="700" letter-spacing="1px">No-Hallucination Design</text>
+  <text x="600" y="66" text-anchor="middle" fill="#94a3b8" font-size="13">Every claim is traceable to source evidence — no invented facts</text>
+
+  <!-- ===== MAIN FLOW: left to right, single row ===== -->
+
+  <!-- 1. Slide Content -->
+  <rect class="node-box" x="50" y="140" width="160" height="60" fill="url(#gB)" stroke="#4DA6FF"/>
+  <text class="label" x="130" y="163">Slide Content</text>
+  <text class="sub" x="130" y="183">text, shapes, images, notes</text>
+
+  <!-- Edge 1→2 -->
+  <line class="eg" x1="210" y1="170" x2="278" y2="170" stroke="#4DA6FF" marker-end="url(#aT)" style="animation-delay:0s"/>
+  <circle r="4" fill="#4DA6FF" filter="url(#pg)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M210,170 L278,170" begin="0s"/>
+    <animate attributeName="opacity" values="0;1;1;0" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 2. Evidence Index -->
+  <rect class="node-box" x="280" y="130" width="200" height="80" fill="url(#gT)" stroke="#2DD4A8"/>
+  <text class="label" x="380" y="155">Evidence Index</text>
+  <text x="380" y="175" text-anchor="middle" fill="#5eead4" font-size="11.5" font-weight="500">SHA-256 hashed IDs</text>
+  <text x="380" y="195" text-anchor="middle" fill="#94a3b8" font-size="12">8 evidence kinds per slide</text>
+
+  <!-- Edge 2→3 -->
+  <line class="eg" x1="480" y1="170" x2="548" y2="170" stroke="#2DD4A8" marker-end="url(#aO)" style="animation-delay:0.5s"/>
+  <circle r="4" fill="#2DD4A8" filter="url(#pg)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M480,170 L548,170" begin="0.5s"/>
+    <animate attributeName="opacity" values="0;1;1;0" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+  </circle>
+
+  <!-- 3. Script Generator -->
+  <rect class="node-box" x="550" y="140" width="180" height="60" fill="url(#gO)" stroke="#FFB347"/>
+  <text class="label" x="640" y="163">Script Generator</text>
+  <text class="sub" x="640" y="183">claims must cite evidence_ids</text>
+
+  <!-- Edge 3→4 -->
+  <line class="eg" x1="730" y1="170" x2="798" y2="170" stroke="#FFB347" marker-end="url(#aV)" style="animation-delay:1s"/>
+  <circle r="4" fill="#FFB347" filter="url(#pg)">
+    <animateMotion dur="1.5s" repeatCount="indefinite" path="M730,170 L798,170" begin="1s"/>
+    <animate attributeName="opacity" values="0;1;1;0" dur="1.5s" repeatCount="indefinite" begin="1s"/>
+  </circle>
+
+  <!-- 4. Verifier -->
+  <rect class="node-box" x="800" y="140" width="160" height="60" fill="url(#gV)" stroke="#FF6B35"/>
+  <text class="label" x="880" y="163">Verifier</text>
+  <text class="sub" x="880" y="183">check claim ↔ evidence</text>
+
+  <!-- Edge: Evidence → Verifier (cross-check, below main flow) -->
+  <path d="M 380,210 L 380,240 L 880,240 L 880,200" class="eg" stroke="#2DD4A8" stroke-dasharray="6,3" marker-end="url(#aT)" style="animation-delay:1.3s" stroke-opacity="0.5"/>
+  <circle r="3" fill="#2DD4A8" filter="url(#pg)" opacity="0.6">
+    <animateMotion dur="3s" repeatCount="indefinite" path="M380,210 L380,240 L880,240 L880,200" begin="1.3s"/>
+    <animate attributeName="opacity" values="0;0.7;0.7;0" dur="3s" repeatCount="indefinite" begin="1.3s"/>
+  </circle>
+  <text x="630" y="255" text-anchor="middle" fill="#5eead4" font-size="12" font-weight="500">verifier cross-checks claims against evidence index</text>
+
+  <!-- ===== VERDICTS: fan out right from Verifier ===== -->
+  <!-- Edge 4→PASS -->
+  <line class="eg" x1="960" y1="155" x2="1018" y2="130" stroke="#4ade80" marker-end="url(#aG)" style="animation-delay:1.5s"/>
+
+  <!-- Edge 4→REWRITE -->
+  <line class="eg" x1="960" y1="170" x2="1018" y2="170" stroke="#FFE066" marker-end="url(#aY)" style="animation-delay:1.7s"/>
+
+  <!-- Edge 4→REMOVE -->
+  <line class="eg" x1="960" y1="185" x2="1018" y2="210" stroke="#666" style="animation-delay:1.9s"/>
+
+  <!-- PASS -->
+  <rect class="node-box" x="1020" y="105" width="120" height="48" fill="url(#gG)" stroke="#4ade80"/>
+  <text x="1080" y="123" text-anchor="middle" fill="#f1f5f9" font-size="16" font-weight="700">PASS &#10003;</text>
+  <text x="1080" y="142" text-anchor="middle" fill="#86efac" font-size="11">claim grounded</text>
+
+  <!-- REWRITE -->
+  <rect class="node-box" x="1020" y="165" width="120" height="48" fill="url(#gY)" stroke="#FFE066"/>
+  <text x="1080" y="183" text-anchor="middle" fill="#f1f5f9" font-size="16" font-weight="700">REWRITE</text>
+  <text x="1080" y="202" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="600">add hedging</text>
+
+  <!-- REMOVE -->
+  <rect class="node-box" x="1020" y="225" width="120" height="48" fill="#1e1215" stroke="#555"/>
+  <text x="1080" y="243" text-anchor="middle" fill="#94a3b8" font-size="16" font-weight="700">REMOVE &#10005;</text>
+  <text x="1080" y="262" text-anchor="middle" fill="#64748b" font-size="11">hallucination</text>
+
+  <!-- ===== REWRITE LOOP: clean arc below, back to Script Generator ===== -->
+  <path d="M 1080,213 L 1080,310 Q 860,340 640,310 L 640,200" fill="none" stroke="#FFE066" stroke-width="2.5" stroke-dasharray="5,3" class="lg" marker-end="url(#aO)"/>
+  <circle r="4.5" fill="#FFE066" filter="url(#pg)">
+    <animateMotion dur="3s" repeatCount="indefinite" path="M1080,213 L1080,310 Q860,340 640,310 L640,200" begin="0s"/>
+    <animate attributeName="opacity" values="0;1;1;0" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <text x="860" y="330" text-anchor="middle" fill="#fde68a" font-size="11.5" font-weight="600">regenerate with hedging</text>
+
+  <!-- ===== EXAMPLES: 3 cards, taller, better spacing ===== -->
+  <line x1="50" y1="380" x2="1150" y2="380" stroke="#1e293b"/>
+  <text class="section" x="50" y="405">Example: How the verifier handles 3 claims</text>
+
+  <!-- PASS example -->
+  <rect x="50" y="418" width="340" height="80" rx="10" fill="#0f1d15" stroke="#4ade80" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="70" y="439" fill="#4ade80" font-size="14" font-weight="700">PASS &#10003;</text>
+  <text x="70" y="458" fill="#e2e8f0" font-size="11.5">"Revenue grew 23% YoY"</text>
+  <text x="70" y="476" fill="#94a3b8" font-size="10">cited: TEXT_SPAN (notes, conf: 1.0)</text>
+  <text x="70" y="491" fill="#94a3b8" font-size="10">cited: SHAPE_LABEL ("Revenue Chart")</text>
+
+  <!-- REWRITE example -->
+  <rect x="420" y="418" width="340" height="80" rx="10" fill="#1a1606" stroke="#FFE066" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="440" y="439" fill="#FFE066" font-size="14" font-weight="700">REWRITE</text>
+  <text x="440" y="458" fill="#e2e8f0" font-size="11.5">"The diagram shows three actors"</text>
+  <text x="440" y="476" fill="#94a3b8" font-size="10">cited: DIAGRAM_ENTITIES (conf: 0.85)</text>
+  <text x="440" y="491" fill="#fde68a" font-size="10">&#8594; "The diagram appears to show three actors"</text>
+
+  <!-- REMOVE example -->
+  <rect x="790" y="418" width="340" height="80" rx="10" fill="#1a1215" stroke="#555" stroke-width="1" stroke-opacity="0.3"/>
+  <text x="810" y="439" fill="#94a3b8" font-size="14" font-weight="700">REMOVE &#10005;</text>
+  <text x="810" y="458" fill="#e2e8f0" font-size="11.5" text-decoration="line-through">"This shows a 15% increase"</text>
+  <text x="810" y="476" fill="#94a3b8" font-size="10">no evidence_id found — fabricated</text>
+  <text x="810" y="491" fill="#ef4444" font-size="10">hallucination blocked</text>
+
+  <!-- ===== KEY PROPERTIES: single line ===== -->
+  <line x1="50" y1="525" x2="1150" y2="525" stroke="#1e293b"/>
+
+  <g transform="translate(160,560)">
+    <rect x="-100" y="-20" width="200" height="40" rx="8" fill="#1e293b" stroke="#2DD4A8" stroke-opacity="0.4"/>
+    <text x="0" y="-2" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="600">Content-Addressable</text>
+    <text x="0" y="14" text-anchor="middle" fill="#94a3b8" font-size="10">SHA-256 IDs — deterministic across reruns</text>
+  </g>
+  <g transform="translate(430,560)">
+    <rect x="-100" y="-20" width="200" height="40" rx="8" fill="#1e293b" stroke="#FFB347" stroke-opacity="0.4"/>
+    <text x="0" y="-2" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="600">Inline Verification</text>
+    <text x="0" y="14" text-anchor="middle" fill="#94a3b8" font-size="10">verified during generation, not post-hoc</text>
+  </g>
+  <g transform="translate(700,560)">
+    <rect x="-100" y="-20" width="200" height="40" rx="8" fill="#1e293b" stroke="#FF6B35" stroke-opacity="0.4"/>
+    <text x="0" y="-2" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="600">Iterative Convergence</text>
+    <text x="0" y="14" text-anchor="middle" fill="#94a3b8" font-size="10">generate &#8594; verify &#8594; regenerate until pass</text>
+  </g>
+  <g transform="translate(970,560)">
+    <rect x="-100" y="-20" width="200" height="40" rx="8" fill="#1e293b" stroke="#4ade80" stroke-opacity="0.4"/>
+    <text x="0" y="-2" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="600">Confidence-Aware</text>
+    <text x="0" y="14" text-anchor="middle" fill="#94a3b8" font-size="10">low-conf vision claims get hedging language</text>
+  </g>
+
+  <!-- Stats -->
+  <text x="600" y="610" text-anchor="middle" fill="#334155" font-size="10" letter-spacing="2px">CLOSED-LOOP CONTROL — GENERATE &#8594; VERIFY &#8594; REGENERATE UNTIL CONVERGENCE</text>
+
+</svg>
+</body>
+</html>
