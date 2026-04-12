@@ -12,6 +12,8 @@ __pycache__/
 htmlcov/
 *.mp4
 *.png
+!docs/*.png
+!docs/*.gif
 *.jpg
 *.jpeg
 .vscode/

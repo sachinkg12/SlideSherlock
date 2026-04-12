@@ -86,29 +86,7 @@ Other supported providers: OpenAI, Groq, Together, OpenRouter, DeepInfra, Anysca
 
 ## Architecture
 
-```
-PPTX
- │
- ▼
-┌─────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
-│  Ingest  │──▶│ Evidence  │──▶│  Render  │──▶│  Graph   │   Shared stages
-│ parse    │   │ index     │   │ PDF→PNG  │   │ native + │   (run once)
-│ extract  │   │ photo/diag│   │          │   │ vision + │
-└─────────┘   └──────────┘   └──────────┘   │ merge    │
-                                             └────┬─────┘
-                                                  │
-                    ┌─────────────────────────────┘
-                    ▼  (per language variant)
-┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐
-│  Script  │─▶│  Verify  │─▶│Translate │─▶│ Narrate  │─▶│  Audio   │─▶│  Video   │
-│ generate │  │ PASS/    │  │ (l2 only)│  │ AI rewrite│  │ TTS +   │  │ timeline │
-│ + context│  │ REWRITE/ │  │          │  │ (optional)│  │ align   │  │ compose  │
-│          │  │ REMOVE   │  │          │  │          │  │         │  │          │
-└──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘
-                                                                            │
-                                                                            ▼
-                                                                       final.mp4
-```
+![SlideSherlock Pipeline Architecture](docs/architecture.gif)
 
 The pipeline follows the **Open/Closed Principle**: each stage implements a `Stage` protocol. Adding a new stage requires no changes to existing code — just add a class and register it.
 
