@@ -418,8 +418,10 @@ async def get_job_progress(job_id: str, db: Session = Depends(get_db)):
     }
     ui_status = status_map.get(job.status.value, "running")
 
-    # If video stage is done, the job is done regardless of DB status
-    if "video" in completed_base:
+    # Only report done when the pipeline has actually finished (DB status = DONE).
+    # Don't use video artifact presence — with multi-language variants, the first
+    # variant's video completes while others are still processing.
+    if job.status.value == "DONE":
         ui_status = "done"
         pct = 100
 
