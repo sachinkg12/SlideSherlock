@@ -26,7 +26,7 @@ def test_get_preset_env_vars_draft():
     assert env.get("AUDIO_BGM_ENABLED") == "0"
     assert env.get("VIDEO_TRANSITION") == "cut"
     assert env.get("ON_SCREEN_NOTES_ENABLED") == "0"
-    assert env.get("SUBTITLES_ENABLED") == "0"
+    assert env.get("SUBTITLES_ENABLED") == "1"
 
 
 def test_get_preset_env_vars_standard():

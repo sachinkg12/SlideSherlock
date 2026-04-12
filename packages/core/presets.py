@@ -21,7 +21,7 @@ PRESET_ENV_VARS: Dict[str, Dict[str, str]] = {
         "AUDIO_BGM_ENABLED": "0",
         "VIDEO_TRANSITION": "cut",
         "ON_SCREEN_NOTES_ENABLED": "0",  # Disabled: covers slide content, 16× slower video encode
-        "SUBTITLES_ENABLED": "0",
+        "SUBTITLES_ENABLED": "1",  # .srt sidecar for CC in web player (zero perf cost)
         "VIDEO_INTRO_ENABLED": "0",
         "VIDEO_OUTRO_ENABLED": "0",
         "AUDIO_LOUDNESS_NORMALIZE": "0",

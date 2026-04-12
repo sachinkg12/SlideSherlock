@@ -295,7 +295,7 @@ The stage registry in `apps/web/src/config/stages.ts` follows the Open/Closed Pr
 | AI Narration | Off (orthogonal) | Off (orthogonal) | Off (orthogonal) |
 | Notes Overlay | Off | Off | Off |
 | Transitions | Cut | Crossfade | Crossfade |
-| Subtitles | Off | On (sidecar) | On (sidecar) |
+| Subtitles | On (sidecar) | On (sidecar) | On (sidecar) |
 | Intro / Outro | Off | On | On |
 | Background Music | Off | Off | On (ducked under narration) |
 | Loudness Normalization | Off | EBU R128 | EBU R128 |
