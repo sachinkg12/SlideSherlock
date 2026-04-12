@@ -28,7 +28,7 @@ Existing slide-to-video tools either read bullet points verbatim or hallucinate 
 | **Web UI** | React Mission Control dashboard: pipeline track, focus panel, activity feed, dark/light theme, color-blind safe |
 | **CLI** | `slidesherlock run deck.pptx --preset pro --ai-narration` with structured JSON logging for experiments |
 | **Docker** | `docker compose up` &mdash; one command for the full 6-service stack |
-| **152 Tests** | Automated test suite covering evidence grounding, verification, graph fusion, and pipeline stages |
+| **167 Tests** | Automated test suite covering evidence grounding, verification, graph fusion, and pipeline stages |
 
 ## Quick Start
 
@@ -42,6 +42,7 @@ docker compose up           # Starts API, worker, Postgres, Redis, MinIO, pgAdmi
 ```
 
 - **API**: http://localhost:8000
+- **API Docs** (interactive): http://localhost:8000/docs (Swagger UI) or http://localhost:8000/redoc (ReDoc)
 - **Web UI**: http://localhost:3000 (if running `pnpm dev` in `apps/web/`)
 
 ### Local Development
@@ -61,11 +62,12 @@ slidesherlock run deck.pptx                                  # Draft preset, out
 slidesherlock run deck.pptx --preset pro -o results/         # Pro preset, custom output
 slidesherlock run deck.pptx --preset pro --ai-narration      # Enable GPT-4o narration rewrite
 slidesherlock run deck.pptx --preset standard --lang hi-IN   # Add Hindi second-language variant
+slidesherlock run deck.pptx --preset pro --dry-run             # Metrics only, no audio/video
 slidesherlock doctor                                          # Check system dependencies
 slidesherlock doctor --json                                   # Machine-readable JSON output
 ```
 
-Each CLI run produces `final.mp4`, `metrics.json`, and `run_log.json` (structured log for experiment aggregation).
+Each CLI run produces `metrics.json` and `run_log.json` (structured log for experiment aggregation). Full runs also produce `final.mp4`. Use `--dry-run` for quick validation without video encode.
 
 ## Architecture
 
