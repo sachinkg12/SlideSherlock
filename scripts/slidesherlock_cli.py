@@ -682,7 +682,10 @@ def main() -> int:
         help="Output directory (default: ./output)",
     )
     run_parser.add_argument(
-        "--lang", "-l", default=None, help="Add a second language variant (e.g. hi-IN)"
+        "--lang",
+        "-l",
+        default=None,
+        help="Add language variants, comma-separated (e.g. hi-IN or hi-IN,es-ES,fr-FR)",
     )
     run_parser.add_argument(
         "--ai-narration",

@@ -11,19 +11,30 @@ def build_output_variants(requested_language: Optional[str] = None) -> List[Dict
     """
     Build output_variants for manifest.
     Default: [{"id":"en","lang":"en-US","voice_id":"default_en","notes_translate":false}]
-    With requested_language (e.g. hi-IN): add second variant l2.
+
+    requested_language can be:
+    - Single language: "hi-IN"
+    - Comma-separated: "hi-IN,es-ES,fr-FR"
+    - None: English only
+
+    Each additional language gets its own variant (l2, l3, l4, ...) that
+    runs translate → verify → narrate → audio → video independently.
     """
     variants: List[Dict[str, Any]] = [
         {"id": "en", "lang": "en-US", "voice_id": "default_en", "notes_translate": False},
     ]
-    if requested_language and (requested_language or "").strip():
-        lang = requested_language.strip()
-        # Map lang to variant id (e.g. hi-IN -> l2)
+    if not requested_language or not requested_language.strip():
+        return variants
+
+    langs = [lang_code.strip() for lang_code in requested_language.split(",") if lang_code.strip()]
+    for i, lang in enumerate(langs):
+        variant_id = f"l{i + 2}"  # l2, l3, l4, ...
+        lang_base = lang.split("-")[0] if "-" in lang else lang
         variants.append(
             {
-                "id": "l2",
+                "id": variant_id,
                 "lang": lang,
-                "voice_id": f"default_{lang.split('-')[0]}" if "-" in lang else "default_l2",
+                "voice_id": f"default_{lang_base}",
                 "notes_translate": True,
             }
         )
