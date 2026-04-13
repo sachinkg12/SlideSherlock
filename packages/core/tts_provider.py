@@ -193,15 +193,19 @@ class LocalTTSProvider(TTSProvider):
         if not text:
             self._write_silence(output_path, 0.5, sample_rate)
             return 0.5
-        engine = self._get_engine()
-        if engine:
-            try:
-                engine.save_to_file(text, output_path)
-                engine.runAndWait()
-                dur = self._get_duration_seconds(output_path)
-                return dur if dur and dur > 0 else 2.0
-            finally:
-                self._engine = None
+        # USE_SYSTEM_TTS=true → skip pyttsx3, go straight to macOS say / espeak.
+        # pyttsx3 doesn't handle non-English languages well (produces stuttered audio).
+        use_system = os.environ.get("USE_SYSTEM_TTS", "").strip().lower() in ("1", "true", "yes")
+        if not use_system:
+            engine = self._get_engine()
+            if engine:
+                try:
+                    engine.save_to_file(text, output_path)
+                    engine.runAndWait()
+                    dur = self._get_duration_seconds(output_path)
+                    return dur if dur and dur > 0 else 2.0
+                finally:
+                    self._engine = None
         return self._synthesize_say(output_path, text, sample_rate)
 
     def _get_duration_seconds(self, path: str) -> Optional[float]:
