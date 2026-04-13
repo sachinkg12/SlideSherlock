@@ -72,6 +72,11 @@ function UploadPage() {
       transition={{ duration: 0.3 }}
       className="flex flex-col gap-8 pt-8 sm:pt-16"
     >
+      {/* Privacy disclaimer */}
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-300">
+        Uploaded files are automatically deleted after 30 minutes. Do not upload sensitive or confidential material.
+      </div>
+
       {/* Hero area */}
       <div className="text-center">
         <motion.h1

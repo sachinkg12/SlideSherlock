@@ -58,6 +58,10 @@ export interface Language {
   code: string
 }
 
+export async function deleteJob(jobId: string): Promise<void> {
+  await fetch(`${BASE}/jobs/${jobId}`, { method: 'DELETE' })
+}
+
 export async function getLanguages(): Promise<Language[]> {
   try {
     const res = await fetch(`${BASE}/languages`)

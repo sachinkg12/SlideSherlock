@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Download, ArrowLeft, FileText, AlertTriangle, Globe } from 'lucide-react'
+import { Download, ArrowLeft, FileText, AlertTriangle, Globe, Trash2 } from 'lucide-react'
 import VideoPlayer from '../components/VideoPlayer'
 import MetricBar from '../components/MetricBar'
 import GlowButton from '../components/GlowButton'
 import PipelineTrack from '../components/PipelineTrack'
-import { getMetrics, getProgress, getVideoUrl, getVideoDownloadUrl, getEvidenceReportUrl, getVariants, Variant } from '../api/client'
+import { getMetrics, getProgress, getVideoUrl, getVideoDownloadUrl, getEvidenceReportUrl, getVariants, deleteJob, Variant } from '../api/client'
 import { isDemoMode, getMockMetrics, getMockProgress } from '../api/mock'
 import type { JobMetrics, JobProgress, StageProgress } from '../api/client'
 import { STAGE_REGISTRY } from '../config/stages'
@@ -231,16 +231,31 @@ function ResultPage() {
         </div>
       </motion.div>
 
-      {/* Back to upload */}
+      {/* Back + Delete */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
+        className="flex flex-col gap-4 sm:flex-row"
       >
         <GlowButton variant="secondary" onClick={() => navigate('/')}>
           <ArrowLeft className="h-5 w-5" />
           Transform another presentation
         </GlowButton>
+        {!demo && (
+          <button
+            onClick={async () => {
+              if (confirm('Delete this job and all its files? This cannot be undone.')) {
+                await deleteJob(jobId)
+                navigate('/')
+              }
+            }}
+            className="flex items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-6 py-3 text-base font-medium text-red-400 transition-all hover:bg-red-500/20"
+          >
+            <Trash2 className="h-5 w-5" />
+            Delete my data
+          </button>
+        )}
       </motion.div>
     </motion.div>
   )

@@ -89,6 +89,34 @@ async def health():
     return {"status": "ok"}
 
 
+@app.delete("/jobs/{job_id}")
+async def delete_job(job_id: str, db: Session = Depends(get_db)):
+    """Delete a job and all its artifacts from storage."""
+    job = db.query(Job).filter(Job.job_id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Delete all artifacts from storage
+    minio_client = MinIOClient() if MinIOClient else None
+    if minio_client:
+        try:
+            objs = minio_client.client.list_objects_v2(
+                Bucket=minio_client.bucket,
+                Prefix=f"jobs/{job_id}/",
+            )
+            for obj in objs.get("Contents", []):
+                minio_client.delete(obj["Key"])
+        except Exception:
+            pass
+
+    # Delete DB records
+    for artifact in db.query(Artifact).filter(Artifact.job_id == job_id).all():
+        db.delete(artifact)
+    db.delete(job)
+    db.commit()
+    return {"status": "deleted", "job_id": job_id}
+
+
 @app.post("/projects", response_model=ProjectResponse)
 async def create_project(project: ProjectCreate, db: Session = Depends(get_db)):
     """Create a new project"""
