@@ -58,9 +58,14 @@ class NarrateStage:
 
         variant = ctx.variant or {}
         variant_id = variant.get("id", "en")
-        verified_script = ctx.verified_script
+        # Use translated script if available (set by TranslateStage for non-English variants),
+        # otherwise fall back to the verified English script.
+        verified_script = ctx.script_for_downstream or ctx.verified_script
 
-        _log(f"variant={variant_id}, verified_script={'present' if verified_script else 'MISSING'}")
+        _log(
+            f"variant={variant_id}, verified_script={'present' if verified_script else 'MISSING'}"
+            f", using={'translated' if ctx.script_for_downstream else 'original'}"
+        )
         if verified_script:
             seg_count = len(verified_script.get("segments", []))
             _log(f"verified_script has {seg_count} segments")
