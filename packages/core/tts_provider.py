@@ -261,7 +261,8 @@ class LocalTTSProvider(TTSProvider):
                 )
                 if lang_code and lang_code != "en_US":
                     cmd.extend(["-l", lang_code.replace("_", "-")])
-                if self.voice_id and self.voice_id != "default":
+                # Only use explicit voice name if it's a real voice (not "default_xx" placeholder)
+                if self.voice_id and not self.voice_id.startswith("default"):
                     cmd.extend(["-v", self.voice_id])
                 cmd.append(text)
                 subprocess.run(cmd, check=True, capture_output=True, timeout=30)
