@@ -289,7 +289,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         db.add(project)
         db.flush()
 
-        job = Job(project_id=project.project_id, status="QUEUED")
+        job = Job(
+            project_id=project.project_id,
+            status="QUEUED",
+            requested_language=getattr(args, "lang", None),
+        )
         db.add(job)
         db.flush()
         job_id = job.job_id
