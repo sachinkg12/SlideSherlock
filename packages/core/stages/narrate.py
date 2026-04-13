@@ -131,6 +131,15 @@ class NarrateStage:
         rewritten_entries = []
         success_count = 0
 
+        target_lang = variant.get("lang", "en-US")
+        lang_instruction = ""
+        if target_lang and not target_lang.startswith("en"):
+            lang_instruction = (
+                f"\n9. IMPORTANT: Output the narration in {target_lang} language. "
+                f"The template text may already be translated — preserve that language. "
+                f"Do NOT translate back to English."
+            )
+
         system_prompt = (
             "You are a professional presenter narrating a slideshow to a live audience. "
             "For each slide, you receive:\n"
@@ -148,6 +157,7 @@ class NarrateStage:
             "6. Be concise: 2-5 natural sentences. No filler words.\n"
             "7. Vary your openings — don't start every slide with 'This slide' or 'Here we see'\n"
             "8. Output ONLY the narration text. No labels, no slide numbers, no meta-commentary."
+            + lang_instruction
         )
 
         # Build prompts for each slide
