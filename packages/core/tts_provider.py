@@ -249,6 +249,57 @@ class LocalTTSProvider(TTSProvider):
             with open(path, "wb") as f:
                 f.write(b"\x00" * int(sample_rate * duration_sec * 2))
 
+    # macOS voice name per language code (say -v VoiceName)
+    _MACOS_VOICES = {
+        "en_US": "Samantha",
+        "en_GB": "Daniel",
+        "en_AU": "Karen",
+        "en_IN": "Rishi",
+        "es_ES": "Mónica",
+        "es_MX": "Paulina",
+        "fr_FR": "Thomas",
+        "fr_CA": "Amélie",
+        "de_DE": "Anna",
+        "pt_BR": "Luciana",
+        "pt_PT": "Joana",
+        "it_IT": "Alice",
+        "zh_CN": "Tingting",
+        "zh_TW": "Meijia",
+        "zh_HK": "Sinji",
+        "ja_JP": "Kyoko",
+        "ko_KR": "Yuna",
+        "hi_IN": "Lekha",
+        "ar_SA": "Majed",
+        "ar_001": "Majed",
+        "tr_TR": "Yelda",
+        "nl_NL": "Xander",
+        "pl_PL": "Zosia",
+        "sv_SE": "Alva",
+        "ru_RU": "Milena",
+        "id_ID": "Damayanti",
+        "bn_IN": "Piya",
+        "vi_VN": "Linh",
+        "te_IN": "Geeta",
+        "ta_IN": "Vani",
+        "th_TH": "Kanya",
+        "kn_IN": "Soumya",
+        "ms_MY": "Amira",
+        "he_IL": "Carmit",
+        "uk_UA": "Lesya",
+        "cs_CZ": "Zuzana",
+        "hu_HU": "Tünde",
+        "el_GR": "Melina",
+        "fi_FI": "Satu",
+        "da_DK": "Sara",
+        "nb_NO": "Nora",
+        "ro_RO": "Ioana",
+        "hr_HR": "Lana",
+        "sk_SK": "Laura",
+        "bg_BG": "Daria",
+        "ca_ES": "Montse",
+        "sl_SI": "Tina",
+    }
+
     def _synthesize_say(self, output_path: str, text: str, sample_rate: int) -> float:
         """Fallback: macOS say or Linux espeak, then convert to WAV. Uses voice_id/lang for multilingual."""
         with tempfile.NamedTemporaryFile(suffix=".aiff", delete=False) as f:
@@ -256,14 +307,14 @@ class LocalTTSProvider(TTSProvider):
         try:
             if os.name == "posix" and os.uname().sysname == "Darwin":
                 cmd = ["say", "-o", aiff_path]
+                # Select voice: explicit voice_id > language-based lookup > default
                 lang_code = VOICE_LANG_MAP.get(
                     self.lang, VOICE_LANG_MAP.get(self.lang.split("-")[0], "en_US")
                 )
-                if lang_code and lang_code != "en_US":
-                    cmd.extend(["-l", lang_code.replace("_", "-")])
-                # Only use explicit voice name if it's a real voice (not "default_xx" placeholder)
                 if self.voice_id and not self.voice_id.startswith("default"):
                     cmd.extend(["-v", self.voice_id])
+                elif lang_code in self._MACOS_VOICES:
+                    cmd.extend(["-v", self._MACOS_VOICES[lang_code]])
                 cmd.append(text)
                 subprocess.run(cmd, check=True, capture_output=True, timeout=30)
             else:
