@@ -426,8 +426,8 @@ def run_pipeline(job_id: str):
         print(f"Render stage: Job {job_id} completed successfully")
         print(f"  - Slides: {ctx.slide_count} PNG files")
 
-        # Update status
-        job.status = JobStatus.RUNNING
+        # Update status to DONE
+        job.status = JobStatus.DONE
         job.updated_at = datetime.utcnow()
         db.commit()
 
