@@ -60,11 +60,11 @@ async def list_languages():
 
 # Redis connection for RQ
 # Note: RQ works better with decode_responses=False for binary serialization
+# Reads REDIS_URL from env (Docker sets redis://redis:6379), falls back to localhost
+_redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
 try:
-    redis_conn = redis.Redis(
-        host="localhost",
-        port=6379,
-        db=0,
+    redis_conn = redis.Redis.from_url(
+        _redis_url,
         decode_responses=False,
         socket_connect_timeout=2,
         socket_timeout=2,
