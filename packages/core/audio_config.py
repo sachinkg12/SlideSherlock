@@ -33,7 +33,14 @@ class AudioConfig:
         mode = (os.environ.get("AUDIO_MODE") or "generate").strip().lower()
         if mode not in (AUDIO_MODE_USE_SUPPLIED, AUDIO_MODE_GENERATE):
             mode = AUDIO_MODE_GENERATE
-        voice = (os.environ.get("AUDIO_VOICE_PROVIDER") or "local").strip().lower()
+        voice = (os.environ.get("AUDIO_VOICE_PROVIDER") or "").strip().lower()
+        if not voice:
+            # Auto-detect: use OpenAI TTS if API key is available (works cross-platform),
+            # fall back to local (macOS say / espeak) otherwise.
+            if os.environ.get("OPENAI_API_KEY", "").strip():
+                voice = AUDIO_VOICE_OPENAI
+            else:
+                voice = AUDIO_VOICE_LOCAL
         if voice not in (AUDIO_VOICE_LOCAL, AUDIO_VOICE_OPENAI, AUDIO_VOICE_ELEVENLABS):
             voice = AUDIO_VOICE_LOCAL
         norm = (os.environ.get("AUDIO_LOUDNESS_NORMALIZE", "1")).strip().lower() in (
