@@ -72,9 +72,11 @@ function UploadPage() {
       transition={{ duration: 0.3 }}
       className="flex flex-col gap-8 pt-8 sm:pt-16"
     >
-      {/* Privacy disclaimer */}
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-sm text-amber-300">
-        Uploaded files are automatically deleted after 30 minutes. Do not upload sensitive or confidential material.
+      {/* Privacy + legal disclaimer */}
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-xs text-amber-300/90 leading-relaxed">
+        <strong>Research demonstration.</strong> Uploaded files are processed via OpenAI API and automatically deleted within 30 minutes.
+        Do not upload confidential, sensitive, or personally identifiable information.
+        Provided &ldquo;as is&rdquo; under Apache 2.0 &mdash; no warranties. By uploading, you agree to these terms.
       </div>
 
       {/* Hero area */}
