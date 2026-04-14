@@ -318,8 +318,10 @@ def render_slide_with_overlay_mp4(
     draw_notes = (
         notes_config and getattr(notes_config, "enabled", False) and (notes_text or "").strip()
     )
+    # Only count actions that have actual content (bbox/path) — empty actions are no-ops
     has_actions = any(
-        act.get("type") in ("HIGHLIGHT", "TRACE", "ZOOM") for act in (timeline_actions or [])
+        act.get("type") in ("HIGHLIGHT", "TRACE", "ZOOM") and (act.get("bbox") or act.get("path"))
+        for act in (timeline_actions or [])
     )
 
     if not has_actions:
