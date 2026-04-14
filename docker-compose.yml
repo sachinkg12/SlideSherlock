@@ -67,7 +67,7 @@ services:
     environment:
       DATABASE_URL: postgresql://slidesherlock:slidesherlock@postgres:5432/slidesherlock
       REDIS_URL: redis://redis:6379
-      MINIO_ENDPOINT: minio:9000
+      MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: slidesherlock
@@ -89,7 +89,7 @@ services:
     environment:
       DATABASE_URL: postgresql://slidesherlock:slidesherlock@postgres:5432/slidesherlock
       REDIS_URL: redis://redis:6379
-      MINIO_ENDPOINT: minio:9000
+      MINIO_ENDPOINT: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
       MINIO_BUCKET: slidesherlock
@@ -97,6 +97,9 @@ services:
       PYTHONPATH: /app:/app/packages/core
       OBJC_DISABLE_INITIALIZE_FORK_SAFETY: "YES"
       NO_PROXY: "*"
+      OVERLAY_PARALLEL: "1"
+      TTS_PARALLEL: "1"
+      SKIP_STAGE_CACHE: "1"
     depends_on:
       postgres:
         condition: service_healthy
