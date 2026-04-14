@@ -339,34 +339,36 @@ def render_slide_with_overlay_mp4(
         os.close(fd)
         try:
             frame.convert("RGB").save(tmp_png)
+            # Use lavfi color source + overlay instead of -loop 1 (more compatible
+            # across ffmpeg versions including Docker/Debian-slim).
+            n_frames = max(1, int(slide_duration_seconds * fps))
             subprocess.run(
                 [
                     "ffmpeg",
                     "-y",
-                    "-loop",
-                    "1",
-                    "-framerate",
-                    str(int(fps)),
+                    "-f",
+                    "lavfi",
+                    "-i",
+                    f"color=c=black:s=2x2:d={slide_duration_seconds}:r={int(fps)}",
                     "-i",
                     tmp_png,
-                    "-t",
-                    str(slide_duration_seconds),
+                    "-filter_complex",
+                    "[1:v]scale=trunc(iw/2)*2:trunc(ih/2)*2[img];[0:v][img]overlay=0:0:shortest=1",
                     "-c:v",
                     "libx264",
                     "-pix_fmt",
                     "yuv420p",
-                    "-r",
-                    str(int(fps)),
+                    "-preset",
+                    "ultrafast",
                     output_path,
                 ],
                 check=True,
                 capture_output=True,
-                timeout=30,
+                timeout=60,
             )
             return output_path
-        except (subprocess.SubprocessError, OSError):
-            # ffmpeg -loop 1 crashes on some PNGs (exit 187). Fall through
-            # to the slow frame-by-frame path below.
+        except (subprocess.SubprocessError, OSError) as e:
+            print(f"  [overlay] fast path failed: {e}")
             pass
         finally:
             if os.path.exists(tmp_png):
