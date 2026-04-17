@@ -7,7 +7,6 @@ Optional: on-screen notes (narration text) with layout templates and styling.
 from __future__ import annotations
 
 import io
-import os
 import re
 from typing import Any, Dict, List, Optional
 
@@ -310,9 +309,6 @@ def render_slide_with_overlay_mp4(
     ~0.5s instead of frame-by-frame rendering (18-45s per slide). This
     is the dominant speedup for large decks where most slides are static.
     """
-    import subprocess
-    import tempfile
-
     from PIL import Image
 
     draw_notes = (
@@ -325,59 +321,33 @@ def render_slide_with_overlay_mp4(
     )
 
     if not has_actions:
-        # Fast path: no animations — render a single frame (slide + optional
-        # notes) then ffmpeg -loop 1.  ~0.5s per slide vs 18-45s frame-by-frame.
-        # Falls back to slow path if ffmpeg crashes (exit 187 on some PNGs).
-        from PIL import Image as PILImage  # noqa: F811
-
-        base = PILImage.open(io.BytesIO(slide_image_bytes)).convert("RGBA")
+        # Fast path for static slides: render one frame, repeat at 1fps.
+        # A 30s slide = 30 frames instead of 450 (at 15fps). 15× faster,
+        # works on all platforms (no ffmpeg -loop or lavfi tricks needed).
+        try:
+            import imageio
+            import numpy as np
+        except ImportError:
+            raise RuntimeError("imageio and numpy required")
+        base = Image.open(io.BytesIO(slide_image_bytes)).convert("RGBA")
         width, height = base.size
         frame = base.copy()
         if draw_notes:
             draw_notes_on_image(
                 frame, (notes_text or "").strip(), width, height, notes_config, notes_font_path
             )
-        fd, tmp_png = tempfile.mkstemp(suffix=".png")
-        os.close(fd)
-        try:
-            frame.convert("RGB").save(tmp_png)
-            # Use lavfi color source + overlay instead of -loop 1 (more compatible
-            # across ffmpeg versions including Docker/Debian-slim).
-            n_frames = max(1, int(slide_duration_seconds * fps))
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-y",
-                    "-f",
-                    "lavfi",
-                    "-i",
-                    f"color=c=black:s=2x2:d={slide_duration_seconds}:r={int(fps)}",
-                    "-i",
-                    tmp_png,
-                    "-filter_complex",
-                    "[1:v]scale=trunc(iw/2)*2:trunc(ih/2)*2[img];[0:v][img]overlay=0:0:shortest=1",
-                    "-c:v",
-                    "libx264",
-                    "-pix_fmt",
-                    "yuv420p",
-                    "-preset",
-                    "ultrafast",
-                    output_path,
-                ],
-                check=True,
-                capture_output=True,
-                timeout=60,
-            )
-            return output_path
-        except (subprocess.SubprocessError, OSError) as e:
-            print(f"  [overlay] fast path failed: {e}")
-            pass
-        finally:
-            if os.path.exists(tmp_png):
-                try:
-                    os.unlink(tmp_png)
-                except Exception:
-                    pass
+        arr = np.array(frame.convert("RGB"))
+        # Use 1fps for static content — massively fewer frames to encode.
+        # The final video is re-encoded during crossfade/concat anyway.
+        static_fps = 1
+        n_frames = max(1, int(slide_duration_seconds * static_fps))
+        writer = imageio.get_writer(
+            output_path, fps=static_fps, codec="libx264", quality=8, pixelformat="yuv420p"
+        )
+        for _ in range(n_frames):
+            writer.append_data(arr)
+        writer.close()
+        return output_path
 
     # Slow path: frame-by-frame rendering for slides with overlays or notes
     try:
