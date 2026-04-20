@@ -24,7 +24,6 @@ import argparse
 import json
 import os
 import subprocess
-import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -214,7 +213,7 @@ def main():
         pptx_files = pptx_files[: args.limit]
 
     print(f"\n{'='*60}")
-    print(f"Hallucination Baseline Experiment")
+    print("Hallucination Baseline Experiment")
     print(f"Files: {len(pptx_files)} | Conditions: {', '.join(args.conditions)}")
     print(f"Output: {args.output}")
     print(f"{'='*60}\n")
@@ -266,7 +265,7 @@ def main():
 
     # Print comparison table
     print(f"\n{'='*60}")
-    print(f"COMPARISON TABLE")
+    print("COMPARISON TABLE")
     print(f"{'='*60}")
     print(f"{'Condition':<35} {'Claims':>7} {'Pass%':>7} {'Rewrite%':>9} {'Coverage%':>10}")
     print("-" * 70)
