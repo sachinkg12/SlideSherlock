@@ -16,19 +16,19 @@ const presetConfig: Record<
     icon: <Zap className="h-7 w-7" />,
     label: 'Draft',
     description: 'Fast, silent preview',
-    accent: 'text-amber-400',
+    accent: 'text-amber-600 dark:text-amber-400',
   },
   standard: {
     icon: <Sparkles className="h-7 w-7" />,
     label: 'Standard',
     description: 'Narration + subtitles',
-    accent: 'text-indigo-400',
+    accent: 'text-indigo-600 dark:text-indigo-400',
   },
   pro: {
     icon: <Rocket className="h-7 w-7" />,
     label: 'Pro',
     description: 'Vision AI + full polish',
-    accent: 'text-violet-400',
+    accent: 'text-violet-600 dark:text-violet-400',
   },
 }
 
@@ -77,7 +77,7 @@ function PresetCard({ preset, selected, onSelect }: PresetCardProps) {
       <motion.div
         className="mt-1 h-2 w-2 rounded-full"
         animate={{
-          backgroundColor: selected ? 'rgb(99, 102, 241)' : 'rgba(255,255,255,0.15)',
+          backgroundColor: selected ? 'rgb(99, 102, 241)' : 'rgba(128,128,128,0.3)',
           scale: selected ? 1 : 0.8,
         }}
         transition={{ type: 'spring', stiffness: 500 }}

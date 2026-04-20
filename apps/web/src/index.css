@@ -103,7 +103,11 @@
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent;
+  }
+
+  .dark .gradient-text {
+    @apply from-indigo-400 to-violet-400;
   }
 
   .gradient-border {

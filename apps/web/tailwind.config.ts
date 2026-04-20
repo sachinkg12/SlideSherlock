@@ -6,12 +6,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: 'rgba(255,255,255,0.03)',
-        'surface-hover': 'rgba(255,255,255,0.06)',
-        'border-subtle': 'rgba(255,255,255,0.08)',
-        'border-active': 'rgba(255,255,255,0.15)',
-        'text-primary': '#f0f0f5',
-        'text-secondary': '#6b7280',
+        surface: 'var(--color-surface)',
+        'surface-hover': 'var(--color-surface-hover)',
+        'border-subtle': 'var(--color-border-subtle)',
+        'border-active': 'var(--color-border-active)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
         dark: '#0a0a0f',
         'dark-raised': '#12121a',
         'status-done': '#3b82f6',

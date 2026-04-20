@@ -73,7 +73,7 @@ function UploadPage() {
       className="flex flex-col gap-8 pt-8 sm:pt-16"
     >
       {/* Privacy + legal disclaimer */}
-      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-xs text-amber-300/90 leading-relaxed">
+      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-center text-xs text-amber-700 dark:text-amber-300/90 leading-relaxed">
         <strong>Research demonstration.</strong> Uploaded files are processed via OpenAI API and automatically deleted within 30 minutes.
         Do not upload confidential, sensitive, or personally identifiable information.
         Provided &ldquo;as is&rdquo; under Apache 2.0 &mdash; no warranties. By uploading, you agree to these terms.
@@ -196,13 +196,13 @@ function UploadPage() {
         </div>
         {selectedLangs.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/20 px-3 py-1 text-sm text-indigo-300">
+            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/20 px-3 py-1 text-sm text-indigo-700 dark:text-indigo-300">
               English (default)
             </span>
             {selectedLangs.map(code => (
               <span
                 key={code}
-                className="inline-flex items-center gap-1 rounded-full bg-blue-500/20 px-3 py-1 text-sm text-blue-300"
+                className="inline-flex items-center gap-1 rounded-full bg-blue-500/20 px-3 py-1 text-sm text-blue-700 dark:text-blue-300"
               >
                 {langName(code)}
                 <button
