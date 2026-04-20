@@ -101,21 +101,25 @@ class NarrateStage:
             template_narration = " ".join(s.get("text", "") for s in segments).strip()
             ctx_parts["template_narration"] = template_narration[:800]
 
-            evidence_items = evidence_index.get("evidence_items", []) if evidence_index else []
-            slide_evidence = [e for e in evidence_items if e.get("slide_index") == si]
-            evidence_texts = []
-            for ev in slide_evidence[:5]:
-                kind = ev.get("kind", "")
-                content = (ev.get("content") or "").strip()
-                if content and kind not in ("TEXT_SPAN",):
-                    evidence_texts.append(f"{kind}: {content[:200]}")
-            ctx_parts["evidence"] = evidence_texts
+            # Experiment gate: strip evidence context for Condition A (raw GPT)
+            strip_evidence = os.environ.get("NARRATE_NO_EVIDENCE", "").lower() in ("1", "true", "yes")
 
-            graph = unified_by_slide.get(si, {})
-            nodes = graph.get("nodes", [])
-            node_labels = [n.get("label_text", "") for n in nodes[:8] if n.get("label_text")]
-            if node_labels:
-                ctx_parts["graph_elements"] = node_labels
+            if not strip_evidence:
+                evidence_items = evidence_index.get("evidence_items", []) if evidence_index else []
+                slide_evidence = [e for e in evidence_items if e.get("slide_index") == si]
+                evidence_texts = []
+                for ev in slide_evidence[:5]:
+                    kind = ev.get("kind", "")
+                    content = (ev.get("content") or "").strip()
+                    if content and kind not in ("TEXT_SPAN",):
+                        evidence_texts.append(f"{kind}: {content[:200]}")
+                ctx_parts["evidence"] = evidence_texts
+
+                graph = unified_by_slide.get(si, {})
+                nodes = graph.get("nodes", [])
+                node_labels = [n.get("label_text", "") for n in nodes[:8] if n.get("label_text")]
+                if node_labels:
+                    ctx_parts["graph_elements"] = node_labels
 
             slides_context.append(ctx_parts)
 

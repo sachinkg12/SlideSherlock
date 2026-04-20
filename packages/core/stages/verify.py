@@ -31,7 +31,12 @@ class VerifyStage:
     name = "verify"
 
     def run(self, ctx: "PipelineContext") -> "StageResult":
+        import os
         from pipeline import StageResult
+
+        # Experiment gate: skip verifier for hallucination baseline conditions A & B
+        if os.environ.get("SKIP_VERIFY", "").lower() in ("1", "true", "yes"):
+            return StageResult(status="skipped", metrics={"reason": "SKIP_VERIFY=1"})
 
         try:
             from apps.api.models import Artifact

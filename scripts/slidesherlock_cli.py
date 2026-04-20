@@ -418,11 +418,13 @@ def cmd_run(args: argparse.Namespace) -> int:
                 print()
 
                 # --dry-run: stop after verify (skip translate/narrate/audio/video)
-                dry_run_skip = (
-                    {"translate", "narrate", "audio", "video"}
-                    if getattr(args, "dry_run", False)
-                    else set()
-                )
+                # --skip-av: skip only audio+video (keep narrate for hallucination experiments)
+                if getattr(args, "dry_run", False):
+                    dry_run_skip = {"translate", "narrate", "audio", "video"}
+                elif getattr(args, "skip_av", False):
+                    dry_run_skip = {"audio", "video"}
+                else:
+                    dry_run_skip = set()
 
                 for stage in PER_VARIANT_STAGES:
                     if stage.name in dry_run_skip:
@@ -702,6 +704,12 @@ def main() -> int:
         action="store_true",
         default=False,
         help="Run through verify stage then stop (no audio/video). Outputs metrics + evidence only.",
+    )
+    run_parser.add_argument(
+        "--skip-av",
+        action="store_true",
+        default=False,
+        help="Skip audio+video stages (keep narrate). For hallucination experiments.",
     )
     run_parser.set_defaults(func=cmd_run)
 
