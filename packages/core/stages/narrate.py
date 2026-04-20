@@ -102,7 +102,11 @@ class NarrateStage:
             ctx_parts["template_narration"] = template_narration[:800]
 
             # Experiment gate: strip evidence context for Condition A (raw GPT)
-            strip_evidence = os.environ.get("NARRATE_NO_EVIDENCE", "").lower() in ("1", "true", "yes")
+            strip_evidence = os.environ.get("NARRATE_NO_EVIDENCE", "").lower() in (
+                "1",
+                "true",
+                "yes",
+            )
 
             if not strip_evidence:
                 evidence_items = evidence_index.get("evidence_items", []) if evidence_index else []

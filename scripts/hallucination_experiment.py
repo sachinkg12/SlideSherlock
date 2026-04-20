@@ -85,13 +85,20 @@ def run_one(pptx_path: str, output_dir: str, condition_env: dict, idx: int, tota
             os.path.join(repo_root, "scripts", "slidesherlock_cli.py"),
             "run",
             pptx_path,
-            "--preset", "draft",
-            "--output", file_output,
+            "--preset",
+            "draft",
+            "--output",
+            file_output,
             "--ai-narration",
             "--skip-av",  # Skip audio+video — we only need narration text
         ]
         proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=1800, env=env, cwd=repo_root,
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=1800,
+            env=env,
+            cwd=repo_root,
         )
 
         elapsed = time.time() - t0
@@ -138,7 +145,9 @@ def run_one(pptx_path: str, output_dir: str, condition_env: dict, idx: int, tota
         result["pipeline_duration_s"] = round(time.time() - t0, 1)
 
     icon = "OK" if result["status"] == "ok" else result["status"].upper()
-    print(f"  [{idx:>3}/{total}] {icon:<8} {result['pipeline_duration_s']:>6.1f}s  {result['file'][:50]}")
+    print(
+        f"  [{idx:>3}/{total}] {icon:<8} {result['pipeline_duration_s']:>6.1f}s  {result['file'][:50]}"
+    )
     return result
 
 
@@ -158,7 +167,9 @@ def aggregate_condition(results: list[dict]) -> dict:
         "total_slides": sum(r.get("slide_count", 0) for r in ok),
         "total_claims": total_claims,
         "claims_with_evidence": total_claims_with_ev,
-        "pct_evidence_coverage": round(total_claims_with_ev / total_claims * 100, 1) if total_claims else 0,
+        "pct_evidence_coverage": round(total_claims_with_ev / total_claims * 100, 1)
+        if total_claims
+        else 0,
         "verifier_pass": total_pass,
         "verifier_rewrite": total_rewrite,
         "verifier_remove": total_remove,
@@ -166,17 +177,24 @@ def aggregate_condition(results: list[dict]) -> dict:
         "rewrite_rate": round(total_rewrite / total_verdicts * 100, 1) if total_verdicts else 0,
         "remove_rate": round(total_remove / total_verdicts * 100, 1) if total_verdicts else 0,
         "ai_slides_rewritten": sum(r.get("ai_slides_rewritten", 0) for r in ok),
-        "mean_pipeline_s": round(sum(r["pipeline_duration_s"] for r in ok) / len(ok), 1) if ok else 0,
+        "mean_pipeline_s": round(sum(r["pipeline_duration_s"] for r in ok) / len(ok), 1)
+        if ok
+        else 0,
     }
 
 
 def main():
     parser = argparse.ArgumentParser(description="Hallucination baseline experiment (E1-E3)")
     parser.add_argument("pptx_dir", help="Directory containing PPTX files")
-    parser.add_argument("--output", "-o", default="./hallucination_results", help="Output directory")
+    parser.add_argument(
+        "--output", "-o", default="./hallucination_results", help="Output directory"
+    )
     parser.add_argument("--limit", "-n", type=int, default=30, help="Number of files to process")
     parser.add_argument(
-        "--conditions", "-c", nargs="+", default=["condition_a", "condition_b", "condition_c"],
+        "--conditions",
+        "-c",
+        nargs="+",
+        default=["condition_a", "condition_b", "condition_c"],
         choices=list(CONDITIONS.keys()),
         help="Which conditions to run (default: all three)",
     )
@@ -184,11 +202,13 @@ def main():
 
     # Discover PPTX files
     pptx_dir = os.path.abspath(args.pptx_dir)
-    pptx_files = sorted([
-        os.path.join(pptx_dir, f)
-        for f in os.listdir(pptx_dir)
-        if f.endswith(".pptx") and not f.startswith("~$")
-    ])
+    pptx_files = sorted(
+        [
+            os.path.join(pptx_dir, f)
+            for f in os.listdir(pptx_dir)
+            if f.endswith(".pptx") and not f.startswith("~$")
+        ]
+    )
 
     if args.limit and args.limit < len(pptx_files):
         pptx_files = pptx_files[: args.limit]
@@ -224,10 +244,12 @@ def main():
             "per_file": [{k: v for k, v in r.items() if k != "narration_entries"} for r in results],
         }
 
-        print(f"\n  Summary: {agg['files_processed']}/{len(pptx_files)} ok, "
-              f"claims={agg['total_claims']}, "
-              f"pass={agg['pass_rate']}%, rewrite={agg['rewrite_rate']}%, "
-              f"coverage={agg['pct_evidence_coverage']}%")
+        print(
+            f"\n  Summary: {agg['files_processed']}/{len(pptx_files)} ok, "
+            f"claims={agg['total_claims']}, "
+            f"pass={agg['pass_rate']}%, rewrite={agg['rewrite_rate']}%, "
+            f"coverage={agg['pct_evidence_coverage']}%"
+        )
 
     # Write combined results
     experiment = {
@@ -251,7 +273,9 @@ def main():
     for cond_name in args.conditions:
         agg = all_results[cond_name]["aggregate"]
         label = CONDITIONS[cond_name]["label"]
-        print(f"{label:<35} {agg['total_claims']:>7} {agg['pass_rate']:>6.1f}% {agg['rewrite_rate']:>8.1f}% {agg['pct_evidence_coverage']:>9.1f}%")
+        print(
+            f"{label:<35} {agg['total_claims']:>7} {agg['pass_rate']:>6.1f}% {agg['rewrite_rate']:>8.1f}% {agg['pct_evidence_coverage']:>9.1f}%"
+        )
     print()
 
 
