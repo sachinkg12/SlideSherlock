@@ -271,6 +271,58 @@ class NarrateStage:
                     }
                 )
 
+        # ---- Post-rewrite verification ----
+        # Run the verifier on the rewritten text to catch any new claims GPT introduced.
+        # Uses the same evidence_ids from the original verified segments.
+        from verifier import verify_segment as _verify_seg
+        from verifier import _evidence_by_id as _build_ev_by_id
+
+        ev_by_id = _build_ev_by_id(evidence_index) if evidence_index else {}
+        all_segments = verified_script.get("segments", [])
+        post_rewrite_rewrites = 0
+
+        for entry in rewritten_entries:
+            if entry.get("source_used") != "ai_narrate":
+                continue
+            si = entry["slide_index"]
+            # Collect evidence_ids and entity_ids from original segments for this slide
+            orig_segs = [s for s in all_segments if s.get("slide_index") == si]
+            combined_ev_ids = []
+            combined_ent_ids = []
+            for seg in orig_segs:
+                combined_ev_ids.extend(seg.get("evidence_ids") or [])
+                combined_ent_ids.extend(seg.get("entity_ids") or [])
+
+            # Build a synthetic segment for verification
+            synth_segment = {
+                "claim_id": f"post_rewrite_{si}",
+                "slide_index": si,
+                "text": entry["narration_text"],
+                "evidence_ids": list(set(combined_ev_ids)),
+                "entity_ids": list(set(combined_ent_ids)),
+            }
+
+            graph = unified_by_slide.get(si, {"nodes": [], "edges": [], "clusters": []})
+            result = _verify_seg(synth_segment, ev_by_id, graph)
+            verdict = result.get("verdict", "PASS")
+
+            if verdict != "PASS":
+                post_rewrite_rewrites += 1
+                # Fall back to the verified template narration
+                template = " ".join(s.get("text", "") for s in orig_segs).strip()
+                if template:
+                    entry["narration_text"] = template
+                    entry["source_used"] = "post_rewrite_fallback"
+                    entry["word_count"] = len(template.split())
+
+        if post_rewrite_rewrites > 0:
+            _log(
+                f"Post-rewrite verification: {post_rewrite_rewrites}/{success_count} "
+                f"slides reverted to verified template"
+            )
+        else:
+            _log("Post-rewrite verification: all slides passed")
+
         # ---- Set override for audio stage ----
         _log(f"Setting narration_entries_override: {len(rewritten_entries)} entries")
         ctx.narration_entries_override = rewritten_entries
