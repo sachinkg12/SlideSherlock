@@ -1,0 +1,147 @@
+{
+  "run_id": "f2fd557d-a079-4238-a3ac-17f1cb028a35",
+  "started_at": "2026-04-10T05:41:48.223695+00:00",
+  "input_file": "www.michigan.gov_documents_recovery_FLINT_275338_7.pptx",
+  "input_bytes": 1648614,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1550.031,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 5.467,
+      "metrics": {
+        "slide_count": 19
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 112.43,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 43.356,
+      "metrics": {
+        "slide_count": 19,
+        "pdf_size": 1095181
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 14.512,
+      "metrics": {
+        "unified_graph_count": 19
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.067,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.219,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 11.647,
+      "metrics": {
+        "slides_rewritten": 19,
+        "slides_total": 19,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 132.391,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 1221.206,
+      "metrics": {
+        "total_duration": 616.5407090000002
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.michigan.gov_documents_recovery_FLINT_275338_7/final.mp4",
+  "output_bytes": 20814403,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-10T05:41:56.147986Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1120,
+    "claims_with_evidence": 38,
+    "pct_claims_with_evidence": 3.39,
+    "entities_total": 1082,
+    "entities_grounded": 1082,
+    "pct_entities_grounded": 100.0,
+    "pass": 28,
+    "rewrite": 1092,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 160,
+    "kinds": {
+      "TEXT_SPAN": 18,
+      "SHAPE_LABEL": 37,
+      "IMAGE_ASSET": 18,
+      "IMAGE_CAPTION": 37,
+      "IMAGE_OBJECTS": 18,
+      "IMAGE_TAGS": 18,
+      "IMAGE_ACTIONS": 3,
+      "SLIDE_CAPTION": 6,
+      "DIAGRAM_SUMMARY": 5
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 19,
+    "slides_total": 19
+  },
+  "finished_at": "2026-04-10T06:07:38.254749+00:00"
+}

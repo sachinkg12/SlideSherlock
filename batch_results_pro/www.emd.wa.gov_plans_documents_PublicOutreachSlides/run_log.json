@@ -1,0 +1,147 @@
+{
+  "run_id": "d1052197-59fc-4491-91f9-ad4ab2e4bf6b",
+  "started_at": "2026-04-09T16:32:47.998937+00:00",
+  "input_file": "www.emd.wa.gov_plans_documents_PublicOutreachSlides.pptx",
+  "input_bytes": 7766036,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 316.54,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 7.755,
+      "metrics": {
+        "slide_count": 5
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 37.385,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 10.633,
+      "metrics": {
+        "slide_count": 5,
+        "pdf_size": 4816632
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 4.86,
+      "metrics": {
+        "unified_graph_count": 5
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.022,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.049,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 2.149,
+      "metrics": {
+        "slides_rewritten": 5,
+        "slides_total": 5,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 29.07,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 223.518,
+      "metrics": {
+        "total_duration": 128.315333
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.emd.wa.gov_plans_documents_PublicOutreachSlides/final.mp4",
+  "output_bytes": 6751015,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T16:32:48.395479Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 204,
+    "claims_with_evidence": 10,
+    "pct_claims_with_evidence": 4.9,
+    "entities_total": 196,
+    "entities_grounded": 196,
+    "pct_entities_grounded": 100.0,
+    "pass": 7,
+    "rewrite": 197,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 49,
+    "kinds": {
+      "TEXT_SPAN": 4,
+      "SHAPE_LABEL": 22,
+      "IMAGE_ASSET": 4,
+      "IMAGE_CAPTION": 8,
+      "IMAGE_OBJECTS": 4,
+      "IMAGE_TAGS": 4,
+      "IMAGE_ACTIONS": 1,
+      "SLIDE_CAPTION": 1,
+      "DIAGRAM_SUMMARY": 1
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 5,
+    "slides_total": 5
+  },
+  "finished_at": "2026-04-09T16:38:04.539348+00:00"
+}

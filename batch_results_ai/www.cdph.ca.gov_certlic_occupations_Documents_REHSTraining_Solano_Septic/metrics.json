@@ -1,0 +1,111 @@
+{
+  "job_id": "e23a6e23-85cc-458d-b2a1-4d59ddbe6d9b",
+  "preset": "draft",
+  "pipeline_duration_ms": 456547,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_ms": 6781,
+      "metrics": {
+        "slide_count": 30
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_ms": 93046,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_ms": 15901,
+      "metrics": {
+        "slide_count": 30,
+        "pdf_size": 1603330
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_ms": 8310,
+      "metrics": {
+        "unified_graph_count": 30
+      }
+    },
+    "script": {
+      "status": "ok",
+      "duration_ms": 70,
+      "metrics": {}
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_ms": 70,
+      "metrics": {}
+    },
+    "verify": {
+      "status": "ok",
+      "duration_ms": 111,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_ms": 111,
+      "metrics": {}
+    },
+    "translate": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate": {
+      "status": "ok",
+      "duration_ms": 83528,
+      "metrics": {
+        "slides_rewritten": 30,
+        "slides_total": 30,
+        "slides_fallback": 0
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_ms": 83528,
+      "metrics": {
+        "slides_rewritten": 30,
+        "slides_total": 30,
+        "slides_fallback": 0
+      }
+    },
+    "audio": {
+      "status": "ok",
+      "duration_ms": 159776,
+      "metrics": {}
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_ms": 159776,
+      "metrics": {}
+    },
+    "video": {
+      "status": "ok",
+      "duration_ms": 89010,
+      "metrics": {
+        "total_duration": 714.8741660000001
+      }
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_ms": 89010,
+      "metrics": {
+        "total_duration": 714.8741660000001
+      }
+    }
+  },
+  "created_at": "2026-04-05T17:33:52.064658+00:00Z"
+}

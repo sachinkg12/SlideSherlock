@@ -1,0 +1,147 @@
+{
+  "run_id": "d8752d71-daa1-4411-8baa-9c7d637ae0c2",
+  "started_at": "2026-04-09T15:11:09.386002+00:00",
+  "input_file": "www.cdph.ca.gov_certlic_occupations_Documents_REHSTraining_Solano_Septic.pptx",
+  "input_bytes": 1872789,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1603.447,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 8.339,
+      "metrics": {
+        "slide_count": 30
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 183.675,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 18.436,
+      "metrics": {
+        "slide_count": 30,
+        "pdf_size": 1603330
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 19.605,
+      "metrics": {
+        "unified_graph_count": 30
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.058,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.094,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 13.925,
+      "metrics": {
+        "slides_rewritten": 30,
+        "slides_total": 30,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 191.712,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 1166.243,
+      "metrics": {
+        "total_duration": 716.6534800000002
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.cdph.ca.gov_certlic_occupations_Documents_REHSTraining_Solano_Septic/final.mp4",
+  "output_bytes": 21677869,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T15:11:09.895810Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 232,
+    "claims_with_evidence": 60,
+    "pct_claims_with_evidence": 25.86,
+    "entities_total": 172,
+    "entities_grounded": 172,
+    "pct_entities_grounded": 100.0,
+    "pass": 43,
+    "rewrite": 189,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 209,
+    "kinds": {
+      "TEXT_SPAN": 29,
+      "SHAPE_LABEL": 30,
+      "IMAGE_ASSET": 29,
+      "IMAGE_CAPTION": 57,
+      "IMAGE_OBJECTS": 28,
+      "IMAGE_TAGS": 28,
+      "IMAGE_ACTIONS": 5,
+      "SLIDE_CAPTION": 2,
+      "DIAGRAM_SUMMARY": 1
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 30,
+    "slides_total": 30
+  },
+  "finished_at": "2026-04-09T15:37:52.833259+00:00"
+}

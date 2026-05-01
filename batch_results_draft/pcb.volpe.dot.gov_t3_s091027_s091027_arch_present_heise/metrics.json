@@ -1,0 +1,107 @@
+{
+  "job_id": "305123ec-2e69-402e-a57e-91735777d883",
+  "preset": "draft",
+  "pipeline_duration_ms": 452842,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_ms": 14923,
+      "metrics": {
+        "slide_count": 40
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_ms": 192602,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_ms": 77459,
+      "metrics": {
+        "slide_count": 40,
+        "pdf_size": 3160525
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_ms": 4393,
+      "metrics": {
+        "unified_graph_count": 40
+      }
+    },
+    "script": {
+      "status": "ok",
+      "duration_ms": 135,
+      "metrics": {}
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_ms": 135,
+      "metrics": {}
+    },
+    "verify": {
+      "status": "ok",
+      "duration_ms": 504,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_ms": 504,
+      "metrics": {}
+    },
+    "translate": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "narrate": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio": {
+      "status": "ok",
+      "duration_ms": 120547,
+      "metrics": {}
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_ms": 120547,
+      "metrics": {}
+    },
+    "video": {
+      "status": "ok",
+      "duration_ms": 42264,
+      "metrics": {
+        "total_duration": 439.5425
+      }
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_ms": 42264,
+      "metrics": {
+        "total_duration": 439.5425
+      }
+    }
+  },
+  "created_at": "2026-05-01T02:08:13.411716+00:00Z"
+}

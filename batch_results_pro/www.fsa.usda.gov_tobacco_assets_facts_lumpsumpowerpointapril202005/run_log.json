@@ -1,0 +1,146 @@
+{
+  "run_id": "43f891a9-89bd-4bf6-a4f1-da73d3d643b8",
+  "started_at": "2026-04-10T03:25:17.314697+00:00",
+  "input_file": "www.fsa.usda.gov_tobacco_assets_facts_lumpsumpowerpointapril202005.pptx",
+  "input_bytes": 404484,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1190.571,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 10.765,
+      "metrics": {
+        "slide_count": 19
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 45.486,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 43.769,
+      "metrics": {
+        "slide_count": 19,
+        "pdf_size": 506253
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 13.807,
+      "metrics": {
+        "unified_graph_count": 19
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.07,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.228,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 9.249,
+      "metrics": {
+        "slides_rewritten": 19,
+        "slides_total": 19,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 109.713,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 947.135,
+      "metrics": {
+        "total_duration": 497.75810499999994
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.fsa.usda.gov_tobacco_assets_facts_lumpsumpowerpointapril202005/final.mp4",
+  "output_bytes": 14941496,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-10T03:25:26.901719Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1179,
+    "claims_with_evidence": 38,
+    "pct_claims_with_evidence": 3.22,
+    "entities_total": 1216,
+    "entities_grounded": 1216,
+    "pct_entities_grounded": 100.0,
+    "pass": 36,
+    "rewrite": 1143,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 257,
+    "kinds": {
+      "TEXT_SPAN": 19,
+      "SHAPE_LABEL": 64,
+      "IMAGE_ASSET": 30,
+      "IMAGE_CAPTION": 74,
+      "IMAGE_OBJECTS": 30,
+      "IMAGE_TAGS": 30,
+      "IMAGE_ACTIONS": 3,
+      "SLIDE_CAPTION": 7
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 19,
+    "slides_total": 19
+  },
+  "finished_at": "2026-04-10T03:45:07.886156+00:00"
+}

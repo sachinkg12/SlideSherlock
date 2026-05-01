@@ -1,0 +1,138 @@
+{
+  "run_id": "3a764b0e-9ae2-47e9-9b9b-07940d557055",
+  "started_at": "2026-05-01T01:50:42.620027+00:00",
+  "input_file": "hefd.jsc.nasa.gov_files_HRP-AFT-Nutrition-Study-Poster(Feb2008).pptx",
+  "input_bytes": 314181,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 129.03,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 2.743,
+      "metrics": {
+        "slide_count": 1
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 52.752,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 10.058,
+      "metrics": {
+        "slide_count": 1,
+        "pdf_size": 483336
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 2.617,
+      "metrics": {
+        "unified_graph_count": 1
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.106,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 1.068,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 4.536,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 54.086,
+      "metrics": {
+        "total_duration": 23.5875
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft_18/hefd.jsc.nasa.gov_files_HRP-AFT-Nutrition-Study-Poster(Feb2008)/final.mp4",
+  "output_bytes": 17630774,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-05-01T01:50:43.068675Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1027,
+    "claims_with_evidence": 2,
+    "pct_claims_with_evidence": 0.19,
+    "entities_total": 2229,
+    "entities_grounded": 2229,
+    "pct_entities_grounded": 100.0,
+    "pass": 2,
+    "rewrite": 1025,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 971,
+    "kinds": {
+      "TEXT_SPAN": 1,
+      "SHAPE_LABEL": 391,
+      "IMAGE_ASSET": 142,
+      "IMAGE_CAPTION": 286,
+      "IMAGE_OBJECTS": 142,
+      "IMAGE_TAGS": 9
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-05-01T01:52:51.649777+00:00"
+}

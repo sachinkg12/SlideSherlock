@@ -1,0 +1,6 @@
+file,status,slide_count,pipeline_duration_s,input_bytes,output_bytes,evidence_items,total_claims,claims_with_evidence,pct_evidence_coverage,verifier_pass,verifier_rewrite,verifier_remove,verify_iterations,ai_slides_rewritten,error,ingest_s,evidence_s,render_s,graph_s,script_s,verify_s,translate_s,narrate_s,audio_s,video_s
+cdc.gov_tb_programs_Evaluation_Guide_Webinar_Using_survillance_data_in_evaluation.pptx,ok,0,605.834,609422,27572533,172,2480,70,2.82,66,2414,0,1,35,,4.6,31.593,75.104,43.411,0.2,0.564,0.0,11.443,265.661,168.137
+www.hepatitis.va.gov_ppt_va01-pr_prtop-05_prtop05-pe-01.pptx,ok,0,691.615,1735858,39034580,289,2082,102,4.9,91,1991,0,1,51,,0.5,0.437,56.025,43.369,0.203,0.383,0.0,18.015,399.269,168.177
+www.it.ojp.gov_documents_pennsylvania_county_gjxdm_court_case_message.pptx,ok,0,834.738,653669,53956823,385,3596,104,2.89,84,3512,0,1,52,,4.171,52.95,129.185,66.54,0.293,0.957,0.0,19.05,423.049,133.179
+www.jcsda.noaa.gov_documents_meetings_wkshp2006_Jung-Zapotocny_31May06a.pptx,ok,0,480.585,3897169,28335347,223,1655,70,4.23,63,1592,0,1,35,,7.387,38.842,83.55,34.567,0.418,0.55,0.0,13.187,200.474,99.286
+www.mrsars.usda.gov_mwa_shem_watershedslideshow.pptx,ok,0,490.916,28145270,70141959,229,1105,50,4.52,44,1061,0,1,25,,34.654,132.862,48.311,28.05,0.107,0.31,0.0,9.695,167.266,67.984

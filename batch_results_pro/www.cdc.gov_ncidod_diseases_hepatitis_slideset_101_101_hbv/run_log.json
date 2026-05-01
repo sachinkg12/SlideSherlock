@@ -1,0 +1,148 @@
+{
+  "run_id": "ccc63cdf-9440-403f-bf25-425f1f490fb2",
+  "started_at": "2026-04-09T14:47:21.706048+00:00",
+  "input_file": "www.cdc.gov_ncidod_diseases_hepatitis_slideset_101_101_hbv.pptx",
+  "input_bytes": 10266995,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1455.089,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 2.029,
+      "metrics": {
+        "slide_count": 20
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 28.216,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 42.598,
+      "metrics": {
+        "slide_count": 20,
+        "pdf_size": 887783
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 16.332,
+      "metrics": {
+        "unified_graph_count": 20
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.176,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.987,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 8.238,
+      "metrics": {
+        "slides_rewritten": 20,
+        "slides_total": 20,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 127.085,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 1228.029,
+      "metrics": {
+        "total_duration": 598.1807939999999
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.cdc.gov_ncidod_diseases_hepatitis_slideset_101_101_hbv/final.mp4",
+  "output_bytes": 15675741,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T14:47:22.323420Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 2176,
+    "claims_with_evidence": 40,
+    "pct_claims_with_evidence": 1.84,
+    "entities_total": 3385,
+    "entities_grounded": 3385,
+    "pct_entities_grounded": 100.0,
+    "pass": 34,
+    "rewrite": 2142,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 282,
+    "kinds": {
+      "TEXT_SPAN": 30,
+      "SHAPE_LABEL": 192,
+      "CONNECTOR": 10,
+      "IMAGE_ASSET": 4,
+      "IMAGE_CAPTION": 8,
+      "IMAGE_OBJECTS": 4,
+      "IMAGE_ACTIONS": 4,
+      "IMAGE_TAGS": 4,
+      "SLIDE_CAPTION": 9,
+      "DIAGRAM_SUMMARY": 17
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 20,
+    "slides_total": 20
+  },
+  "finished_at": "2026-04-09T15:11:36.795160+00:00"
+}

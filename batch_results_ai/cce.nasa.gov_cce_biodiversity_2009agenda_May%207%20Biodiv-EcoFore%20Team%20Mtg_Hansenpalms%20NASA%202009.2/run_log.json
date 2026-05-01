@@ -1,0 +1,147 @@
+{
+  "run_id": "bc465b67-1b95-4cf1-88ab-61d85377e9ea",
+  "started_at": "2026-04-05T14:30:44.465285+00:00",
+  "input_file": "cce.nasa.gov_cce_biodiversity_2009agenda_May%207%20Biodiv-EcoFore%20Team%20Mtg_Hansenpalms%20NASA%202009.2.pptx",
+  "input_bytes": 7944282,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 456.268,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 14.503,
+      "metrics": {
+        "slide_count": 23
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 107.849,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 35.799,
+      "metrics": {
+        "slide_count": 23,
+        "pdf_size": 3434853
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 3.076,
+      "metrics": {
+        "unified_graph_count": 23
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.053,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.094,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 76.033,
+      "metrics": {
+        "slides_rewritten": 23,
+        "slides_total": 23,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 144.68,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 72.682,
+      "metrics": {
+        "total_duration": 698.840168
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/cce.nasa.gov_cce_biodiversity_2009agenda_May%207%20Biodiv-EcoFore%20Team%20Mtg_Hansenpalms%20NASA%202009.2/final.mp4",
+  "output_bytes": 24538925,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T14:30:45.089487Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 206,
+    "claims_with_evidence": 46,
+    "pct_claims_with_evidence": 22.33,
+    "entities_total": 187,
+    "entities_grounded": 187,
+    "pct_entities_grounded": 100.0,
+    "pass": 40,
+    "rewrite": 166,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 300,
+    "kinds": {
+      "TEXT_SPAN": 25,
+      "SHAPE_LABEL": 91,
+      "IMAGE_ASSET": 31,
+      "IMAGE_CAPTION": 65,
+      "IMAGE_OBJECTS": 31,
+      "IMAGE_TAGS": 30,
+      "IMAGE_ACTIONS": 8,
+      "SLIDE_CAPTION": 10,
+      "DIAGRAM_SUMMARY": 9
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 23,
+    "slides_total": 23
+  },
+  "finished_at": "2026-04-05T14:38:20.732807+00:00"
+}

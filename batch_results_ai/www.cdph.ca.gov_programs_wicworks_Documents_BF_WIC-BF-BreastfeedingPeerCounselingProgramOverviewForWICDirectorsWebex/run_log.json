@@ -1,0 +1,147 @@
+{
+  "run_id": "2285dfb4-0d19-401e-ba88-a97c364dceda",
+  "started_at": "2026-04-05T17:33:52.589991+00:00",
+  "input_file": "www.cdph.ca.gov_programs_wicworks_Documents_BF_WIC-BF-BreastfeedingPeerCounselingProgramOverviewForWICDirectorsWebex.pptx",
+  "input_bytes": 1413888,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 565.235,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 4.938,
+      "metrics": {
+        "slide_count": 35
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 85.969,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 20.252,
+      "metrics": {
+        "slide_count": 35,
+        "pdf_size": 1104287
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 4.715,
+      "metrics": {
+        "unified_graph_count": 35
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.069,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.108,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 124.054,
+      "metrics": {
+        "slides_rewritten": 35,
+        "slides_total": 35,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 212.578,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 111.535,
+      "metrics": {
+        "total_duration": 839.1951869999999
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/www.cdph.ca.gov_programs_wicworks_Documents_BF_WIC-BF-BreastfeedingPeerCounselingProgramOverviewForWICDirectorsWebex/final.mp4",
+  "output_bytes": 21800680,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T17:33:53.000420Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 179,
+    "claims_with_evidence": 70,
+    "pct_claims_with_evidence": 39.11,
+    "entities_total": 109,
+    "entities_grounded": 109,
+    "pct_entities_grounded": 100.0,
+    "pass": 64,
+    "rewrite": 115,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 281,
+    "kinds": {
+      "TEXT_SPAN": 50,
+      "SHAPE_LABEL": 67,
+      "IMAGE_ASSET": 28,
+      "IMAGE_CAPTION": 55,
+      "IMAGE_OBJECTS": 27,
+      "IMAGE_ACTIONS": 13,
+      "IMAGE_TAGS": 27,
+      "SLIDE_CAPTION": 6,
+      "DIAGRAM_SUMMARY": 8
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 35,
+    "slides_total": 35
+  },
+  "finished_at": "2026-04-05T17:43:17.825318+00:00"
+}

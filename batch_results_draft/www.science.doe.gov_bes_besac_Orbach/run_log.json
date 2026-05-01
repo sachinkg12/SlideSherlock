@@ -1,0 +1,139 @@
+{
+  "run_id": "03ce8a0d-c849-4135-afcf-d1193cec0fa9",
+  "started_at": "2026-04-05T04:15:57.211900+00:00",
+  "input_file": "www.science.doe.gov_bes_besac_Orbach.pptx",
+  "input_bytes": 1613313,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 321.107,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 6.127,
+      "metrics": {
+        "slide_count": 10
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 224.557,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 24.337,
+      "metrics": {
+        "slide_count": 10,
+        "pdf_size": 879839
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 1.134,
+      "metrics": {
+        "unified_graph_count": 10
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 9.673,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.041,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 30.805,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 23.524,
+      "metrics": {
+        "total_duration": 134.22510499999999
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/www.science.doe.gov_bes_besac_Orbach/final.mp4",
+  "output_bytes": 5660683,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T04:15:57.627738Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 69,
+    "claims_with_evidence": 20,
+    "pct_claims_with_evidence": 28.99,
+    "entities_total": 65,
+    "entities_grounded": 65,
+    "pct_entities_grounded": 100.0,
+    "pass": 20,
+    "rewrite": 49,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 84,
+    "kinds": {
+      "TEXT_SPAN": 10,
+      "SHAPE_LABEL": 26,
+      "IMAGE_ASSET": 8,
+      "IMAGE_CAPTION": 19,
+      "IMAGE_OBJECTS": 8,
+      "SLIDE_CAPTION": 10,
+      "DIAGRAM_SUMMARY": 3
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T04:21:18.318847+00:00"
+}

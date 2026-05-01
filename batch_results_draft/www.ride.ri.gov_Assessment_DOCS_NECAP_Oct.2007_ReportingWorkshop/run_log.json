@@ -1,0 +1,141 @@
+{
+  "run_id": "f2d77603-c54d-4fde-b196-5fb029f5af69",
+  "started_at": "2026-05-01T02:33:01.963566+00:00",
+  "input_file": "www.ride.ri.gov_Assessment_DOCS_NECAP_Oct.2007_ReportingWorkshop.pptx",
+  "input_bytes": 3591461,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 661.488,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 87.757,
+      "metrics": {
+        "slide_count": 57
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 281.79,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 61.691,
+      "metrics": {
+        "slide_count": 57,
+        "pdf_size": 7148084
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 6.232,
+      "metrics": {
+        "unified_graph_count": 57
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.113,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.19,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 166.304,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 56.299,
+      "metrics": {
+        "total_duration": 652.8260000000001
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft_18/www.ride.ri.gov_Assessment_DOCS_NECAP_Oct.2007_ReportingWorkshop/final.mp4",
+  "output_bytes": 21168000,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-05-01T02:33:02.392862Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 772,
+    "claims_with_evidence": 114,
+    "pct_claims_with_evidence": 14.77,
+    "entities_total": 843,
+    "entities_grounded": 843,
+    "pct_entities_grounded": 100.0,
+    "pass": 76,
+    "rewrite": 696,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 526,
+    "kinds": {
+      "TEXT_SPAN": 57,
+      "SHAPE_LABEL": 148,
+      "IMAGE_ASSET": 58,
+      "IMAGE_CAPTION": 117,
+      "IMAGE_OBJECTS": 57,
+      "IMAGE_TAGS": 58,
+      "IMAGE_ACTIONS": 2,
+      "SLIDE_CAPTION": 15,
+      "DIAGRAM_SUMMARY": 14
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-05-01T02:44:03.451088+00:00"
+}

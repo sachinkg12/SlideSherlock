@@ -1,0 +1,53 @@
+{
+  "created_at": "2026-04-05T05:51:45.191061+00:00",
+  "corpus": "Library of Congress PowerPoint Collection (139 US Government presentations, public domain). 18 files excluded due to excessive size or preprocessing timeouts.",
+  "total_files": 139,
+  "processed": 139,
+  "successful_with_video": 139,
+  "skipped": 0,
+  "success_rate_pct": 100.0,
+  "total_slides": 0,
+  "pipeline": {
+    "mean_duration_s": 326.3,
+    "median_duration_s": 264.9,
+    "min_duration_s": 13.9,
+    "max_duration_s": 894.8,
+    "total_duration_s": 45349.2
+  },
+  "evidence": {
+    "total_items": 23562,
+    "mean_per_file": 169.5,
+    "kind_distribution": {
+      "SHAPE_LABEL": 8456,
+      "IMAGE_CAPTION": 3720,
+      "TEXT_SPAN": 3252,
+      "SLIDE_CAPTION": 2221,
+      "IMAGE_ASSET": 1741,
+      "DIAGRAM_SUMMARY": 1720,
+      "IMAGE_OBJECTS": 1682,
+      "IMAGE_TAGS": 469,
+      "CONNECTOR": 187,
+      "IMAGE_ACTIONS": 114
+    }
+  },
+  "verification": {
+    "total_claims": 25819,
+    "claims_with_evidence": 5774,
+    "pct_evidence_coverage": 22.4,
+    "total_verdicts": 25819,
+    "pass": 5293,
+    "rewrite": 20526,
+    "remove": 0,
+    "pass_rate_pct": 20.5,
+    "rewrite_rate_pct": 79.5,
+    "remove_rate_pct": 0.0
+  },
+  "input": {
+    "total_mb": 497.4,
+    "mean_mb": 3.58
+  },
+  "output": {
+    "total_mb": 2127.5,
+    "mean_mb": 15.31
+  }
+}

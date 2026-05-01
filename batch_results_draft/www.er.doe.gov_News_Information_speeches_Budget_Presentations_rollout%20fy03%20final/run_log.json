@@ -1,0 +1,139 @@
+{
+  "run_id": "ff2b18a8-ccda-4e9f-80b9-376b0438e9b2",
+  "started_at": "2026-04-05T02:41:49.038138+00:00",
+  "input_file": "www.er.doe.gov_News_Information_speeches_Budget_Presentations_rollout%20fy03%20final.pptx",
+  "input_bytes": 10922645,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 553.146,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 15.271,
+      "metrics": {
+        "slide_count": 16
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 105.147,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 37.695,
+      "metrics": {
+        "slide_count": 16,
+        "pdf_size": 3207728
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 2.408,
+      "metrics": {
+        "unified_graph_count": 16
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 242.293,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 3.399,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 91.62,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 54.12,
+      "metrics": {
+        "total_duration": 329.8861260000001
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/www.er.doe.gov_News_Information_speeches_Budget_Presentations_rollout%20fy03%20final/final.mp4",
+  "output_bytes": 16383991,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T02:41:49.491631Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 2020,
+    "claims_with_evidence": 32,
+    "pct_claims_with_evidence": 1.58,
+    "entities_total": 3418,
+    "entities_grounded": 3418,
+    "pct_entities_grounded": 100.0,
+    "pass": 30,
+    "rewrite": 1990,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 352,
+    "kinds": {
+      "TEXT_SPAN": 18,
+      "SHAPE_LABEL": 106,
+      "IMAGE_ASSET": 53,
+      "IMAGE_CAPTION": 106,
+      "IMAGE_OBJECTS": 53,
+      "SLIDE_CAPTION": 14,
+      "DIAGRAM_SUMMARY": 2
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T02:51:02.184125+00:00"
+}

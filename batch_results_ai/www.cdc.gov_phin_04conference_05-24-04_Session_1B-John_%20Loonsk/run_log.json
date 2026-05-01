@@ -1,0 +1,146 @@
+{
+  "run_id": "99ef9106-ca1d-4709-a16d-6ffd77b01095",
+  "started_at": "2026-04-05T17:26:10.911069+00:00",
+  "input_file": "www.cdc.gov_phin_04conference_05-24-04_Session_1B-John_%20Loonsk.pptx",
+  "input_bytes": 570992,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 351.007,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 0.793,
+      "metrics": {
+        "slide_count": 22
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 3.548,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 40.835,
+      "metrics": {
+        "slide_count": 22,
+        "pdf_size": 532856
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 2.177,
+      "metrics": {
+        "unified_graph_count": 22
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.04,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.071,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 77.042,
+      "metrics": {
+        "slides_rewritten": 22,
+        "slides_total": 22,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 136.19,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 89.18,
+      "metrics": {
+        "total_duration": 649.289813
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/www.cdc.gov_phin_04conference_05-24-04_Session_1B-John_%20Loonsk/final.mp4",
+  "output_bytes": 19550350,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T17:26:11.334665Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 141,
+    "claims_with_evidence": 44,
+    "pct_claims_with_evidence": 31.21,
+    "entities_total": 119,
+    "entities_grounded": 119,
+    "pct_entities_grounded": 100.0,
+    "pass": 41,
+    "rewrite": 100,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 135,
+    "kinds": {
+      "TEXT_SPAN": 21,
+      "SHAPE_LABEL": 64,
+      "IMAGE_ASSET": 2,
+      "IMAGE_CAPTION": 4,
+      "IMAGE_OBJECTS": 2,
+      "IMAGE_TAGS": 2,
+      "SLIDE_CAPTION": 20,
+      "DIAGRAM_SUMMARY": 20
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 22,
+    "slides_total": 22
+  },
+  "finished_at": "2026-04-05T17:32:01.917756+00:00"
+}

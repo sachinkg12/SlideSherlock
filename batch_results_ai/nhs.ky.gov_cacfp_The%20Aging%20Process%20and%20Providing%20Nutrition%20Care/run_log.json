@@ -1,0 +1,147 @@
+{
+  "run_id": "eccaff96-51cc-4960-bb70-e77418b1af97",
+  "started_at": "2026-04-05T15:48:46.995390+00:00",
+  "input_file": "nhs.ky.gov_cacfp_The%20Aging%20Process%20and%20Providing%20Nutrition%20Care.pptx",
+  "input_bytes": 2097014,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 358.967,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 3.665,
+      "metrics": {
+        "slide_count": 23
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 42.45,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 30.153,
+      "metrics": {
+        "slide_count": 23,
+        "pdf_size": 1317933
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 2.431,
+      "metrics": {
+        "unified_graph_count": 23
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.04,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.066,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 81.339,
+      "metrics": {
+        "slides_rewritten": 23,
+        "slides_total": 23,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 136.225,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 61.633,
+      "metrics": {
+        "total_duration": 585.0971040000001
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/nhs.ky.gov_cacfp_The%20Aging%20Process%20and%20Providing%20Nutrition%20Care/final.mp4",
+  "output_bytes": 15735745,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T15:48:47.403532Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 103,
+    "claims_with_evidence": 46,
+    "pct_claims_with_evidence": 44.66,
+    "entities_total": 57,
+    "entities_grounded": 57,
+    "pct_entities_grounded": 100.0,
+    "pass": 40,
+    "rewrite": 63,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 151,
+    "kinds": {
+      "TEXT_SPAN": 23,
+      "SHAPE_LABEL": 47,
+      "IMAGE_ASSET": 10,
+      "IMAGE_CAPTION": 20,
+      "IMAGE_OBJECTS": 10,
+      "IMAGE_TAGS": 10,
+      "IMAGE_ACTIONS": 5,
+      "SLIDE_CAPTION": 13,
+      "DIAGRAM_SUMMARY": 13
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 23,
+    "slides_total": 23
+  },
+  "finished_at": "2026-04-05T15:54:45.962230+00:00"
+}

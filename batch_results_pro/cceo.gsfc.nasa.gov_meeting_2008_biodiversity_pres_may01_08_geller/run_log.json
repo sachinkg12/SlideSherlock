@@ -1,0 +1,146 @@
+{
+  "run_id": "3a6d42dc-97db-4b37-a085-655c1d16ea88",
+  "started_at": "2026-04-09T08:50:15.529682+00:00",
+  "input_file": "cceo.gsfc.nasa.gov_meeting_2008_biodiversity_pres_may01_08_geller.pptx",
+  "input_bytes": 1619103,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1146.87,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 1.571,
+      "metrics": {
+        "slide_count": 20
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 29.873,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 41.169,
+      "metrics": {
+        "slide_count": 20,
+        "pdf_size": 725801
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 17.639,
+      "metrics": {
+        "unified_graph_count": 20
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.082,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.513,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 7.109,
+      "metrics": {
+        "slides_rewritten": 20,
+        "slides_total": 20,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 111.345,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 936.426,
+      "metrics": {
+        "total_duration": 524.728501
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/cceo.gsfc.nasa.gov_meeting_2008_biodiversity_pres_may01_08_geller/final.mp4",
+  "output_bytes": 12857967,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T08:50:15.941985Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1312,
+    "claims_with_evidence": 40,
+    "pct_claims_with_evidence": 3.05,
+    "entities_total": 1274,
+    "entities_grounded": 1274,
+    "pct_entities_grounded": 100.0,
+    "pass": 36,
+    "rewrite": 1276,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 194,
+    "kinds": {
+      "TEXT_SPAN": 21,
+      "SHAPE_LABEL": 109,
+      "IMAGE_ASSET": 5,
+      "IMAGE_CAPTION": 21,
+      "IMAGE_OBJECTS": 5,
+      "IMAGE_TAGS": 5,
+      "SLIDE_CAPTION": 14,
+      "DIAGRAM_SUMMARY": 14
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 20,
+    "slides_total": 20
+  },
+  "finished_at": "2026-04-09T09:09:22.399505+00:00"
+}

@@ -1,0 +1,139 @@
+{
+  "run_id": "e949b589-d62e-49f0-b729-b2be55f7e3b4",
+  "started_at": "2026-04-05T02:40:13.720246+00:00",
+  "input_file": "www.emsc.nysed.gov_irts_cohort_2009_Grad-Rates07-08additionalslides.pptx",
+  "input_bytes": 744248,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 608.926,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 2.586,
+      "metrics": {
+        "slide_count": 72
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 14.17,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 145.561,
+      "metrics": {
+        "slide_count": 72,
+        "pdf_size": 702346
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 6.829,
+      "metrics": {
+        "unified_graph_count": 72
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 77.961,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.237,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 193.994,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 166.479,
+      "metrics": {
+        "total_duration": 825.8294389999999
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/www.emsc.nysed.gov_irts_cohort_2009_Grad-Rates07-08additionalslides/final.mp4",
+  "output_bytes": 21893987,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T02:40:14.155449Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 554,
+    "claims_with_evidence": 144,
+    "pct_claims_with_evidence": 25.99,
+    "entities_total": 410,
+    "entities_grounded": 410,
+    "pct_entities_grounded": 100.0,
+    "pass": 83,
+    "rewrite": 471,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 418,
+    "kinds": {
+      "TEXT_SPAN": 72,
+      "SHAPE_LABEL": 172,
+      "IMAGE_ASSET": 8,
+      "IMAGE_CAPTION": 16,
+      "IMAGE_OBJECTS": 8,
+      "SLIDE_CAPTION": 72,
+      "DIAGRAM_SUMMARY": 70
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T02:50:22.646076+00:00"
+}

@@ -1,0 +1,147 @@
+{
+  "run_id": "c38b5608-75d4-4dc3-a9e1-35f5abde63f6",
+  "started_at": "2026-04-09T17:41:52.334336+00:00",
+  "input_file": "www.giss.nasa.gov_meetings_arctic2007_ppt_aws_warren.pptx",
+  "input_bytes": 7128706,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1170.859,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 13.469,
+      "metrics": {
+        "slide_count": 17
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 54.324,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 34.799,
+      "metrics": {
+        "slide_count": 17,
+        "pdf_size": 3086130
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 14.589,
+      "metrics": {
+        "unified_graph_count": 17
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.053,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.142,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 7.347,
+      "metrics": {
+        "slides_rewritten": 17,
+        "slides_total": 17,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 101.505,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 943.142,
+      "metrics": {
+        "total_duration": 480.85568699999993
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.giss.nasa.gov_meetings_arctic2007_ppt_aws_warren/final.mp4",
+  "output_bytes": 13143132,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T17:41:52.840234Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 775,
+    "claims_with_evidence": 34,
+    "pct_claims_with_evidence": 4.39,
+    "entities_total": 741,
+    "entities_grounded": 741,
+    "pct_entities_grounded": 100.0,
+    "pass": 29,
+    "rewrite": 746,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 94,
+    "kinds": {
+      "TEXT_SPAN": 14,
+      "SHAPE_LABEL": 23,
+      "IMAGE_ASSET": 8,
+      "IMAGE_CAPTION": 15,
+      "IMAGE_OBJECTS": 7,
+      "IMAGE_TAGS": 7,
+      "IMAGE_ACTIONS": 1,
+      "SLIDE_CAPTION": 10,
+      "DIAGRAM_SUMMARY": 9
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 17,
+    "slides_total": 17
+  },
+  "finished_at": "2026-04-09T18:01:23.193350+00:00"
+}

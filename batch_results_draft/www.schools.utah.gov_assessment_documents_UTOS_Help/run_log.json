@@ -1,0 +1,139 @@
+{
+  "run_id": "afc427a6-6812-4500-a2a9-86a23dd5c1a2",
+  "started_at": "2026-04-05T04:14:52.059412+00:00",
+  "input_file": "www.schools.utah.gov_assessment_documents_UTOS_Help.pptx",
+  "input_bytes": 1458268,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 418.158,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 9.161,
+      "metrics": {
+        "slide_count": 17
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 294.317,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 36.975,
+      "metrics": {
+        "slide_count": 17,
+        "pdf_size": 1609823
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 2.019,
+      "metrics": {
+        "unified_graph_count": 17
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 13.952,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.101,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 38.357,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 22.27,
+      "metrics": {
+        "total_duration": 138.327416
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/www.schools.utah.gov_assessment_documents_UTOS_Help/final.mp4",
+  "output_bytes": 5449760,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T04:14:52.504506Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 113,
+    "claims_with_evidence": 34,
+    "pct_claims_with_evidence": 30.09,
+    "entities_total": 79,
+    "entities_grounded": 79,
+    "pct_entities_grounded": 100.0,
+    "pass": 34,
+    "rewrite": 79,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 128,
+    "kinds": {
+      "TEXT_SPAN": 17,
+      "SHAPE_LABEL": 28,
+      "IMAGE_ASSET": 16,
+      "IMAGE_CAPTION": 32,
+      "IMAGE_OBJECTS": 16,
+      "SLIDE_CAPTION": 17,
+      "DIAGRAM_SUMMARY": 2
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T04:21:50.217362+00:00"
+}

@@ -1,0 +1,111 @@
+{
+  "job_id": "9141dfc8-6ebf-4787-b3b7-00b9676b9dd0",
+  "preset": "pro",
+  "pipeline_duration_ms": 1493669,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_ms": 2827,
+      "metrics": {
+        "slide_count": 18
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_ms": 41387,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_ms": 61507,
+      "metrics": {
+        "slide_count": 18,
+        "pdf_size": 374694
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_ms": 14626,
+      "metrics": {
+        "unified_graph_count": 18
+      }
+    },
+    "script": {
+      "status": "ok",
+      "duration_ms": 80,
+      "metrics": {}
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_ms": 80,
+      "metrics": {}
+    },
+    "verify": {
+      "status": "ok",
+      "duration_ms": 300,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_ms": 300,
+      "metrics": {}
+    },
+    "translate": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate": {
+      "status": "ok",
+      "duration_ms": 10029,
+      "metrics": {
+        "slides_rewritten": 18,
+        "slides_total": 18,
+        "slides_fallback": 0
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_ms": 10029,
+      "metrics": {
+        "slides_rewritten": 18,
+        "slides_total": 18,
+        "slides_fallback": 0
+      }
+    },
+    "audio": {
+      "status": "ok",
+      "duration_ms": 120401,
+      "metrics": {}
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_ms": 120401,
+      "metrics": {}
+    },
+    "video": {
+      "status": "ok",
+      "duration_ms": 1242499,
+      "metrics": {
+        "total_duration": 570.1347920000001
+      }
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_ms": 1242499,
+      "metrics": {
+        "total_duration": 570.1347920000001
+      }
+    }
+  },
+  "created_at": "2026-04-09T16:32:47.610251+00:00Z"
+}

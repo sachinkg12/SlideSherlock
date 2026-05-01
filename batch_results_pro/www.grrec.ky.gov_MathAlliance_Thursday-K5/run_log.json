@@ -1,0 +1,147 @@
+{
+  "run_id": "35876229-19e8-4136-bba7-48fd9d676c0a",
+  "started_at": "2026-04-09T18:01:23.554745+00:00",
+  "input_file": "www.grrec.ky.gov_MathAlliance_Thursday-K5.pptx",
+  "input_bytes": 1656050,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 541.425,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 3.35,
+      "metrics": {
+        "slide_count": 8
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 43.601,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 12.959,
+      "metrics": {
+        "slide_count": 8,
+        "pdf_size": 738201
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 6.542,
+      "metrics": {
+        "unified_graph_count": 8
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.037,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.099,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 7.018,
+      "metrics": {
+        "slides_rewritten": 8,
+        "slides_total": 8,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 56.445,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 409.706,
+      "metrics": {
+        "total_duration": 198.31637600000002
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.grrec.ky.gov_MathAlliance_Thursday-K5/final.mp4",
+  "output_bytes": 6282605,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T18:01:24.202458Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 362,
+    "claims_with_evidence": 16,
+    "pct_claims_with_evidence": 4.42,
+    "entities_total": 346,
+    "entities_grounded": 346,
+    "pct_entities_grounded": 100.0,
+    "pass": 12,
+    "rewrite": 350,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 90,
+    "kinds": {
+      "TEXT_SPAN": 8,
+      "SHAPE_LABEL": 25,
+      "IMAGE_ASSET": 10,
+      "IMAGE_CAPTION": 20,
+      "IMAGE_OBJECTS": 10,
+      "IMAGE_TAGS": 10,
+      "IMAGE_ACTIONS": 3,
+      "SLIDE_CAPTION": 2,
+      "DIAGRAM_SUMMARY": 2
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 8,
+    "slides_total": 8
+  },
+  "finished_at": "2026-04-09T18:10:24.980180+00:00"
+}

@@ -1,0 +1,141 @@
+{
+  "run_id": "f27db1e2-c0e2-4f3c-bb4d-2445de7148f0",
+  "started_at": "2026-04-11T08:31:48.553800+00:00",
+  "input_file": "www.nlm.nih.gov_docline_MLA%202007%20Sunrise%20Seminar%20ILL%20Study.pptx",
+  "input_bytes": 181336,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 722.912,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 1.085,
+      "metrics": {
+        "slide_count": 24
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 0.424,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 46.823,
+      "metrics": {
+        "slide_count": 24,
+        "pdf_size": 277801
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 64.188,
+      "metrics": {
+        "unified_graph_count": 24
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.235,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 1.074,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 14.376,
+      "metrics": {
+        "slides_rewritten": 24,
+        "slides_total": 24,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 361.202,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 226.298,
+      "metrics": {
+        "total_duration": 788.973146
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.nlm.nih.gov_docline_MLA%202007%20Sunrise%20Seminar%20ILL%20Study/final.mp4",
+  "output_bytes": 20778324,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-11T08:31:53.656641Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1498,
+    "claims_with_evidence": 48,
+    "pct_claims_with_evidence": 3.2,
+    "entities_total": 1450,
+    "entities_grounded": 1450,
+    "pct_entities_grounded": 100.0,
+    "pass": 34,
+    "rewrite": 1464,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 127,
+    "kinds": {
+      "TEXT_SPAN": 48,
+      "SHAPE_LABEL": 55,
+      "DIAGRAM_SUMMARY": 24
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 24,
+    "slides_total": 24
+  },
+  "finished_at": "2026-04-11T08:43:51.465612+00:00"
+}

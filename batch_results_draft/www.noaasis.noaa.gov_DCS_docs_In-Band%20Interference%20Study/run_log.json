@@ -1,0 +1,139 @@
+{
+  "run_id": "ba86d46c-84cd-4032-9803-fcc4cbb47119",
+  "started_at": "2026-04-05T03:59:48.915556+00:00",
+  "input_file": "www.noaasis.noaa.gov_DCS_docs_In-Band%20Interference%20Study.pptx",
+  "input_bytes": 3239593,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 196.222,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 7.702,
+      "metrics": {
+        "slide_count": 15
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 43.528,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 32.321,
+      "metrics": {
+        "slide_count": 15,
+        "pdf_size": 757339
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 1.999,
+      "metrics": {
+        "unified_graph_count": 15
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 17.928,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.136,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 53.123,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 38.087,
+      "metrics": {
+        "total_duration": 156.17908199999997
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/www.noaasis.noaa.gov_DCS_docs_In-Band%20Interference%20Study/final.mp4",
+  "output_bytes": 4253445,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T03:59:49.421028Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 173,
+    "claims_with_evidence": 30,
+    "pct_claims_with_evidence": 17.34,
+    "entities_total": 143,
+    "entities_grounded": 143,
+    "pct_entities_grounded": 100.0,
+    "pass": 29,
+    "rewrite": 144,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 184,
+    "kinds": {
+      "TEXT_SPAN": 15,
+      "SHAPE_LABEL": 48,
+      "CONNECTOR": 6,
+      "IMAGE_ASSET": 25,
+      "IMAGE_CAPTION": 50,
+      "IMAGE_OBJECTS": 25,
+      "SLIDE_CAPTION": 15
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T04:03:05.137666+00:00"
+}

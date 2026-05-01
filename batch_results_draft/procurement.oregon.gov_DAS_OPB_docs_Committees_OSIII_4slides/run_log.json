@@ -1,0 +1,137 @@
+{
+  "run_id": "0a8cfb39-3af9-402b-8c67-d135abf59af4",
+  "started_at": "2026-04-05T01:11:14.270517+00:00",
+  "input_file": "procurement.oregon.gov_DAS_OPB_docs_Committees_OSIII_4slides.pptx",
+  "input_bytes": 28378,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 222.226,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 0.209,
+      "metrics": {
+        "slide_count": 4
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 0.201,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 12.369,
+      "metrics": {
+        "slide_count": 4,
+        "pdf_size": 258831
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 0.463,
+      "metrics": {
+        "unified_graph_count": 4
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 181.028,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.077,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 17.683,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 9.347,
+      "metrics": {
+        "total_duration": 65.243354
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/procurement.oregon.gov_DAS_OPB_docs_Committees_OSIII_4slides/final.mp4",
+  "output_bytes": 2643757,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T01:11:14.670083Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 292,
+    "claims_with_evidence": 8,
+    "pct_claims_with_evidence": 2.74,
+    "entities_total": 472,
+    "entities_grounded": 472,
+    "pct_entities_grounded": 100.0,
+    "pass": 8,
+    "rewrite": 284,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 176,
+    "kinds": {
+      "TEXT_SPAN": 4,
+      "SHAPE_LABEL": 162,
+      "CONNECTOR": 2,
+      "SLIDE_CAPTION": 4,
+      "DIAGRAM_SUMMARY": 4
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T01:14:56.496473+00:00"
+}

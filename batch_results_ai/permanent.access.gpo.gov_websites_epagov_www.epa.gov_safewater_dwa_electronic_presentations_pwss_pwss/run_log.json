@@ -1,0 +1,148 @@
+{
+  "run_id": "45ad4e5c-a6d3-41d0-94cb-da1d124e52c3",
+  "started_at": "2026-04-30T08:30:20.128004+00:00",
+  "input_file": "permanent.access.gpo.gov_websites_epagov_www.epa.gov_safewater_dwa_electronic_presentations_pwss_pwss.pptx",
+  "input_bytes": 14146240,
+  "preset": "standard",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1301.87,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 25.622,
+      "metrics": {
+        "slide_count": 125
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 206.997,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 87.498,
+      "metrics": {
+        "slide_count": 125,
+        "pdf_size": 8104418
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 22.902,
+      "metrics": {
+        "unified_graph_count": 125
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.291,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.594,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.009,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 60.47,
+      "metrics": {
+        "slides_rewritten": 125,
+        "slides_total": 125,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 735.312,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 160.338,
+      "metrics": {
+        "total_duration": 4664.385
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai_18/permanent.access.gpo.gov_websites_epagov_www.epa.gov_safewater_dwa_electronic_presentations_pwss_pwss/final.mp4",
+  "output_bytes": 112019172,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-30T08:30:20.542773Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1067,
+    "claims_with_evidence": 250,
+    "pct_claims_with_evidence": 23.43,
+    "entities_total": 845,
+    "entities_grounded": 845,
+    "pct_entities_grounded": 100.0,
+    "pass": 214,
+    "rewrite": 853,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 789,
+    "kinds": {
+      "TEXT_SPAN": 208,
+      "SHAPE_LABEL": 264,
+      "CONNECTOR": 8,
+      "IMAGE_ASSET": 38,
+      "IMAGE_CAPTION": 89,
+      "IMAGE_OBJECTS": 38,
+      "IMAGE_TAGS": 38,
+      "IMAGE_ACTIONS": 8,
+      "SLIDE_CAPTION": 16,
+      "DIAGRAM_SUMMARY": 82
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 125,
+    "slides_total": 125
+  },
+  "finished_at": "2026-04-30T08:52:01.998487+00:00"
+}

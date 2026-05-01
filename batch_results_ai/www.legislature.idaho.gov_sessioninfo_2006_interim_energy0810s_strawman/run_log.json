@@ -1,0 +1,146 @@
+{
+  "run_id": "4d19d66e-6d2d-4cdb-8d04-3f67eb285d20",
+  "started_at": "2026-04-05T19:38:35.366744+00:00",
+  "input_file": "www.legislature.idaho.gov_sessioninfo_2006_interim_energy0810s_strawman.pptx",
+  "input_bytes": 53779,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 94.612,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 0.311,
+      "metrics": {
+        "slide_count": 6
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 4.354,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 16.275,
+      "metrics": {
+        "slide_count": 6,
+        "pdf_size": 157512
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 0.624,
+      "metrics": {
+        "unified_graph_count": 6
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.017,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.025,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 16.913,
+      "metrics": {
+        "slides_rewritten": 6,
+        "slides_total": 6,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 35.784,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 19.192,
+      "metrics": {
+        "total_duration": 182.214355
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/www.legislature.idaho.gov_sessioninfo_2006_interim_energy0810s_strawman/final.mp4",
+  "output_bytes": 5747932,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T19:38:35.835960Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 37,
+    "claims_with_evidence": 12,
+    "pct_claims_with_evidence": 32.43,
+    "entities_total": 25,
+    "entities_grounded": 25,
+    "pct_entities_grounded": 100.0,
+    "pass": 11,
+    "rewrite": 26,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 40,
+    "kinds": {
+      "TEXT_SPAN": 6,
+      "SHAPE_LABEL": 16,
+      "IMAGE_ASSET": 1,
+      "IMAGE_CAPTION": 5,
+      "IMAGE_OBJECTS": 1,
+      "IMAGE_TAGS": 1,
+      "SLIDE_CAPTION": 5,
+      "DIAGRAM_SUMMARY": 5
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 6,
+    "slides_total": 6
+  },
+  "finished_at": "2026-04-05T19:40:09.978646+00:00"
+}

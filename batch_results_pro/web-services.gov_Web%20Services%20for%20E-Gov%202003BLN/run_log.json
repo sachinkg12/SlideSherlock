@@ -1,0 +1,148 @@
+{
+  "run_id": "d35346c7-5ecb-4b87-bb74-abfdcadb7c52",
+  "started_at": "2026-04-11T06:21:02.604087+00:00",
+  "input_file": "web-services.gov_Web%20Services%20for%20E-Gov%202003BLN.pptx",
+  "input_bytes": 2562899,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 963.924,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 15.789,
+      "metrics": {
+        "slide_count": 44
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 134.487,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 142.097,
+      "metrics": {
+        "slide_count": 44,
+        "pdf_size": 2307068
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 58.682,
+      "metrics": {
+        "unified_graph_count": 44
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.23,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 1.104,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 15.503,
+      "metrics": {
+        "slides_rewritten": 44,
+        "slides_total": 44,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 339.213,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 254.612,
+      "metrics": {
+        "total_duration": 1345.6122520000001
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/web-services.gov_Web%20Services%20for%20E-Gov%202003BLN/final.mp4",
+  "output_bytes": 67975653,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-11T06:21:03.356380Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 5064,
+    "claims_with_evidence": 88,
+    "pct_claims_with_evidence": 1.74,
+    "entities_total": 5586,
+    "entities_grounded": 5586,
+    "pct_entities_grounded": 100.0,
+    "pass": 78,
+    "rewrite": 4986,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 507,
+    "kinds": {
+      "TEXT_SPAN": 44,
+      "SHAPE_LABEL": 272,
+      "CONNECTOR": 19,
+      "IMAGE_ASSET": 22,
+      "IMAGE_CAPTION": 47,
+      "IMAGE_OBJECTS": 22,
+      "IMAGE_ACTIONS": 6,
+      "IMAGE_TAGS": 22,
+      "SLIDE_CAPTION": 27,
+      "DIAGRAM_SUMMARY": 26
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 44,
+    "slides_total": 44
+  },
+  "finished_at": "2026-04-11T06:37:06.528056+00:00"
+}

@@ -1,0 +1,147 @@
+{
+  "run_id": "be3f9872-c8af-44bf-a593-d5e94e3414db",
+  "started_at": "2026-04-09T11:30:57.903606+00:00",
+  "input_file": "mobile.va.gov_sites_default_files_ProviderProgram_OutreachToolkitPresentation.pptx",
+  "input_bytes": 621428,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 536.275,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 2.516,
+      "metrics": {
+        "slide_count": 8
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 51.155,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 10.402,
+      "metrics": {
+        "slide_count": 8,
+        "pdf_size": 590809
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 6.813,
+      "metrics": {
+        "unified_graph_count": 8
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.034,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.08,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 4.061,
+      "metrics": {
+        "slides_rewritten": 8,
+        "slides_total": 8,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 46.655,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 413.57,
+      "metrics": {
+        "total_duration": 216.289292
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/mobile.va.gov_sites_default_files_ProviderProgram_OutreachToolkitPresentation/final.mp4",
+  "output_bytes": 5803526,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T11:30:58.311939Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 446,
+    "claims_with_evidence": 16,
+    "pct_claims_with_evidence": 3.59,
+    "entities_total": 430,
+    "entities_grounded": 430,
+    "pct_entities_grounded": 100.0,
+    "pass": 12,
+    "rewrite": 434,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 89,
+    "kinds": {
+      "TEXT_SPAN": 15,
+      "SHAPE_LABEL": 18,
+      "IMAGE_ASSET": 10,
+      "IMAGE_CAPTION": 20,
+      "IMAGE_OBJECTS": 10,
+      "IMAGE_ACTIONS": 3,
+      "IMAGE_TAGS": 10,
+      "SLIDE_CAPTION": 1,
+      "DIAGRAM_SUMMARY": 2
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 8,
+    "slides_total": 8
+  },
+  "finished_at": "2026-04-09T11:39:54.178427+00:00"
+}

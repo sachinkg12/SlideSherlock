@@ -1,0 +1,123 @@
+{
+  "created_at": "2026-04-08T03:08:21.286530+00:00",
+  "corpus": "Library of Congress PowerPoint Collection (139 US Government presentations, public domain). 18 files excluded due to excessive size or preprocessing timeouts. AI narration enabled (GPT-4o rewrites template narration per slide).",
+  "total_files": 139,
+  "processed": 139,
+  "successful_with_video": 139,
+  "skipped": 0,
+  "success_rate_pct": 100.0,
+  "total_slides": 2914,
+  "pipeline": {
+    "mean_duration_s": 337.8,
+    "median_duration_s": 289.2,
+    "min_duration_s": 16.7,
+    "max_duration_s": 1101.8,
+    "total_duration_s": 46947.5
+  },
+  "evidence": {
+    "total_items": 24378,
+    "mean_per_file": 175.4,
+    "kind_distribution": {
+      "SHAPE_LABEL": 8456,
+      "IMAGE_CAPTION": 3720,
+      "TEXT_SPAN": 3252,
+      "IMAGE_ASSET": 1741,
+      "DIAGRAM_SUMMARY": 1720,
+      "IMAGE_OBJECTS": 1655,
+      "IMAGE_TAGS": 1646,
+      "SLIDE_CAPTION": 1600,
+      "IMAGE_ACTIONS": 401,
+      "CONNECTOR": 187
+    }
+  },
+  "verification": {
+    "total_claims": 25819,
+    "claims_with_evidence": 5774,
+    "pct_evidence_coverage": 22.4,
+    "total_verdicts": 25819,
+    "pass": 5046,
+    "rewrite": 20773,
+    "remove": 0,
+    "pass_rate_pct": 19.5,
+    "rewrite_rate_pct": 80.5,
+    "remove_rate_pct": 0.0
+  },
+  "ai_narration": {
+    "total_slides_processed": 2887,
+    "total_slides_rewritten": 2887,
+    "rewrite_coverage_pct": 100.0
+  },
+  "stage_stats": {
+    "audio": {
+      "mean_s": 127.22,
+      "min_s": 5.74,
+      "max_s": 532.46,
+      "total_s": 17683.98,
+      "count": 139
+    },
+    "evidence": {
+      "mean_s": 39.56,
+      "min_s": 0.01,
+      "max_s": 215.82,
+      "total_s": 5498.99,
+      "count": 139
+    },
+    "graph": {
+      "mean_s": 3.31,
+      "min_s": 0.1,
+      "max_s": 14.54,
+      "total_s": 460.48,
+      "count": 139
+    },
+    "ingest": {
+      "mean_s": 4.98,
+      "min_s": 0.02,
+      "max_s": 31.03,
+      "total_s": 691.53,
+      "count": 139
+    },
+    "narrate": {
+      "mean_s": 53.58,
+      "min_s": 1.61,
+      "max_s": 203.68,
+      "total_s": 7447.73,
+      "count": 139
+    },
+    "render": {
+      "mean_s": 32.41,
+      "min_s": 2.19,
+      "max_s": 141.46,
+      "total_s": 4504.4,
+      "count": 139
+    },
+    "script": {
+      "mean_s": 0.06,
+      "min_s": 0.01,
+      "max_s": 0.67,
+      "total_s": 7.74,
+      "count": 139
+    },
+    "verify": {
+      "mean_s": 0.12,
+      "min_s": 0.01,
+      "max_s": 2.62,
+      "total_s": 16.19,
+      "count": 139
+    },
+    "video": {
+      "mean_s": 75.15,
+      "min_s": 3.62,
+      "max_s": 272.49,
+      "total_s": 10445.96,
+      "count": 139
+    }
+  },
+  "input": {
+    "total_mb": 474.4,
+    "mean_mb": 3.41
+  },
+  "output": {
+    "total_mb": 2599.9,
+    "mean_mb": 18.7
+  }
+}

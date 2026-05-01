@@ -1,0 +1,147 @@
+{
+  "run_id": "20a8895d-53b5-4e57-897d-88c3cff0b5a4",
+  "started_at": "2026-04-11T07:22:01.409332+00:00",
+  "input_file": "www.hep.anl.gov_stk_airfly_fluor_talk.pptx",
+  "input_bytes": 6712206,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 684.423,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 26.963,
+      "metrics": {
+        "slide_count": 31
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 207.884,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 28.69,
+      "metrics": {
+        "slide_count": 31,
+        "pdf_size": 3780572
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 24.871,
+      "metrics": {
+        "unified_graph_count": 31
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.088,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.263,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 15.06,
+      "metrics": {
+        "slides_rewritten": 31,
+        "slides_total": 31,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 191.872,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 186.89,
+      "metrics": {
+        "total_duration": 795.4398159999998
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.hep.anl.gov_stk_airfly_fluor_talk/final.mp4",
+  "output_bytes": 25791515,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-11T07:22:02.228764Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1355,
+    "claims_with_evidence": 62,
+    "pct_claims_with_evidence": 4.58,
+    "entities_total": 1294,
+    "entities_grounded": 1294,
+    "pct_entities_grounded": 100.0,
+    "pass": 52,
+    "rewrite": 1303,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 263,
+    "kinds": {
+      "TEXT_SPAN": 29,
+      "SHAPE_LABEL": 52,
+      "IMAGE_ASSET": 34,
+      "IMAGE_CAPTION": 71,
+      "IMAGE_OBJECTS": 31,
+      "IMAGE_TAGS": 34,
+      "IMAGE_ACTIONS": 1,
+      "SLIDE_CAPTION": 6,
+      "DIAGRAM_SUMMARY": 5
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 31,
+    "slides_total": 31
+  },
+  "finished_at": "2026-04-11T07:33:25.832504+00:00"
+}

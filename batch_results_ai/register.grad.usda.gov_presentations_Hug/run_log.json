@@ -1,0 +1,147 @@
+{
+  "run_id": "85449bc7-890f-4ef6-821d-1f523392ee53",
+  "started_at": "2026-04-05T16:04:01.994998+00:00",
+  "input_file": "register.grad.usda.gov_presentations_Hug.pptx",
+  "input_bytes": 202977,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 411.954,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 0.761,
+      "metrics": {
+        "slide_count": 26
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 10.354,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 48.184,
+      "metrics": {
+        "slide_count": 26,
+        "pdf_size": 1032664
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 3.096,
+      "metrics": {
+        "unified_graph_count": 26
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.062,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.078,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 93.647,
+      "metrics": {
+        "slides_rewritten": 26,
+        "slides_total": 26,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 156.017,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 98.806,
+      "metrics": {
+        "total_duration": 757.0757920000002
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/register.grad.usda.gov_presentations_Hug/final.mp4",
+  "output_bytes": 17488542,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T16:04:02.404225Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 149,
+    "claims_with_evidence": 52,
+    "pct_claims_with_evidence": 34.9,
+    "entities_total": 97,
+    "entities_grounded": 97,
+    "pct_entities_grounded": 100.0,
+    "pass": 52,
+    "rewrite": 97,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 148,
+    "kinds": {
+      "TEXT_SPAN": 26,
+      "SHAPE_LABEL": 53,
+      "IMAGE_ASSET": 4,
+      "IMAGE_CAPTION": 14,
+      "IMAGE_OBJECTS": 4,
+      "IMAGE_ACTIONS": 2,
+      "IMAGE_TAGS": 4,
+      "SLIDE_CAPTION": 23,
+      "DIAGRAM_SUMMARY": 18
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 26,
+    "slides_total": 26
+  },
+  "finished_at": "2026-04-05T16:10:53.948982+00:00"
+}

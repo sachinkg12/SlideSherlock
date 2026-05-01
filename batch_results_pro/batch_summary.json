@@ -1,0 +1,117 @@
+{
+  "created_at": "2026-04-12T09:08:23.977049+00:00",
+  "total_files": 5,
+  "successful": 5,
+  "failed": 0,
+  "success_rate": 100.0,
+  "total_slides": 0,
+  "total_pipeline_s": 3103.7,
+  "mean_pipeline_s": 620.7,
+  "mean_slides": 0.0,
+  "total_input_mb": 35.0,
+  "total_output_mb": 219.0,
+  "stage_stats": {
+    "audio": {
+      "mean_s": 291.14,
+      "min_s": 167.27,
+      "max_s": 423.05,
+      "total_s": 1455.72,
+      "count": 5
+    },
+    "evidence": {
+      "mean_s": 51.34,
+      "min_s": 0.44,
+      "max_s": 132.86,
+      "total_s": 256.68,
+      "count": 5
+    },
+    "graph": {
+      "mean_s": 43.19,
+      "min_s": 28.05,
+      "max_s": 66.54,
+      "total_s": 215.94,
+      "count": 5
+    },
+    "ingest": {
+      "mean_s": 10.26,
+      "min_s": 0.5,
+      "max_s": 34.65,
+      "total_s": 51.31,
+      "count": 5
+    },
+    "narrate": {
+      "mean_s": 14.28,
+      "min_s": 9.7,
+      "max_s": 19.05,
+      "total_s": 71.39,
+      "count": 5
+    },
+    "render": {
+      "mean_s": 78.43,
+      "min_s": 48.31,
+      "max_s": 129.19,
+      "total_s": 392.17,
+      "count": 5
+    },
+    "script": {
+      "mean_s": 0.24,
+      "min_s": 0.11,
+      "max_s": 0.42,
+      "total_s": 1.22,
+      "count": 5
+    },
+    "translate": {
+      "mean_s": 0.0,
+      "min_s": 0.0,
+      "max_s": 0.0,
+      "total_s": 0.0,
+      "count": 5
+    },
+    "verify": {
+      "mean_s": 0.55,
+      "min_s": 0.31,
+      "max_s": 0.96,
+      "total_s": 2.76,
+      "count": 5
+    },
+    "video": {
+      "mean_s": 127.35,
+      "min_s": 67.98,
+      "max_s": 168.18,
+      "total_s": 636.76,
+      "count": 5
+    }
+  },
+  "evidence": {
+    "total_items": 1298,
+    "mean_per_file": 259.6,
+    "kind_distribution": {
+      "TEXT_SPAN": 237,
+      "SHAPE_LABEL": 435,
+      "IMAGE_ASSET": 74,
+      "IMAGE_CAPTION": 159,
+      "IMAGE_OBJECTS": 49,
+      "IMAGE_TAGS": 59,
+      "IMAGE_ACTIONS": 12,
+      "SLIDE_CAPTION": 118,
+      "DIAGRAM_SUMMARY": 155
+    }
+  },
+  "verification": {
+    "total_claims": 10918,
+    "claims_with_evidence": 396,
+    "pct_evidence_coverage": 3.6,
+    "total_verdicts": 10918,
+    "pass": 348,
+    "rewrite": 10570,
+    "remove": 0,
+    "pass_rate": 3.2,
+    "rewrite_rate": 96.8,
+    "remove_rate": 0.0
+  },
+  "ai_narration": {
+    "files_with_ai": 5,
+    "total_slides_rewritten": 198
+  },
+  "failures": []
+}

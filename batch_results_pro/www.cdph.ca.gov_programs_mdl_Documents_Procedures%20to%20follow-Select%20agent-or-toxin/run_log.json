@@ -1,0 +1,147 @@
+{
+  "run_id": "3e46e2a4-154e-4a4f-9e75-2af03be55bb7",
+  "started_at": "2026-04-11T06:37:06.861927+00:00",
+  "input_file": "www.cdph.ca.gov_programs_mdl_Documents_Procedures%20to%20follow-Select%20agent-or-toxin.pptx",
+  "input_bytes": 318960,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 708.97,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 2.493,
+      "metrics": {
+        "slide_count": 47
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 54.541,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 97.031,
+      "metrics": {
+        "slide_count": 47,
+        "pdf_size": 531942
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 38.987,
+      "metrics": {
+        "unified_graph_count": 47
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.193,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.635,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 17.881,
+      "metrics": {
+        "slides_rewritten": 47,
+        "slides_total": 47,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 334.876,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 160.903,
+      "metrics": {
+        "total_duration": 1311.0735430000007
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.cdph.ca.gov_programs_mdl_Documents_Procedures%20to%20follow-Select%20agent-or-toxin/final.mp4",
+  "output_bytes": 39453376,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-11T06:37:07.348966Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 2940,
+    "claims_with_evidence": 94,
+    "pct_claims_with_evidence": 3.2,
+    "entities_total": 2846,
+    "entities_grounded": 2846,
+    "pct_entities_grounded": 100.0,
+    "pass": 91,
+    "rewrite": 2849,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 275,
+    "kinds": {
+      "TEXT_SPAN": 59,
+      "SHAPE_LABEL": 86,
+      "IMAGE_ASSET": 12,
+      "IMAGE_CAPTION": 24,
+      "IMAGE_OBJECTS": 12,
+      "IMAGE_TAGS": 12,
+      "IMAGE_ACTIONS": 1,
+      "SLIDE_CAPTION": 29,
+      "DIAGRAM_SUMMARY": 40
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 47,
+    "slides_total": 47
+  },
+  "finished_at": "2026-04-11T06:48:55.832234+00:00"
+}

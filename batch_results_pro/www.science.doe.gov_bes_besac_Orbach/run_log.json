@@ -1,0 +1,146 @@
+{
+  "run_id": "a9c57603-0d3c-4ce5-8759-a1f1c171c8dc",
+  "started_at": "2026-04-10T07:19:25.030183+00:00",
+  "input_file": "www.science.doe.gov_bes_besac_Orbach.pptx",
+  "input_bytes": 1613313,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 826.149,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 6.617,
+      "metrics": {
+        "slide_count": 10
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 29.988,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 40.461,
+      "metrics": {
+        "slide_count": 10,
+        "pdf_size": 879839
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 11.787,
+      "metrics": {
+        "unified_graph_count": 10
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.106,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.669,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 7.093,
+      "metrics": {
+        "slides_rewritten": 10,
+        "slides_total": 10,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 70.733,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 652.738,
+      "metrics": {
+        "total_duration": 298.119356
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.science.doe.gov_bes_besac_Orbach/final.mp4",
+  "output_bytes": 12446431,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-10T07:19:30.218704Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "/Applications/LibreOffice.app/Contents/MacOS/soffice"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1787,
+    "claims_with_evidence": 20,
+    "pct_claims_with_evidence": 1.12,
+    "entities_total": 1783,
+    "entities_grounded": 1783,
+    "pct_entities_grounded": 100.0,
+    "pass": 17,
+    "rewrite": 1770,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 84,
+    "kinds": {
+      "TEXT_SPAN": 10,
+      "SHAPE_LABEL": 26,
+      "IMAGE_ASSET": 8,
+      "IMAGE_CAPTION": 19,
+      "IMAGE_OBJECTS": 6,
+      "IMAGE_TAGS": 6,
+      "SLIDE_CAPTION": 6,
+      "DIAGRAM_SUMMARY": 3
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 10,
+    "slides_total": 10
+  },
+  "finished_at": "2026-04-10T07:33:11.178740+00:00"
+}

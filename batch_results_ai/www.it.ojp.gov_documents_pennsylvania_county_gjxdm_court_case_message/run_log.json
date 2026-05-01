@@ -1,0 +1,147 @@
+{
+  "run_id": "831adb66-18bf-449b-8bb4-2fdb92ab34cc",
+  "started_at": "2026-04-05T19:23:57.926760+00:00",
+  "input_file": "www.it.ojp.gov_documents_pennsylvania_county_gjxdm_court_case_message.pptx",
+  "input_bytes": 653669,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 877.071,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 4.138,
+      "metrics": {
+        "slide_count": 55
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 46.397,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 106.444,
+      "metrics": {
+        "slide_count": 52,
+        "pdf_size": 699619
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 9.786,
+      "metrics": {
+        "unified_graph_count": 52
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.093,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.239,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 171.461,
+      "metrics": {
+        "slides_rewritten": 52,
+        "slides_total": 52,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 318.426,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 218.76,
+      "metrics": {
+        "total_duration": 1594.3546239999996
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/www.it.ojp.gov_documents_pennsylvania_county_gjxdm_court_case_message/final.mp4",
+  "output_bytes": 54319890,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T19:23:58.369341Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 412,
+    "claims_with_evidence": 104,
+    "pct_claims_with_evidence": 25.24,
+    "entities_total": 497,
+    "entities_grounded": 497,
+    "pct_entities_grounded": 100.0,
+    "pass": 86,
+    "rewrite": 326,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 385,
+    "kinds": {
+      "TEXT_SPAN": 60,
+      "SHAPE_LABEL": 135,
+      "IMAGE_ASSET": 22,
+      "IMAGE_CAPTION": 55,
+      "IMAGE_TAGS": 19,
+      "IMAGE_OBJECTS": 4,
+      "IMAGE_ACTIONS": 4,
+      "SLIDE_CAPTION": 42,
+      "DIAGRAM_SUMMARY": 44
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 52,
+    "slides_total": 52
+  },
+  "finished_at": "2026-04-05T19:38:34.998079+00:00"
+}

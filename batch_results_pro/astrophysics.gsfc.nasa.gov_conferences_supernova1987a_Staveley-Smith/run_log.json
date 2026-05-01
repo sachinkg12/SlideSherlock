@@ -1,0 +1,146 @@
+{
+  "run_id": "4ab16a28-66d4-4b36-967f-a1b4f13cc663",
+  "started_at": "2026-04-10T00:07:22.284502+00:00",
+  "input_file": "astrophysics.gsfc.nasa.gov_conferences_supernova1987a_Staveley-Smith.pptx",
+  "input_bytes": 1090835,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1420.779,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 5.186,
+      "metrics": {
+        "slide_count": 17
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 92.541,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 22.302,
+      "metrics": {
+        "slide_count": 17,
+        "pdf_size": 827924
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 12.031,
+      "metrics": {
+        "unified_graph_count": 17
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.067,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.226,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 8.799,
+      "metrics": {
+        "slides_rewritten": 17,
+        "slides_total": 17,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 131.539,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 1146.544,
+      "metrics": {
+        "total_duration": 562.866438
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/astrophysics.gsfc.nasa.gov_conferences_supernova1987a_Staveley-Smith/final.mp4",
+  "output_bytes": 13945841,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-10T00:07:23.013805Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1099,
+    "claims_with_evidence": 34,
+    "pct_claims_with_evidence": 3.09,
+    "entities_total": 1066,
+    "entities_grounded": 1066,
+    "pct_entities_grounded": 100.0,
+    "pass": 28,
+    "rewrite": 1071,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 151,
+    "kinds": {
+      "TEXT_SPAN": 17,
+      "SHAPE_LABEL": 43,
+      "IMAGE_ASSET": 19,
+      "IMAGE_CAPTION": 34,
+      "IMAGE_OBJECTS": 13,
+      "IMAGE_TAGS": 15,
+      "SLIDE_CAPTION": 6,
+      "DIAGRAM_SUMMARY": 4
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 17,
+    "slides_total": 17
+  },
+  "finished_at": "2026-04-10T00:31:03.063096+00:00"
+}

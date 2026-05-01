@@ -1,0 +1,107 @@
+{
+  "job_id": "76b66ed9-1e95-416a-8a35-b494a0ee3680",
+  "preset": "draft",
+  "pipeline_duration_ms": 660286,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_ms": 12208,
+      "metrics": {
+        "slide_count": 44
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_ms": 61993,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_ms": 138397,
+      "metrics": {
+        "slide_count": 44,
+        "pdf_size": 2305986
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_ms": 16051,
+      "metrics": {
+        "unified_graph_count": 44
+      }
+    },
+    "script": {
+      "status": "ok",
+      "duration_ms": 95205,
+      "metrics": {}
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_ms": 95205,
+      "metrics": {}
+    },
+    "verify": {
+      "status": "ok",
+      "duration_ms": 269,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_ms": 269,
+      "metrics": {}
+    },
+    "translate": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_ms": 0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio": {
+      "status": "ok",
+      "duration_ms": 188609,
+      "metrics": {}
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_ms": 188609,
+      "metrics": {}
+    },
+    "video": {
+      "status": "ok",
+      "duration_ms": 147531,
+      "metrics": {
+        "total_duration": 835.275648
+      }
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_ms": 147531,
+      "metrics": {
+        "total_duration": 835.275648
+      }
+    }
+  },
+  "created_at": "2026-04-05T02:07:29.466216+00:00Z"
+}

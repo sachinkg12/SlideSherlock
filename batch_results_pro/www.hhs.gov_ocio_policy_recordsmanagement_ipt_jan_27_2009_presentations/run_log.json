@@ -1,0 +1,147 @@
+{
+  "run_id": "a70a8640-8d21-4d25-bf2d-b57a5b0a0aaf",
+  "started_at": "2026-04-11T07:26:36.584630+00:00",
+  "input_file": "www.hhs.gov_ocio_policy_recordsmanagement_ipt_jan_27_2009_presentations.pptx",
+  "input_bytes": 2541211,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 606.376,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 8.422,
+      "metrics": {
+        "slide_count": 30
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 134.665,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 64.706,
+      "metrics": {
+        "slide_count": 30,
+        "pdf_size": 2303664
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 41.554,
+      "metrics": {
+        "unified_graph_count": 30
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.244,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.918,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 25.389,
+      "metrics": {
+        "slides_rewritten": 30,
+        "slides_total": 30,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 225.179,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 104.102,
+      "metrics": {
+        "total_duration": 979.8614180000002
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/www.hhs.gov_ocio_policy_recordsmanagement_ipt_jan_27_2009_presentations/final.mp4",
+  "output_bytes": 29687040,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-11T07:26:37.021988Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 2763,
+    "claims_with_evidence": 60,
+    "pct_claims_with_evidence": 2.17,
+    "entities_total": 2811,
+    "entities_grounded": 2811,
+    "pct_entities_grounded": 100.0,
+    "pass": 55,
+    "rewrite": 2708,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 543,
+    "kinds": {
+      "TEXT_SPAN": 45,
+      "SHAPE_LABEL": 209,
+      "CONNECTOR": 66,
+      "IMAGE_ASSET": 37,
+      "IMAGE_CAPTION": 83,
+      "IMAGE_OBJECTS": 36,
+      "IMAGE_TAGS": 34,
+      "SLIDE_CAPTION": 13,
+      "DIAGRAM_SUMMARY": 20
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 30,
+    "slides_total": 30
+  },
+  "finished_at": "2026-04-11T07:36:42.960853+00:00"
+}

@@ -1,0 +1,141 @@
+{
+  "run_id": "15403b9c-fa10-4716-acf1-9f1af509b07c",
+  "started_at": "2026-05-01T02:19:12.073846+00:00",
+  "input_file": "www.dof.virginia.gov_fire_resources_ppt-Firewise_Defensible-Space.pptx",
+  "input_bytes": 33709542,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1172.138,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 29.286,
+      "metrics": {
+        "slide_count": 92
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 565.671,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 137.564,
+      "metrics": {
+        "slide_count": 92,
+        "pdf_size": 9594438
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 40.38,
+      "metrics": {
+        "unified_graph_count": 92
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.173,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.472,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 283.462,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 113.091,
+      "metrics": {
+        "total_duration": 1151.4479999999999
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft_18/www.dof.virginia.gov_fire_resources_ppt-Firewise_Defensible-Space/final.mp4",
+  "output_bytes": 118077599,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-05-01T02:19:12.504061Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 951,
+    "claims_with_evidence": 184,
+    "pct_claims_with_evidence": 19.35,
+    "entities_total": 1542,
+    "entities_grounded": 1542,
+    "pct_entities_grounded": 100.0,
+    "pass": 167,
+    "rewrite": 784,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 906,
+    "kinds": {
+      "TEXT_SPAN": 97,
+      "SHAPE_LABEL": 137,
+      "IMAGE_ASSET": 119,
+      "IMAGE_CAPTION": 247,
+      "IMAGE_OBJECTS": 118,
+      "IMAGE_TAGS": 118,
+      "IMAGE_ACTIONS": 24,
+      "SLIDE_CAPTION": 22,
+      "DIAGRAM_SUMMARY": 24
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-05-01T02:38:44.212014+00:00"
+}

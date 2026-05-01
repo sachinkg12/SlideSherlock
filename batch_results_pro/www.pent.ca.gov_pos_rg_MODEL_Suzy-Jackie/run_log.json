@@ -1,0 +1,147 @@
+{
+  "run_id": "f2383a82-216b-4e9b-969a-c42b08776df9",
+  "started_at": "2026-04-30T19:13:06.995712+00:00",
+  "input_file": "www.pent.ca.gov_pos_rg_MODEL_Suzy-Jackie.pptx",
+  "input_bytes": 608014,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 304.86,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 2.126,
+      "metrics": {
+        "slide_count": 22
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 35.53,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 58.917,
+      "metrics": {
+        "slide_count": 22,
+        "pdf_size": 1382594
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 20.395,
+      "metrics": {
+        "unified_graph_count": 22
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.158,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.45,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.009,
+      "metrics": {
+        "reason": "english variant"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 9.478,
+      "metrics": {
+        "slides_rewritten": 22,
+        "slides_total": 22,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 105.076,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 71.126,
+      "metrics": {
+        "total_duration": 404.73949999999996
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro_18/www.pent.ca.gov_pos_rg_MODEL_Suzy-Jackie/final.mp4",
+  "output_bytes": 10671781,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-30T19:13:07.571149Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 1458,
+    "claims_with_evidence": 44,
+    "pct_claims_with_evidence": 3.02,
+    "entities_total": 1414,
+    "entities_grounded": 1414,
+    "pct_entities_grounded": 100.0,
+    "pass": 39,
+    "rewrite": 1419,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 183,
+    "kinds": {
+      "TEXT_SPAN": 20,
+      "SHAPE_LABEL": 68,
+      "IMAGE_ASSET": 13,
+      "IMAGE_CAPTION": 40,
+      "IMAGE_OBJECTS": 13,
+      "IMAGE_TAGS": 6,
+      "IMAGE_ACTIONS": 1,
+      "SLIDE_CAPTION": 17,
+      "DIAGRAM_SUMMARY": 5
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 22,
+    "slides_total": 22
+  },
+  "finished_at": "2026-04-30T19:18:11.855954+00:00"
+}

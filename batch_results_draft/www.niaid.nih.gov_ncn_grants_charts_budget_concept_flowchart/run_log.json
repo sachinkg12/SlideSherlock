@@ -1,0 +1,137 @@
+{
+  "run_id": "99e9c592-f99c-4e12-88b8-bc2dfb703dca",
+  "started_at": "2026-04-05T03:58:31.186935+00:00",
+  "input_file": "www.niaid.nih.gov_ncn_grants_charts_budget_concept_flowchart.pptx",
+  "input_bytes": 9910,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 24.164,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 0.091,
+      "metrics": {
+        "slide_count": 1
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 0.048,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 5.334,
+      "metrics": {
+        "slide_count": 1,
+        "pdf_size": 48510
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 0.136,
+      "metrics": {
+        "unified_graph_count": 1
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 2.341,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.016,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "AI narration not enabled"
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 8.389,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 6.448,
+      "metrics": {
+        "total_duration": 26.0
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_draft/www.niaid.nih.gov_ncn_grants_charts_budget_concept_flowchart/final.mp4",
+  "output_bytes": 517879,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T03:58:31.722505Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 17,
+    "claims_with_evidence": 2,
+    "pct_claims_with_evidence": 11.76,
+    "entities_total": 15,
+    "entities_grounded": 15,
+    "pct_entities_grounded": 100.0,
+    "pass": 2,
+    "rewrite": 15,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 18,
+    "kinds": {
+      "TEXT_SPAN": 1,
+      "SHAPE_LABEL": 10,
+      "CONNECTOR": 5,
+      "SLIDE_CAPTION": 1,
+      "DIAGRAM_SUMMARY": 1
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "finished_at": "2026-04-05T03:58:55.351431+00:00"
+}

@@ -1,0 +1,147 @@
+{
+  "run_id": "0eee14b5-831e-46a5-bff3-60fdf418d700",
+  "started_at": "2026-04-09T10:05:44.742971+00:00",
+  "input_file": "health.utah.gov_phi_brownbag_handouts_2009_New%20Guidelines%20for%20Data%20Result%20Suppression.pptx",
+  "input_bytes": 552594,
+  "preset": "pro",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 1725.671,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 3.949,
+      "metrics": {
+        "slide_count": 24
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 27.276,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 33.679,
+      "metrics": {
+        "slide_count": 24,
+        "pdf_size": 658152
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 20.917,
+      "metrics": {
+        "unified_graph_count": 24
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.208,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.783,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 9.077,
+      "metrics": {
+        "slides_rewritten": 24,
+        "slides_total": 24,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 151.456,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 1476.802,
+      "metrics": {
+        "total_duration": 718.8831050000001
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_pro/health.utah.gov_phi_brownbag_handouts_2009_New%20Guidelines%20for%20Data%20Result%20Suppression/final.mp4",
+  "output_bytes": 17374377,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-09T10:05:45.415373Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 2273,
+    "claims_with_evidence": 48,
+    "pct_claims_with_evidence": 2.11,
+    "entities_total": 2233,
+    "entities_grounded": 2233,
+    "pct_entities_grounded": 100.0,
+    "pass": 43,
+    "rewrite": 2230,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 185,
+    "kinds": {
+      "TEXT_SPAN": 31,
+      "SHAPE_LABEL": 102,
+      "IMAGE_ASSET": 4,
+      "IMAGE_CAPTION": 8,
+      "IMAGE_OBJECTS": 4,
+      "IMAGE_TAGS": 4,
+      "IMAGE_ACTIONS": 3,
+      "SLIDE_CAPTION": 9,
+      "DIAGRAM_SUMMARY": 20
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 24,
+    "slides_total": 24
+  },
+  "finished_at": "2026-04-09T10:34:30.414212+00:00"
+}

@@ -1,0 +1,147 @@
+{
+  "run_id": "e2181bc5-7f32-4a70-9b95-3f4aeeb2c92a",
+  "started_at": "2026-04-06T11:06:39.855697+00:00",
+  "input_file": "www.publicsafety.virginia.gov__Initiatives_PrisonerReentryAcademy_docs_co-occurring_disorders.pptx",
+  "input_bytes": 427707,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 549.403,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 1.118,
+      "metrics": {
+        "slide_count": 43
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 9.029,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 106.003,
+      "metrics": {
+        "slide_count": 43,
+        "pdf_size": 1239727
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 4.859,
+      "metrics": {
+        "unified_graph_count": 43
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.09,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.15,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 23.039,
+      "metrics": {
+        "slides_rewritten": 43,
+        "slides_total": 43,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 269.403,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 134.446,
+      "metrics": {
+        "total_duration": 1239.7612929999998
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/www.publicsafety.virginia.gov__Initiatives_PrisonerReentryAcademy_docs_co-occurring_disorders/final.mp4",
+  "output_bytes": 33506724,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-06T11:06:40.265810Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 260,
+    "claims_with_evidence": 86,
+    "pct_claims_with_evidence": 33.08,
+    "entities_total": 188,
+    "entities_grounded": 188,
+    "pct_entities_grounded": 100.0,
+    "pass": 85,
+    "rewrite": 175,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 253,
+    "kinds": {
+      "TEXT_SPAN": 48,
+      "SHAPE_LABEL": 117,
+      "IMAGE_ASSET": 2,
+      "IMAGE_CAPTION": 4,
+      "IMAGE_OBJECTS": 2,
+      "IMAGE_TAGS": 2,
+      "IMAGE_ACTIONS": 1,
+      "SLIDE_CAPTION": 36,
+      "DIAGRAM_SUMMARY": 41
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 43,
+    "slides_total": 43
+  },
+  "finished_at": "2026-04-06T11:15:49.258998+00:00"
+}

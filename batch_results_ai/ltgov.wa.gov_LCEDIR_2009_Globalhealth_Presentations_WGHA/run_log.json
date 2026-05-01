@@ -1,0 +1,145 @@
+{
+  "run_id": "e9e84932-6f66-4118-b577-9f69bb448f66",
+  "started_at": "2026-04-05T15:40:18.146645+00:00",
+  "input_file": "ltgov.wa.gov_LCEDIR_2009_Globalhealth_Presentations_WGHA.pptx",
+  "input_bytes": 3355747,
+  "preset": "draft",
+  "slide_count": 0,
+  "variant": "en",
+  "pipeline_duration_s": 289.244,
+  "stages": {
+    "ingest": {
+      "status": "ok",
+      "duration_s": 9.965,
+      "metrics": {
+        "slide_count": 14
+      }
+    },
+    "evidence": {
+      "status": "ok",
+      "duration_s": 82.081,
+      "metrics": {}
+    },
+    "render": {
+      "status": "ok",
+      "duration_s": 13.894,
+      "metrics": {
+        "slide_count": 14,
+        "pdf_size": 1655851
+      }
+    },
+    "graph": {
+      "status": "ok",
+      "duration_s": 9.698,
+      "metrics": {
+        "unified_graph_count": 14
+      }
+    },
+    "script_en": {
+      "status": "ok",
+      "duration_s": 0.036,
+      "metrics": {}
+    },
+    "verify_en": {
+      "status": "ok",
+      "duration_s": 0.065,
+      "metrics": {}
+    },
+    "translate_en": {
+      "status": "skipped",
+      "duration_s": 0.0,
+      "metrics": {
+        "reason": "not l2 or english"
+      }
+    },
+    "narrate_en": {
+      "status": "ok",
+      "duration_s": 42.677,
+      "metrics": {
+        "slides_rewritten": 14,
+        "slides_total": 14,
+        "slides_fallback": 0
+      }
+    },
+    "audio_en": {
+      "status": "ok",
+      "duration_s": 74.487,
+      "metrics": {}
+    },
+    "video_en": {
+      "status": "ok",
+      "duration_s": 55.242,
+      "metrics": {
+        "total_duration": 375.76677000000007
+      }
+    }
+  },
+  "output_video": "/Users/sachingupta/Documents/EB1-A/Original_Work/SlideSherlock/batch_results_ai/ltgov.wa.gov_LCEDIR_2009_Globalhealth_Presentations_WGHA/final.mp4",
+  "output_bytes": 23199726,
+  "doctor": {
+    "schema_version": "1.0",
+    "created_at": "2026-04-05T15:40:18.593703Z",
+    "all_required_ok": true,
+    "checks": {
+      "libreoffice": {
+        "ok": true,
+        "required": true,
+        "message": "LibreOffice 26.2.0.3 afbbd0df0edb6d40b450b0337ac646b0913a760c"
+      },
+      "ffmpeg": {
+        "ok": true,
+        "required": true,
+        "message": "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers"
+      },
+      "poppler": {
+        "ok": true,
+        "required": true,
+        "message": "pdftoppm version 26.03.0"
+      },
+      "tesseract": {
+        "ok": true,
+        "required": false,
+        "message": "tesseract 5.5.2"
+      }
+    },
+    "summary": {
+      "required": 3,
+      "required_ok": 3,
+      "optional_ok": 1
+    }
+  },
+  "coverage": {
+    "total_claims": 115,
+    "claims_with_evidence": 28,
+    "pct_claims_with_evidence": 24.35,
+    "entities_total": 87,
+    "entities_grounded": 87,
+    "pct_entities_grounded": 100.0,
+    "pass": 22,
+    "rewrite": 93,
+    "remove": 0
+  },
+  "evidence": {
+    "total_items": 242,
+    "kinds": {
+      "TEXT_SPAN": 22,
+      "SHAPE_LABEL": 34,
+      "IMAGE_ASSET": 38,
+      "IMAGE_CAPTION": 76,
+      "IMAGE_TAGS": 38,
+      "IMAGE_OBJECTS": 25,
+      "IMAGE_ACTIONS": 9
+    }
+  },
+  "verify": {
+    "total_decisions": 0,
+    "verdicts": {},
+    "iterations": 1,
+    "reason_distribution": {}
+  },
+  "ai_narration": {
+    "slides_rewritten": 14,
+    "slides_total": 14
+  },
+  "finished_at": "2026-04-05T15:45:07.390956+00:00"
+}
