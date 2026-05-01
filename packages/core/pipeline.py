@@ -150,16 +150,26 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
                 import json
 
                 cached = json.loads(storage.get(cache_key).decode("utf-8"))
-                print(
-                    f"  Stage '{stage.name}' — cached (skipping, {cached.get('duration_ms', 0)}ms previous)"
-                )
-                result = StageResult(
-                    status=cached.get("status", "ok"),
-                    metrics=cached.get("metrics", {}),
-                )
-                result.duration_ms = 0
-                ctx.stage_results[stage.name] = result
-                return result
+                # Validate that expected artifacts still exist before honoring cache
+                cached_artifacts = cached.get("artifacts_written", [])
+                missing = [a for a in cached_artifacts if not storage.exists(a)]
+                if missing:
+                    print(
+                        f"  Stage '{stage.name}' — cache invalid, "
+                        f"{len(missing)}/{len(cached_artifacts)} artifacts missing, re-running"
+                    )
+                else:
+                    print(
+                        f"  Stage '{stage.name}' — cached (skipping, {cached.get('duration_ms', 0)}ms previous)"
+                    )
+                    result = StageResult(
+                        status=cached.get("status", "ok"),
+                        metrics=cached.get("metrics", {}),
+                        artifacts_written=cached_artifacts,
+                    )
+                    result.duration_ms = 0
+                    ctx.stage_results[stage.name] = result
+                    return result
         except Exception:
             pass  # Cache miss or storage error — run normally
 
@@ -188,6 +198,7 @@ def _run_stage(stage: Stage, ctx: PipelineContext) -> StageResult:
                     "status": result.status,
                     "duration_ms": elapsed_ms,
                     "metrics": result.metrics,
+                    "artifacts_written": result.artifacts_written,
                 }
             ).encode("utf-8")
             cache_key = _stage_cache_key(stage.name, ctx)
