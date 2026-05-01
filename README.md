@@ -374,7 +374,7 @@ This starts **6 services**:
 
 ### GCP Compute Engine
 
-Recommended VM: **e2-medium** (2 vCPU, 4 GB RAM). Zero code changes:
+Recommended VM: **e2-standard-4** (4 vCPU, 16 GB RAM). Zero code changes:
 
 ```bash
 gcloud compute ssh slidesherlock-vm
@@ -425,7 +425,7 @@ If you use SlideSherlock in your research, please cite:
   author    = {Gupta, Sachin},
   title     = {SlideSherlock: Evidence-Grounded Presentation-to-Video Pipeline},
   year      = {2026},
-  doi       = {10.5281/zenodo.19413324},
+  doi       = {10.5281/zenodo.19413323},
   url       = {https://github.com/sachinkg12/SlideSherlock},
   license   = {Apache-2.0}
 }
