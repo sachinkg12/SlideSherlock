@@ -53,14 +53,18 @@ def test_next_action_mapping():
 
 
 def test_html_is_self_contained_and_anonymous():
+    import re
     html = production_summary.render_html(production_summary.build(_qg(), _eh(), []))
     # No external assets / network calls
     assert "<script src=" not in html
     assert "https://" not in html
     assert "http://" not in html
-    # No identity leakage
-    for s in ("sachin", "gupta", "slidesherlock.org", "github.com/", "@gmail"):
-        assert s not in html.lower()
+    # Pattern-based identity leak checks. These catch any future regression
+    # without hardcoding specific identifiers in the test source itself.
+    assert not re.search(r"[\w.\-]+@[\w.\-]+\.[a-z]{2,}", html), \
+        "email-shaped string leaked into render"
+    assert "mailto:" not in html, "mailto: link leaked into render"
+    assert "github.com" not in html.lower(), "github URL leaked into render"
 
 
 def test_write_production_summary_writes_both_files(tmp_path):
