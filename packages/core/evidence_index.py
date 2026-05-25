@@ -444,6 +444,117 @@ def build_evidence_index(
                         "refs": [ref_item],
                     })
 
+        # --- Native PPT charts (modern Insert->Chart or embedded Excel OLE):
+        #     emit CHART_TITLE, CHART_CATEGORY, CHART_SERIES (one per series),
+        #     and CHART_VALUE (one per (series, category) data point).
+        for shape in shapes:
+            if shape.get("type") != "CHART":
+                continue
+            ppt_shape_id = shape.get("ppt_shape_id", "")
+            bbox = shape.get("bbox") or {}
+            title = (shape.get("chart_title") or "").strip()
+            categories = shape.get("categories") or []
+            series_list = shape.get("series") or []
+            source_kind = shape.get("source_kind", "native")
+
+            source_chart_id = str(uuid.uuid4())
+            source_row = Source(
+                source_id=source_chart_id,
+                job_id=job_id,
+                type="PPT_SHAPE",
+                artifact_id=ppt_artifact_ids_by_slide.get(slide_index),
+                slide_id=slide_id,
+                created_at=created_at,
+            )
+            db_session.add(source_row)
+            db_session.flush()
+            sources_out.append({
+                "source_id": source_chart_id,
+                "type": "PPT_SHAPE",
+                "slide_index": slide_index,
+                "artifact_url": None,
+                "metadata": {
+                    "ppt_shape_id": ppt_shape_id,
+                    "shape_kind": "CHART",
+                    "chart_source": source_kind,
+                },
+            })
+
+            def _emit(kind: str, content: str, offset_key: str,
+                      row_ix: int = 0, col_ix: int = 0):
+                eid = _stable_evidence_id(job_id, slide_index, kind, offset_key)
+                ev_row = EvidenceItem(
+                    evidence_id=eid,
+                    job_id=job_id,
+                    slide_id=slide_id,
+                    source_id=source_chart_id,
+                    kind=kind,
+                    content=content,
+                    content_hash=_content_hash(content),
+                    confidence=1.0,
+                    language=None,
+                    created_at=created_at,
+                )
+                db_session.add(ev_row)
+                ref_row = SourceRef(
+                    ref_id=str(uuid.uuid4()),
+                    evidence_id=eid,
+                    ref_type="PPT",
+                    slide_index=slide_index,
+                    ppt_shape_id=ppt_shape_id,
+                    ppt_paragraph_ix=row_ix,
+                    ppt_run_ix=col_ix,
+                    bbox_x=_emu_to_float(bbox.get("left")),
+                    bbox_y=_emu_to_float(bbox.get("top")),
+                    bbox_w=_emu_to_float(bbox.get("width")),
+                    bbox_h=_emu_to_float(bbox.get("height")),
+                    page_num=None,
+                    char_start=None,
+                    char_end=None,
+                    url=None,
+                )
+                db_session.add(ref_row)
+                ref_item = {
+                    "ref_type": "PPT",
+                    "slide_index": slide_index,
+                    "ppt_shape_id": ppt_shape_id,
+                    "chart_row": row_ix,
+                    "chart_col": col_ix,
+                }
+                evidence_items_out.append({
+                    "evidence_id": eid,
+                    "source_id": source_chart_id,
+                    "kind": kind,
+                    "content": content,
+                    "content_hash": _content_hash(content),
+                    "confidence": 1.0,
+                    "slide_index": slide_index,
+                    "refs": [ref_item],
+                })
+
+            if title:
+                _emit("CHART_TITLE", title, f"{ppt_shape_id}_title")
+            for c_ix, cat in enumerate(categories):
+                cat = str(cat).strip()
+                if cat:
+                    _emit("CHART_CATEGORY", cat, f"{ppt_shape_id}_cat{c_ix}", col_ix=c_ix)
+            for s_ix, ser in enumerate(series_list):
+                label = str(ser.get("label", "")).strip()
+                values = ser.get("values") or []
+                if label:
+                    _emit("CHART_SERIES", label, f"{ppt_shape_id}_ser{s_ix}", row_ix=s_ix)
+                for v_ix, val in enumerate(values):
+                    if val is None or val == "":
+                        continue
+                    # Build a self-describing CHART_VALUE so a narration claim
+                    # can cite the exact category+series. e.g.
+                    # "Win2k Service Packs / SP1 = 71"
+                    cat_name = str(categories[v_ix]).strip() if v_ix < len(categories) else f"#{v_ix}"
+                    content = f"{label} / {cat_name} = {val}" if label else f"{cat_name} = {val}"
+                    _emit("CHART_VALUE", content,
+                          f"{ppt_shape_id}_v{s_ix}_{v_ix}",
+                          row_ix=s_ix, col_ix=v_ix)
+
         # --- Connector labels: one Source + one EvidenceItem (CONNECTOR) per connector with label ---
         for conn in connectors:
             label = (conn.get("label") or "").strip()

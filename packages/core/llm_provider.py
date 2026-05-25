@@ -186,26 +186,51 @@ class StubLLMProvider(LLMProvider):
                         intro = prefix_diagram.rstrip() if use_hedging else "This diagram shows "
                         return intro + " ".join(steps)
 
-                parts = []
+                # Evidence selection order matters: when a high-confidence
+                # SLIDE_CAPTION or IMAGE_CAPTION exists, prefer it over a
+                # lower-confidence DIAGRAM_SUMMARY even if the diagram item
+                # appears first in `items`. (Drendel3 slide 8 showed the
+                # original bug: conf-0.95 SLIDE_CAPTION was skipped because
+                # a conf-0.4 DIAGRAM_SUMMARY came first.)
+                HIGH_CONF_CAPTION = 0.8
+                preferred = None
                 for e in items:
                     kind = e.get("kind", "")
                     content = (e.get("content") or "").strip()
                     if not content:
                         continue
-                    if kind == "IMAGE_CAPTION" or kind == "SLIDE_CAPTION":
-                        parts.append(
-                            (prefix_image if tier != "generic" else "This slide shows ").rstrip()
-                            + " "
-                            + content[:300]
-                        )
+                    if kind in ("SLIDE_CAPTION", "IMAGE_CAPTION") and \
+                            float(e.get("confidence", 0)) >= HIGH_CONF_CAPTION:
+                        preferred = (kind, content)
                         break
-                    if kind == "DIAGRAM_SUMMARY":
-                        parts.append(
-                            (prefix_diagram if tier != "generic" else "This slide shows ").rstrip()
-                            + " "
-                            + content[:300]
-                        )
-                        break
+                parts = []
+                if preferred is not None:
+                    _, content = preferred
+                    parts.append(
+                        (prefix_image if tier != "generic" else "This slide shows ").rstrip()
+                        + " "
+                        + content[:300]
+                    )
+                else:
+                    for e in items:
+                        kind = e.get("kind", "")
+                        content = (e.get("content") or "").strip()
+                        if not content:
+                            continue
+                        if kind == "IMAGE_CAPTION" or kind == "SLIDE_CAPTION":
+                            parts.append(
+                                (prefix_image if tier != "generic" else "This slide shows ").rstrip()
+                                + " "
+                                + content[:300]
+                            )
+                            break
+                        if kind == "DIAGRAM_SUMMARY":
+                            parts.append(
+                                (prefix_diagram if tier != "generic" else "This slide shows ").rstrip()
+                                + " "
+                                + content[:300]
+                            )
+                            break
                 if parts:
                     return parts[0]
                 # Fallback: list kinds

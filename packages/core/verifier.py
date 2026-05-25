@@ -30,7 +30,10 @@ REASON_DIAGRAM_UNSUPPORTED = "DIAGRAM_UNSUPPORTED"
 REASON_NEEDS_HEDGING = "NEEDS_HEDGING"
 REASON_OBJECT_ACTION_UNSUPPORTED = "OBJECT_ACTION_UNSUPPORTED"
 
-# Image evidence kinds (NO-HALLUCINATION: image claims must cite these)
+# Image evidence kinds (NO-HALLUCINATION: image claims must cite these).
+# Native CHART_* kinds are also accepted here so a chart-related claim can be
+# grounded against extracted chart structure (modern PPT chart or embedded
+# Excel OLE) rather than only against a vision caption.
 IMAGE_EVIDENCE_KINDS = frozenset(
     {
         "IMAGE_ASSET",  # Extracted embedded image (bbox, uri)
@@ -43,6 +46,10 @@ IMAGE_EVIDENCE_KINDS = frozenset(
         "DIAGRAM_INTERACTIONS",
         "DIAGRAM_SUMMARY",
         "SLIDE_CAPTION",  # Last-resort full-slide caption (Prompt 7)
+        "CHART_TITLE",
+        "CHART_CATEGORY",
+        "CHART_SERIES",
+        "CHART_VALUE",
     }
 )
 

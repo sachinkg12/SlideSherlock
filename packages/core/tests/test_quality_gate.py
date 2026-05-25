@@ -215,6 +215,26 @@ def test_table_evidence_suppresses_table_risk():
     assert qg["decision"] in {"deliver", "deliver_with_warnings"}
 
 
+def test_chart_evidence_suppresses_chart_risk():
+    """Slide with native CHART_* evidence should not flag chart-like narration."""
+    qg = quality_gate.evaluate(
+        verify_report=_vr([{"reason_codes": [], "is_image_claim": False}]),
+        coverage=_coverage(passes=1, rewrites=0, removes=0, total=1),
+        ai_narration=_nar([{
+            "slide_index": 1,
+            "narration_text": "The bar chart shows Win2k service packs increasing over time.",
+            "source_used": "ai_narrate",
+            "word_count": 9,
+        }]),
+        evidence_index={"evidence_items": [
+            {"kind": "CHART_TITLE", "evidence_id": "t1", "source_ref": {"slide_index": 1}, "content": "Win2k Service Packs"},
+            {"kind": "CHART_VALUE", "evidence_id": "v1", "source_ref": {"slide_index": 1}, "content": "SP1 = 71"},
+        ]},
+    )
+    assert qg["chart_or_table_risk_count"] == 0
+    assert qg["decision"] in {"deliver", "deliver_with_warnings"}
+
+
 def test_chart_narration_still_flags_when_only_table_evidence():
     """Native TABLE evidence does NOT cover chart-shaped claims (charts still go through vision)."""
     qg = quality_gate.evaluate(

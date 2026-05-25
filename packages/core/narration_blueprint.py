@@ -165,7 +165,8 @@ def _evidence_for_slide(
     return out
 
 
-# Evidence kinds that describe diagram/image content (used when graph has no labels)
+# Evidence kinds that describe diagram/image/chart content (used when graph has
+# no labels, or as a higher-quality alternative to a generic template).
 _IMAGE_EVIDENCE_KINDS = frozenset(
     {
         "IMAGE_CAPTION",
@@ -173,6 +174,7 @@ _IMAGE_EVIDENCE_KINDS = frozenset(
         "SLIDE_CAPTION",
         "DIAGRAM_ENTITIES",
         "DIAGRAM_INTERACTIONS",
+        "CHART_TITLE",
     }
 )
 
@@ -183,6 +185,27 @@ _LOW_CONFIDENCE_PHRASES = (
     "details not present",
     "could not be extracted",
 )
+
+
+def _format_caption(content: str) -> str:
+    """Format an image/chart caption as narration text.
+
+    If the caption already reads like a complete sentence (starts with a
+    capital letter, ends with terminal punctuation), use it as-is. Otherwise
+    prepend "This slide shows " and ensure a trailing period.
+    """
+    c = (content or "").strip()
+    if not c:
+        return ""
+    starts_sentence = c[:1].isupper()
+    # treat any of '.', '!', '?' followed by nothing (or whitespace) as a terminal
+    ends_sentence = c[-1:] in ".!?"
+    if starts_sentence and ends_sentence:
+        return c
+    if starts_sentence and not ends_sentence:
+        return c + "."
+    # Fall back to the wrapper form for sentence fragments / lower-case starts.
+    return f"This slide shows {c}" + ("" if ends_sentence else ".")
 
 
 def _is_low_confidence_fallback(content: str) -> bool:
@@ -211,19 +234,45 @@ def build_narration_blueprint(
     slide_type = classify_slide_type(slide_text, graph)
     template_narration = build_template_narration(slide_index, slide_type, slide_text, graph)
 
-    # When template is generic and we have image evidence, use evidence content
+    # When template is generic, OR when the slide has a high-confidence vision
+    # caption that's strictly more informative than the generic fallback, swap
+    # in evidence content. Also include the "diagram with key elements" template
+    # in the generic-match list — that template is the one Drendel3 slides 8/9
+    # were stuck on while a 0.95-confidence SLIDE_CAPTION sat unused.
     evidence_for_slide = _evidence_for_slide(evidence_items, slide_index)
     t_lower = template_narration.lower()
     is_generic = (
         "this slide presents a diagram" in t_lower
         or "this slide includes an image or diagram" in t_lower
+        or "diagram with key elements" in t_lower
     )
-    if is_generic:
+
+    # First-pass: if a high-confidence SLIDE_CAPTION or IMAGE_CAPTION is
+    # available, prefer it regardless of how generic the template is. This is
+    # the priority fix.
+    HIGH_CONF_CAPTION = 0.8
+    preferred = None
+    for ev in evidence_for_slide:
+        if ev.get("kind") not in ("SLIDE_CAPTION", "IMAGE_CAPTION"):
+            continue
+        content = (ev.get("content") or "").strip()
+        if not content or _is_low_confidence_fallback(content):
+            continue
+        try:
+            conf = float(ev.get("confidence", 0))
+        except (TypeError, ValueError):
+            conf = 0.0
+        if conf >= HIGH_CONF_CAPTION:
+            preferred = content
+            break
+    if preferred is not None:
+        template_narration = _format_caption(preferred[:400])
+    elif is_generic:
         for ev in evidence_for_slide:
             if ev.get("kind") in _IMAGE_EVIDENCE_KINDS:
                 content = (ev.get("content") or "").strip()
                 if content and len(content) > 10 and not _is_low_confidence_fallback(content):
-                    template_narration = f"This slide shows {content[:400]}."
+                    template_narration = _format_caption(content[:400])
                     break
 
     # LLM context: diagram flow, key nodes, valid evidence_ids

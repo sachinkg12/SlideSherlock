@@ -169,8 +169,184 @@ def _table_to_dict(shape: Any, z_order: int, parent_prefix: str = "") -> Dict[st
     }
 
 
-def _extract_shape(shape: BaseShape, z_order: int, parent_prefix: str = "") -> Dict[str, Any]:
-    """Dispatch to shape, connector, table, or group serializer."""
+def _chart_to_dict(shape: Any, z_order: int, parent_prefix: str = "") -> Dict[str, Any]:
+    """Serialize a native modern PPT chart shape (Insert -> Chart).
+
+    Walks plots, series, and categories using python-pptx's chart API. Each
+    series produces a {label, values} pair; categories are shared per plot.
+    Numeric values are coerced to a list of floats; non-numeric series are
+    kept as strings.
+    """
+    ppt_shape_id = f"{parent_prefix}{getattr(shape, 'shape_id', z_order)}"
+    bbox = _get_shape_bbox(shape)
+    title = ""
+    chart_type = ""
+    categories: List[str] = []
+    series_out: List[Dict[str, Any]] = []
+    try:
+        ch = shape.chart
+        chart_type = type(ch).__name__
+        if getattr(ch, "has_title", False):
+            try:
+                title = ch.chart_title.text_frame.text or ""
+            except Exception:
+                title = ""
+        for plot in ch.plots:
+            try:
+                if not categories:
+                    categories = [str(c) for c in plot.categories if c is not None]
+            except Exception:
+                pass
+            for s in plot.series:
+                label = ""
+                try:
+                    label = s.name or ""
+                except Exception:
+                    label = ""
+                values: List[Any] = []
+                try:
+                    values = [v for v in s.values]
+                except Exception:
+                    values = []
+                series_out.append({"label": str(label), "values": values})
+    except Exception:
+        pass
+    return {
+        "ppt_shape_id": str(ppt_shape_id),
+        "bbox": bbox,
+        "type": "CHART",
+        "text_runs": [],
+        "z_order": z_order,
+        "chart_type": chart_type,
+        "chart_title": title.strip(),
+        "categories": categories,
+        "series": series_out,
+        "source_kind": "native",
+    }
+
+
+def _ole_chart_to_dict(shape: Any, z_order: int, parent_prefix: str = "",
+                       pptx_path: str = "") -> Dict[str, Any]:
+    """Serialize a legacy EMBEDDED_OLE_OBJECT chart that points at an
+    .xlsx in ppt/embeddings/. Modern Office Open XML only; legacy .xls
+    binary parsing is out of scope for this implementation.
+    """
+    ppt_shape_id = f"{parent_prefix}{getattr(shape, 'shape_id', z_order)}"
+    bbox = _get_shape_bbox(shape)
+    payload: Dict[str, Any] = {
+        "ppt_shape_id": str(ppt_shape_id),
+        "bbox": bbox,
+        "type": "CHART",
+        "text_runs": [],
+        "z_order": z_order,
+        "chart_type": "EmbeddedExcel",
+        "chart_title": "",
+        "categories": [],
+        "series": [],
+        "embedded_file": "",
+        "source_kind": "ole_xlsx",
+    }
+    try:
+        # ole_format.blob returns the embedded file bytes directly. For modern
+        # PowerPoints this is a .xlsx (Office Open XML zip starting with PK\x03\x04);
+        # for legacy decks it can be an OLE compound document (D0CF11E0) which we
+        # do not parse here.
+        blob = None
+        try:
+            blob = shape.ole_format.blob
+        except Exception:
+            blob = None
+        if not blob or blob[:4] != b"PK\x03\x04":
+            # Not a modern .xlsx (likely legacy .xls OLE compound document)
+            return payload
+        import io
+        import openpyxl  # type: ignore
+        wb = openpyxl.load_workbook(io.BytesIO(blob), data_only=True)
+        titles: List[str] = []
+        all_categories: List[str] = []
+        all_series: List[Dict[str, Any]] = []
+        for sn in wb.sheetnames:
+            ws = wb[sn]
+            for ch in getattr(ws, "_charts", []) or []:
+                # Title
+                t = ""
+                try:
+                    tx = ch.title.tx.rich  # type: ignore[attr-defined]
+                    for p in tx.p:
+                        for r in p.r:
+                            t += r.t or ""
+                except Exception:
+                    pass
+                if t:
+                    titles.append(t)
+                # Series + categories: openpyxl chart objects carry references
+                # back into the workbook; resolving them needs the worksheet.
+                for s in getattr(ch, "ser", []) or []:
+                    label = ""
+                    try:
+                        # Series title can be a strRef (cell reference) or
+                        # inline text. Resolve cell refs to their actual value.
+                        if s.tx and s.tx.strRef and s.tx.strRef.f:
+                            resolved = _read_xlsx_range(wb, s.tx.strRef.f)
+                            if resolved:
+                                label = " ".join(str(v) for v in resolved if v is not None)
+                        elif s.tx and getattr(s.tx, "v", None):
+                            label = str(s.tx.v)
+                    except Exception:
+                        label = ""
+                    cats: List[str] = []
+                    try:
+                        ref = s.cat.strRef.f if s.cat and s.cat.strRef else None
+                        if ref:
+                            cats = _read_xlsx_range(wb, ref)
+                    except Exception:
+                        cats = []
+                    vals: List[Any] = []
+                    try:
+                        ref = s.val.numRef.f if s.val and s.val.numRef else None
+                        if ref:
+                            vals = _read_xlsx_range(wb, ref)
+                    except Exception:
+                        vals = []
+                    if not all_categories and cats:
+                        all_categories = cats
+                    all_series.append({"label": label, "values": vals})
+        payload["chart_title"] = "; ".join(titles[:3])
+        payload["categories"] = all_categories
+        payload["series"] = all_series
+    except Exception:
+        # Anything goes wrong: fall through with empty chart payload. The
+        # vision path still describes the rendered chart image.
+        pass
+    return payload
+
+
+def _read_xlsx_range(wb: Any, ref: str) -> List[Any]:
+    """Resolve an openpyxl range reference like 'Sheet1!$A$2:$A$10' to a flat
+    list of values. Conservative parsing; returns [] on anything unexpected."""
+    try:
+        import re
+        if "!" in ref:
+            sn, cell_range = ref.split("!", 1)
+            sn = sn.strip("'")
+        else:
+            sn, cell_range = wb.sheetnames[0], ref
+        cell_range = cell_range.replace("$", "")
+        ws = wb[sn]
+        out: List[Any] = []
+        for row in ws[cell_range] if ":" in cell_range else [(ws[cell_range],)]:
+            for cell in row:
+                out.append(cell.value)
+        return out
+    except Exception:
+        return []
+
+
+def _extract_shape(
+    shape: BaseShape, z_order: int, parent_prefix: str = "",
+    pptx_path: str = "",
+) -> Dict[str, Any]:
+    """Dispatch to shape, connector, table, chart, or group serializer."""
     if GroupShape is not None and isinstance(shape, GroupShape):
         return _group_to_dict(shape, z_order, parent_prefix)
     if Connector is not None and isinstance(shape, Connector):
@@ -179,9 +355,18 @@ def _extract_shape(shape: BaseShape, z_order: int, parent_prefix: str = "") -> D
     line_type = getattr(MSO_SHAPE_TYPE, "LINE", None) if MSO_SHAPE_TYPE else None
     if line_type and getattr(shape, "shape_type", None) == line_type and hasattr(shape, "begin_x"):
         return _connector_to_dict(shape, z_order, parent_prefix)
+    # Native modern PPT chart (Insert -> Chart): walk plots/series/categories
+    if getattr(shape, "has_chart", False):
+        return _chart_to_dict(shape, z_order, parent_prefix)
     # Native PPT table: walk cells, emit TABLE shape dict
     if getattr(shape, "has_table", False):
         return _table_to_dict(shape, z_order, parent_prefix)
+    # Embedded OLE object (legacy embedded Excel chart): pull data from the .xlsx
+    # python-pptx returns shape_type as the integer MSO_SHAPE_TYPE value; compare
+    # against the enum directly. EMBEDDED_OLE_OBJECT = 7.
+    if MSO_SHAPE_TYPE is not None and \
+            getattr(shape, "shape_type", None) == MSO_SHAPE_TYPE.EMBEDDED_OLE_OBJECT:
+        return _ole_chart_to_dict(shape, z_order, parent_prefix, pptx_path)
     return _shape_to_dict(shape, z_order, parent_prefix)
 
 

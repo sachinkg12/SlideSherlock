@@ -165,13 +165,15 @@ def _chart_or_table_signal(
                 continue
             by_slide.setdefault(int(si), set()).add(it.get("kind", ""))
     risk = 0
-    # Native table evidence kinds extracted by evidence_index.py. If the slide has
-    # any of these, narration mentions of "table" or "row" are grounded and do not
-    # count as risk. We still flag chart-like narration on those slides because
-    # native CHART extraction is not implemented (rendered chart images go through
-    # the IMAGE_CAPTION path).
+    # Native table and chart evidence kinds extracted by evidence_index.py. If
+    # the slide has any TABLE_* evidence, narration mentions of "table"/"row"
+    # are grounded; if it has any CHART_* evidence (from native PPT charts or
+    # embedded Excel OLE), chart-like narration is grounded too. Rendered
+    # chart screenshots still fall back to the IMAGE_CAPTION path and remain
+    # weaker grounding.
     table_kinds = {"TABLE", "TABLE_CELL", "TABLE_HEADER"}
-    chart_kinds = {"CHART"}
+    chart_kinds = {"CHART", "CHART_TITLE", "CHART_CATEGORY",
+                   "CHART_SERIES", "CHART_VALUE"}
     chart_words = set(chart_kw)
     for entry in entries:
         text = (entry.get("narration_text") or entry.get("text") or "").lower()
