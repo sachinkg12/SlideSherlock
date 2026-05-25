@@ -33,6 +33,8 @@ numpy>=1.24.0
 
 # PPTX parsing (slide text, shapes, connectors, notes)
 python-pptx==0.6.23
+# Embedded-Excel chart extraction (OLE objects referencing an .xlsx workbook)
+openpyxl>=3.1.0
 
 # TTS (per-slide narration)
 pyttsx3>=2.90
