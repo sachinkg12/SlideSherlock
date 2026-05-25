@@ -1,0 +1,42 @@
+{
+  "_comment": "Production-review profile. Routes citation problems to human review instead of blocking delivery outright. The strict default profile (quality_gate.default.json) is the audit setting; production deployments will typically run this profile and only block on extreme proxy rates or many invalid evidence IDs.",
+  "version": 1,
+  "profile_name": "production_review",
+  "thresholds": {
+    "needs_review": {
+      "fallback_rate_gt": 0.50,
+      "proxy_flagged_rate_gt": 0.02,
+      "low_confidence_vision_claim_count_gt": 0,
+      "chart_or_table_risk_count_gt": 0,
+      "translation_warning_count_gt": 0,
+      "missing_citation_count_gt": 0,
+      "invalid_evidence_id_count_gt": 0
+    },
+    "block": {
+      "missing_citation_count_gt": 9223372036854775807,
+      "invalid_evidence_id_count_gt": 10,
+      "proxy_flagged_rate_gt": 0.25
+    }
+  },
+  "definitions": {
+    "low_confidence_vision_threshold": 0.6,
+    "image_claim_keywords": [
+      "image", "photo", "picture", "diagram", "chart", "graph", "figure",
+      "illustration", "screenshot", "logo", "map", "shows", "depicts",
+      "displays", "illustrates"
+    ],
+    "fabrication_keywords": [
+      "vibrant", "serene", "intricate", "stunning", "landscape", "rural",
+      "scenic", "colorful", "abstract", "artistic", "microscopic", "aerial",
+      "panoramic", "beautiful", "elegant", "captures", "gazing", "glimpse",
+      "vivid", "bright", "lush", "backdrop", "swaying", "tranquil"
+    ],
+    "chart_like_keywords": ["chart", "graph", "plot", "histogram", "bar chart", "pie chart", "line chart"],
+    "table_like_keywords": ["table", "row", "column", "spreadsheet"],
+    "image_evidence_kinds": [
+      "IMAGE_ASSET", "IMAGE_CAPTION", "IMAGE_OBJECTS", "IMAGE_ACTIONS",
+      "IMAGE_TAGS", "DIAGRAM_TYPE", "DIAGRAM_ENTITIES",
+      "DIAGRAM_INTERACTIONS", "DIAGRAM_SUMMARY", "SLIDE_CAPTION"
+    ]
+  }
+}

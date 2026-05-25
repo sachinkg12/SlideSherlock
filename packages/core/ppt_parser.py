@@ -133,8 +133,44 @@ def _group_to_dict(shape: GroupShape, z_order: int, parent_prefix: str = "") -> 
     }
 
 
+def _table_to_dict(shape: Any, z_order: int, parent_prefix: str = "") -> Dict[str, Any]:
+    """Serialize a PPT table shape.
+
+    Each cell becomes a string; the first row is treated as a header if any
+    of its cells contain text and the cell layout looks header-like (first
+    row is non-empty). Header detection is a heuristic, not a guarantee.
+    """
+    ppt_shape_id = f"{parent_prefix}{getattr(shape, 'shape_id', z_order)}"
+    bbox = _get_shape_bbox(shape)
+    cells: List[List[str]] = []
+    try:
+        tbl = shape.table
+        for row in tbl.rows:
+            row_cells: List[str] = []
+            for cell in row.cells:
+                tf = getattr(cell, "text_frame", None)
+                if tf is None:
+                    row_cells.append("")
+                    continue
+                text = "\n".join(p.text for p in tf.paragraphs if p.text).strip()
+                row_cells.append(text)
+            cells.append(row_cells)
+    except Exception:
+        cells = []
+    has_header = bool(cells and any(c.strip() for c in cells[0]))
+    return {
+        "ppt_shape_id": str(ppt_shape_id),
+        "bbox": bbox,
+        "type": "TABLE",
+        "text_runs": [],
+        "z_order": z_order,
+        "cells": cells,
+        "first_row_is_header": has_header,
+    }
+
+
 def _extract_shape(shape: BaseShape, z_order: int, parent_prefix: str = "") -> Dict[str, Any]:
-    """Dispatch to shape, connector, or group serializer."""
+    """Dispatch to shape, connector, table, or group serializer."""
     if GroupShape is not None and isinstance(shape, GroupShape):
         return _group_to_dict(shape, z_order, parent_prefix)
     if Connector is not None and isinstance(shape, Connector):
@@ -143,6 +179,9 @@ def _extract_shape(shape: BaseShape, z_order: int, parent_prefix: str = "") -> D
     line_type = getattr(MSO_SHAPE_TYPE, "LINE", None) if MSO_SHAPE_TYPE else None
     if line_type and getattr(shape, "shape_type", None) == line_type and hasattr(shape, "begin_x"):
         return _connector_to_dict(shape, z_order, parent_prefix)
+    # Native PPT table: walk cells, emit TABLE shape dict
+    if getattr(shape, "has_table", False):
+        return _table_to_dict(shape, z_order, parent_prefix)
     return _shape_to_dict(shape, z_order, parent_prefix)
 
 

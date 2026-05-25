@@ -350,6 +350,100 @@ def build_evidence_index(
                 }
             )
 
+        # --- Native PPT tables: emit TABLE_HEADER (per header cell) and TABLE_CELL
+        #     (per body cell) evidence items. Header detection is heuristic.
+        for shape in shapes:
+            if shape.get("type") != "TABLE":
+                continue
+            cells = shape.get("cells") or []
+            if not cells:
+                continue
+            ppt_shape_id = shape.get("ppt_shape_id", "")
+            bbox = shape.get("bbox") or {}
+            has_header = bool(shape.get("first_row_is_header"))
+
+            # One Source per table (the PPT shape it lives in)
+            source_table_id = str(uuid.uuid4())
+            source_row = Source(
+                source_id=source_table_id,
+                job_id=job_id,
+                type="PPT_SHAPE",
+                artifact_id=ppt_artifact_ids_by_slide.get(slide_index),
+                slide_id=slide_id,
+                created_at=created_at,
+            )
+            db_session.add(source_row)
+            db_session.flush()
+            sources_out.append({
+                "source_id": source_table_id,
+                "type": "PPT_SHAPE",
+                "slide_index": slide_index,
+                "artifact_url": None,
+                "metadata": {"ppt_shape_id": ppt_shape_id, "shape_kind": "TABLE"},
+            })
+
+            for r_idx, row_cells in enumerate(cells):
+                kind = "TABLE_HEADER" if (has_header and r_idx == 0) else "TABLE_CELL"
+                for c_idx, content in enumerate(row_cells):
+                    content = (content or "").strip()
+                    if not content:
+                        continue
+                    offset_key = f"{ppt_shape_id}_r{r_idx}c{c_idx}"
+                    ev_id_cell = _stable_evidence_id(job_id, slide_index, kind, offset_key)
+                    ev_row = EvidenceItem(
+                        evidence_id=ev_id_cell,
+                        job_id=job_id,
+                        slide_id=slide_id,
+                        source_id=source_table_id,
+                        kind=kind,
+                        content=content,
+                        content_hash=_content_hash(content),
+                        confidence=1.0,
+                        language=None,
+                        created_at=created_at,
+                    )
+                    db_session.add(ev_row)
+                    ref_row = SourceRef(
+                        ref_id=str(uuid.uuid4()),
+                        evidence_id=ev_id_cell,
+                        ref_type="PPT",
+                        slide_index=slide_index,
+                        ppt_shape_id=ppt_shape_id,
+                        ppt_paragraph_ix=r_idx,
+                        ppt_run_ix=c_idx,
+                        bbox_x=_emu_to_float(bbox.get("left")),
+                        bbox_y=_emu_to_float(bbox.get("top")),
+                        bbox_w=_emu_to_float(bbox.get("width")),
+                        bbox_h=_emu_to_float(bbox.get("height")),
+                        page_num=None,
+                        char_start=None,
+                        char_end=None,
+                        url=None,
+                    )
+                    db_session.add(ref_row)
+                    ref_item = {
+                        "ref_type": "PPT",
+                        "slide_index": slide_index,
+                        "ppt_shape_id": ppt_shape_id,
+                        "table_row": r_idx,
+                        "table_col": c_idx,
+                    }
+                    if bbox:
+                        ref_item["bbox_x"] = _emu_to_float(bbox.get("left"))
+                        ref_item["bbox_y"] = _emu_to_float(bbox.get("top"))
+                        ref_item["bbox_w"] = _emu_to_float(bbox.get("width"))
+                        ref_item["bbox_h"] = _emu_to_float(bbox.get("height"))
+                    evidence_items_out.append({
+                        "evidence_id": ev_id_cell,
+                        "source_id": source_table_id,
+                        "kind": kind,
+                        "content": content,
+                        "content_hash": _content_hash(content),
+                        "confidence": 1.0,
+                        "slide_index": slide_index,
+                        "refs": [ref_item],
+                    })
+
         # --- Connector labels: one Source + one EvidenceItem (CONNECTOR) per connector with label ---
         for conn in connectors:
             label = (conn.get("label") or "").strip()
