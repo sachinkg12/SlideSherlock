@@ -1,0 +1,53 @@
+{
+  "_comment": "One real before/after example showing the L1+L2 win on a chart-bearing slide. Numbers come from an actual deployment run on a U.S. federal-agency public-domain presentation. The deck identifier is anonymized; the raw narration text, evidence kinds, and confidence values are recorded verbatim from the pipeline output. See outputs/emnlp_industry/chart_example.md for the human-readable version.",
+  "schema_version": "1.0",
+  "deck_id": "fed_agency_deck_03",
+  "deck_kind": "U.S. federal-agency presentation (public domain)",
+  "slide_index": 8,
+  "slide_summary": "Bar chart of Win2k service-pack counts over five dates (March 2001 to March 2002). The chart is an EMBEDDED_OLE_OBJECT shape referencing an embedded Excel .xlsx workbook.",
+  "before": {
+    "code_state": "pre-L1 (script generator picked first matching kind) and pre-L2 (no CHART_* evidence extraction)",
+    "narration_source": "template (post-rewrite fallback)",
+    "evidence_kinds_available": [
+      "TEXT_SPAN", "SHAPE_LABEL",
+      "IMAGE_CAPTION", "DIAGRAM_SUMMARY", "SLIDE_CAPTION",
+      "IMAGE_OBJECTS", "IMAGE_TAGS"
+    ],
+    "evidence_kind_used_for_narration": "DIAGRAM_SUMMARY",
+    "evidence_confidence_used": 0.4,
+    "narration": "This slide shows a diagram with key elements: Win2k, Service, Packs, 71."
+  },
+  "after": {
+    "code_state": "post-L1 (script generator prefers SLIDE_CAPTION when conf >= 0.8) and post-L2 (CHART_* kinds extracted from embedded .xlsx)",
+    "narration_source": "template (post-rewrite fallback)",
+    "evidence_kinds_available": [
+      "TEXT_SPAN", "SHAPE_LABEL",
+      "IMAGE_CAPTION", "DIAGRAM_SUMMARY", "SLIDE_CAPTION",
+      "IMAGE_OBJECTS", "IMAGE_TAGS",
+      "CHART_TITLE", "CHART_CATEGORY", "CHART_SERIES", "CHART_VALUE"
+    ],
+    "evidence_kind_used_for_narration": "SLIDE_CAPTION",
+    "evidence_confidence_used": 0.95,
+    "narration": "The bar graph illustrates the number of service packs for Win2k over time, highlighting significant increases in service pack levels SP1 and SP2 compared to SP0.",
+    "chart_evidence_now_available": {
+      "CHART_TITLE_count": 1,
+      "CHART_CATEGORY_count": 7,
+      "CHART_SERIES_count": 13,
+      "CHART_VALUE_count": 97,
+      "sample_chart_values": [
+        "Win2k Service Packs / SP1 = 71",
+        "Win2k Service Packs / SP3 = 28",
+        "WinNT 4.0 Service Packs / SP6a = 149"
+      ]
+    }
+  },
+  "what_changed": {
+    "L1": "Script generator now ranks vision evidence by confidence; a 0.95-confidence SLIDE_CAPTION wins over a 0.4-confidence DIAGRAM_SUMMARY regardless of list order.",
+    "L2": "Embedded Excel OLE workbooks are walked via openpyxl; each chart's title, categories, series, and per-data-point values become first-class CHART_* evidence at confidence 1.0."
+  },
+  "what_did_not_change": {
+    "headline_proxy_rate": "The keyword-based proxy-flagged rate on this slide is the same before and after (neither narration contains any of the 24 visual-embellishment keywords). The improvement is in narration informativeness, not in the headline 7.89%->1.79% number.",
+    "chart_screenshot_case": "If the chart had been a rendered PNG screenshot (no embedded data, no native chart object), neither L1 nor L2 would have helped; that case is named in Limitations as future work."
+  },
+  "notes": "This example was captured from a real deployment pipeline run on 2026-05-25 with full vision + AI narration enabled. Pre-fix and post-fix were two separate end-to-end runs against the same PPTX file."
+}
